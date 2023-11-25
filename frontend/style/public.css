@@ -1,0 +1,32 @@
+* {
+    padding: 0;
+    margin: 0;
+    font-family: "\5FAE\8F6F\96C5\9ED1", "黑体", "宋体";
+    font-size: 15px;
+    color: var(--fontColour);
+    transition: var(--transition);
+}
+
+a {
+    text-decoration: none;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+img {
+    border: none;
+}
+
+body {
+    background-color: var(--backgroundColour);
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: 700;
+}

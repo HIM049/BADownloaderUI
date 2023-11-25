@@ -1,0 +1,65 @@
+.appBody {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 40px;
+}
+
+#app-function {
+    /* 主功能容器 */
+    width: 70%;
+    margin: 0 auto;
+}
+
+.fav-input {
+    /* 收藏夹信息输入 */
+    margin-bottom: 20px;
+}
+
+.fav-input form {
+    /* 收藏夹信息表单 */
+    width: 100%;
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.fav-input form input {
+    /* 收藏夹信息表单输入框 */
+    width: 100%;
+}
+
+.loading-tips {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.information-box {
+    /* 收藏夹信息展示 */
+    margin-bottom: 20px;
+}
+
+.information-box .favlist-box .up-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.information-box .favlist-box .up-box img {
+    width: 30px;
+    border-radius: 50%;
+}
+
+.information-box .favlist-box {
+    display: flex;
+}
+
+.information-box .favlist-box img {
+    width: 150px;
+}
+

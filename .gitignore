@@ -1,0 +1,7 @@
+build/bin
+node_modules
+frontend/dist
+frontend/package-lock.json
+config.json
+Download/*
+Cache/*
