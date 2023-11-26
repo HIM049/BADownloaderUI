@@ -7,20 +7,20 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func (a *App) DownloadList(videoListPath string, threads int) error {
+// 下载列表中歌曲的函数（参数直接读取 config ）
+func (a *App) DownloadList() error {
+	cfg := GetConfig()
 	runtime.LogInfo(a.ctx, "开始下载任务列表")
-	sem := make(chan struct{}, threads+1)
+	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
-	// var progressBar *pb.ProgressBar
 
 	// 获取任务队列
 	var list []VideoInformationList
-	err := LoadJsonFile(videoListPath, &list)
+
+	err := LoadJsonFile(cfg.VideoListPath, &list)
 	if err != nil {
 		return err
 	}
-	// 设置进度条
-	// progressBar = pb.Full.Start(len(list))
 	// 遍历下载队列
 	for _, video := range list {
 
@@ -36,7 +36,7 @@ func (a *App) DownloadList(videoListPath string, threads int) error {
 			sem <- struct{}{} // 给通道中
 			wg.Add(1)         // 任务 +1
 
-			err := GetAndDownload(v.Bvid, v.Cid, "C:/Users/HIM/Desktop/Download/"+strconv.Itoa(v.Cid)+".mp3")
+			err := GetAndDownload(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid))
 			if err != nil {
 				runtime.LogError(a.ctx, "下载时出现错误："+err.Error())
 			}
@@ -45,7 +45,6 @@ func (a *App) DownloadList(videoListPath string, threads int) error {
 	}
 	// 等待任务执行完成
 	wg.Wait()
-	// progressBar.Finish()
 	return nil
 }
 

@@ -4,13 +4,14 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// 创建文件并保存
-func (a *App) MakeAndSaveList(filePath, favlistID string, downloadCount int, downloadCompilation bool) error {
+// 创建并保存视频列表
+func (a *App) MakeAndSaveList(favlistID string, downloadCount int, downloadCompilation bool) error {
+	cfg := GetConfig()
 	data, err := makeVideoList(a, favlistID, downloadCount, downloadCompilation)
 	if err != nil {
 		return err
 	}
-	err = SaveJsonFile(filePath, data)
+	err = SaveJsonFile(cfg.VideoListPath, data)
 	if err != nil {
 		return err
 	}
