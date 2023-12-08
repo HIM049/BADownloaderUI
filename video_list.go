@@ -37,91 +37,104 @@ type VideoInformationList struct {
 func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilation bool) (*[]VideoInformationList, error) {
 	var videoList []VideoInformationList
 
-	// 请求收藏夹基础数据，用于初始化循环
+	// 请求收藏夹基础数据，初始化循环
 	favlist, err := GetFavListObj(favlistID, 1, 1)
 	if err != nil {
 		return nil, err
 	}
-	// 计算下载量
+	// 计算下载页数
+	var pageCount int
 	if downloadCount == 0 {
+		// 如果下载数量为 0 （全部下载）
 		downloadCount = favlist.Data.Info.Media_count
+		pageCount = downloadCount / 20
+	} else {
+		// 计算下载页数
+		pageCount = downloadCount / 20
 	}
-	// // 设置进度条
-	// progressBar := pb.Full.Start(downloadCount)
+	// 非完整页面
+	if downloadCount%20 != 0 {
+		pageCount++
+	}
 
 	// 主循环
-	// TODO：修改请求数量为一次 20
-	for i := 0; i < downloadCount; i++ {
+	for i := 0; i < pageCount; i++ {
+		pageSize := 20
+
+		// 处理非完整尾页
+		if i+1 == pageCount {
+			pageSize = downloadCount % 20
+		}
+
 		// 获取当前分页信息
-		favlist, err := GetFavListObj(favlistID, 1, i+1)
+		favlist, err := GetFavListObj(favlistID, pageSize, i+1)
 		if err != nil {
 			return nil, err
 		}
-		// 获取当前视频详细信息
-		videoInf, err := GetVideoPageInformationObj(favlist.Data.Medias[0].Bvid)
-		if err != nil {
-			// 视频失效
-			// fmt.Printf("获取 "+favlist.Data.Medias[0].Bvid+" 信息时发生错误：%s\n", err)
-			runtime.LogError(a.ctx, "获取 "+favlist.Data.Medias[0].Bvid+" 信息时发生错误: "+err.Error())
-			continue
-		}
+		for j, listVideo := range favlist.Data.Medias {
+			// 获取当前视频详细信息
+			videoInf, err := GetVideoPageInformationObj(listVideo.Bvid)
+			if err != nil {
+				// 视频失效
+				runtime.LogError(a.ctx, "获取 "+listVideo.Bvid+" 信息时发生错误: "+err.Error())
+				continue
+			}
 
-		// 处理音频标题（单 P 视频）
-		songName, err := ExtractTitle(CheckFileName(videoInf.Data.Title))
-		if err != nil {
-			// 如果无法判断标题
-			songName = CheckFileName(videoInf.Data.Title)
-		}
+			// 处理音频标题（单 P 视频）
+			songName, err := ExtractTitle(CheckFileName(videoInf.Data.Title))
+			if err != nil {
+				// 如果无法判断标题
+				songName = CheckFileName(videoInf.Data.Title)
+			}
 
-		// 如果是多 P
-		if videoInf.Data.Videos > 1 && downloadCompilation {
-			for _, pages := range videoInf.Data.Pages {
+			// 分 P 判断
+			if videoInf.Data.Videos > 1 && downloadCompilation {
+				// 如果是多 P
+				for _, pages := range videoInf.Data.Pages {
 
-				// 处理音频标题（分 P 视频）
-				songName, err = ExtractTitle(CheckFileName(pages.Part))
-				if err != nil {
-					// 如果无法判断标题
-					songName = CheckFileName(pages.Part)
+					// 处理音频标题（分 P 视频）
+					songName, err = ExtractTitle(CheckFileName(pages.Part))
+					if err != nil {
+						// 如果无法判断标题
+						songName = CheckFileName(pages.Part)
+					}
+
+					// 填充 Page 数据
+					videoPage := VideoInformationList{
+						Bvid:      videoInf.Data.Bvid,
+						Cid:       pages.Cid,
+						Title:     CheckFileName(videoInf.Data.Title),
+						SongName:  songName,
+						Author:    videoInf.Data.Owner.Name,
+						Cover:     videoInf.Data.Pic,
+						Videos:    videoInf.Data.Videos,
+						ListID:    (i * 20) + j,
+						IsPage:    true,
+						PageTitle: CheckFileName(pages.Part),
+						PageID:    pages.Page,
+					}
+					// 组合数据
+					videoList = append(videoList, videoPage)
 				}
-
-				// 填充 Page 数据
-				videoPage := VideoInformationList{
-					Bvid:      videoInf.Data.Bvid,
-					Cid:       pages.Cid,
-					Title:     CheckFileName(videoInf.Data.Title),
-					SongName:  songName,
-					Author:    videoInf.Data.Owner.Name,
-					Cover:     videoInf.Data.Pic,
-					Videos:    videoInf.Data.Videos,
-					ListID:    i,
-					IsPage:    true,
-					PageTitle: CheckFileName(pages.Part),
-					PageID:    pages.Page,
+			} else {
+				// 如果是单 P
+				video := VideoInformationList{
+					Bvid:     videoInf.Data.Bvid,
+					Cid:      videoInf.Data.Cid,
+					Title:    CheckFileName(videoInf.Data.Title),
+					SongName: songName,
+					Author:   videoInf.Data.Owner.Name,
+					Cover:    videoInf.Data.Pic,
+					Videos:   videoInf.Data.Videos,
+					ListID:   (i * 20) + j,
+					IsPage:   false,
 				}
 				// 组合数据
-				videoList = append(videoList, videoPage)
+				videoList = append(videoList, video)
 			}
-		} else {
-			// 填充单 P 数据
-			video := VideoInformationList{
-				Bvid:     videoInf.Data.Bvid,
-				Cid:      videoInf.Data.Cid,
-				Title:    CheckFileName(videoInf.Data.Title),
-				SongName: songName,
-				Author:   videoInf.Data.Owner.Name,
-				Cover:    videoInf.Data.Pic,
-				Videos:   videoInf.Data.Videos,
-				ListID:   i,
-				IsPage:   false,
-			}
-			// 组合数据
-			videoList = append(videoList, video)
-		}
 
-		// // 进度条增加
-		// progressBar.Increment()
+		}
 	}
-	// // 取消进度条显示
-	// progressBar.Finish()
+
 	return &videoList, nil
 }
