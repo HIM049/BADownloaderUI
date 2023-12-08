@@ -36,6 +36,12 @@ func GetConfig(ctx context.Context) Config {
 	}
 }
 
+// 读取设置
+func (a *App) LoadConfig() Config {
+	cfg := GetConfig(a.ctx)
+	return cfg
+}
+
 // 写入设置
 func (a *App) SaveConfig(cfg Config) {
 	err := SaveJsonFile("./config.json", cfg)

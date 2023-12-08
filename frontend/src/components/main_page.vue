@@ -100,7 +100,7 @@ function makeUpEditor() {
   <!-- 收藏夹信息输入及展示 -->
   <div id="fav-input" class="fav-input">
     <form>
-      <input type="text" id="favIdInput" v-model.trim="parms.favListID" @input.lazy="queryFavListInformation"
+      <input type="text" class="input" id="favIdInput" v-model.trim="parms.favListID" @input.lazy="queryFavListInformation"
         placeholder="请输入要下载的收藏夹 ID">
     </form>
 
@@ -127,7 +127,7 @@ function makeUpEditor() {
     <ol>
     <li class="option-list">
         <label for="downCount">下载数量</label>
-        <input type="text" id="downCount" v-model="options.downCount" style="width: 40px;">
+        <input type="text" class="input" id="downCount" v-model="options.downCount" style="width: 40px;">
     </li>
       <li class="option-list">
         <label for="dPart">下载视频分 P</label>

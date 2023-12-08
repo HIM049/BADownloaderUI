@@ -3,3 +3,30 @@
     padding: 10px;
     margin-bottom: 20px;
 }
+
+.input {
+    /* 收藏夹信息表单输入框 */
+    width: 100%;
+    height: 30px;
+    text-align: center;
+}
+
+.button {
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.button p {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.button:disabled {
+    /* filter: grayscale(1); */
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -86,6 +86,7 @@ func (a *App) StartDownload(DownOpt DownloadOption) {
 
 }
 
+// 唤起系统文本编辑器
 func (a *App) MakeUpEditor() {
 	cfg := GetConfig(a.ctx)
 
