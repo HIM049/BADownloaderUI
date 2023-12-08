@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"strconv"
 	"sync"
 
@@ -8,9 +10,7 @@ import (
 )
 
 // 下载列表中歌曲的函数（参数直接读取 config ）
-func (a *App) DownloadList() error {
-	cfg := GetConfig()
-	runtime.LogInfo(a.ctx, "开始下载任务列表")
+func DownloadList(ctx context.Context, cfg *Config) error {
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
 
@@ -23,6 +23,32 @@ func (a *App) DownloadList() error {
 	}
 	// 遍历下载队列
 	for _, video := range list {
+		go func(v VideoInformationList) {
+			fmt.Println("调用下载")
+
+			sem <- struct{}{} // 给通道中填入数据
+			wg.Add(1)         // 任务 +1
+
+			// TODO：下载重试次数可设定
+
+			// 下载重试
+			for i := 0; i < 10; i++ {
+				err := GetAndDownload(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid)+".m4a")
+				if err == nil {
+					// 下载成功
+					runtime.LogInfo(ctx, "下载成功")
+					break
+				}
+				runtime.LogErrorf(ctx, "下载时出现错误：%s (重试 %s )\n", err, strconv.Itoa(i+1))
+			}
+
+			// 下载完成后
+			defer func() {
+				// progressBar.Increment()
+				<-sem     // 释放一个并发槽
+				wg.Done() // 发出任务完成通知
+			}()
+		}(video)
 
 		go func(v VideoInformationList) {
 			// fmt.Println("调用下载")
@@ -33,12 +59,12 @@ func (a *App) DownloadList() error {
 				wg.Done() // 发出任务完成通知
 			}()
 
-			sem <- struct{}{} // 给通道中
+			sem <- struct{}{} // 给通道中填入数据
 			wg.Add(1)         // 任务 +1
 
-			err := GetAndDownload(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid))
+			err = SaveFromURL(v.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
-				runtime.LogError(a.ctx, "下载时出现错误："+err.Error())
+				runtime.LogErrorf(ctx, "保存封面时发生错误：%s\n", err)
 			}
 
 		}(video)

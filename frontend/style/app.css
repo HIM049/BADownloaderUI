@@ -84,3 +84,10 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.option-list {
+    /* 选项列表 */
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+}

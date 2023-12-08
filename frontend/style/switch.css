@@ -1,10 +1,4 @@
 
-.checkbox {
-    display: flex;
-    justify-content: space-around;
-    margin: 10px 0;
-}
-
 input[class="switch"] {
     display: none;
 }

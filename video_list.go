@@ -23,6 +23,8 @@ type VideoInformationList struct {
 	Bvid      string `json:"bvid"`
 	Cid       int    `json:"cid"`
 	Title     string `json:"title"`
+	SongName  string `json:"song_name"`
+	Author    string `json:"author"`
 	Cover     string `json:"cover"`
 	Videos    int    `json:"videos"`
 	ListID    int    `json:"list_id"`
@@ -48,6 +50,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 	// progressBar := pb.Full.Start(downloadCount)
 
 	// 主循环
+	// TODO：修改请求数量为一次 20
 	for i := 0; i < downloadCount; i++ {
 		// 获取当前分页信息
 		favlist, err := GetFavListObj(favlistID, 1, i+1)
@@ -63,14 +66,31 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 			continue
 		}
 
+		// 处理音频标题（单 P 视频）
+		songName, err := ExtractTitle(CheckFileName(videoInf.Data.Title))
+		if err != nil {
+			// 如果无法判断标题
+			songName = CheckFileName(videoInf.Data.Title)
+		}
+
 		// 如果是多 P
 		if videoInf.Data.Videos > 1 && downloadCompilation {
 			for _, pages := range videoInf.Data.Pages {
+
+				// 处理音频标题（分 P 视频）
+				songName, err = ExtractTitle(CheckFileName(pages.Part))
+				if err != nil {
+					// 如果无法判断标题
+					songName = CheckFileName(pages.Part)
+				}
+
 				// 填充 Page 数据
 				videoPage := VideoInformationList{
 					Bvid:      videoInf.Data.Bvid,
 					Cid:       pages.Cid,
 					Title:     CheckFileName(videoInf.Data.Title),
+					SongName:  songName,
+					Author:    videoInf.Data.Owner.Name,
 					Cover:     videoInf.Data.Pic,
 					Videos:    videoInf.Data.Videos,
 					ListID:    i,
@@ -84,13 +104,15 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 		} else {
 			// 填充单 P 数据
 			video := VideoInformationList{
-				Bvid:   videoInf.Data.Bvid,
-				Cid:    videoInf.Data.Cid,
-				Title:  CheckFileName(videoInf.Data.Title),
-				Cover:  videoInf.Data.Pic,
-				Videos: videoInf.Data.Videos,
-				ListID: i,
-				IsPage: false,
+				Bvid:     videoInf.Data.Bvid,
+				Cid:      videoInf.Data.Cid,
+				Title:    CheckFileName(videoInf.Data.Title),
+				SongName: songName,
+				Author:   videoInf.Data.Owner.Name,
+				Cover:    videoInf.Data.Pic,
+				Videos:   videoInf.Data.Videos,
+				ListID:   i,
+				IsPage:   false,
 			}
 			// 组合数据
 			videoList = append(videoList, video)

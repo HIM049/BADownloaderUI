@@ -5,8 +5,8 @@
 <style>
 .loading {
   position: relative;
-  width: 15px;
-  height: 15px;
+  width: 21px;
+  height: 21px;
   border: 2px solid #000;
   border-top-color: rgba(0, 0, 0, 0.2);
   border-right-color: rgba(0, 0, 0, 0.2);

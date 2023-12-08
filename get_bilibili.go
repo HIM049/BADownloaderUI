@@ -85,12 +85,15 @@ type VideoInformation struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Data    struct {
-		Bvid   string     `json:"bvid"`   // 稿件 BVID
-		Videos int        `json:"videos"` // 稿件分 P 总数
-		Pic    string     `json:"pic"`    // 稿件封面图片url
-		Title  string     `json:"title"`  // 稿件标题
-		Cid    int        `json:"cid"`    // 视频1P cid
-		Pages  []struct { // 分 P 列表
+		Bvid   string   `json:"bvid"`   // 稿件 BVID
+		Videos int      `json:"videos"` // 稿件分 P 总数
+		Pic    string   `json:"pic"`    // 稿件封面图片url
+		Title  string   `json:"title"`  // 稿件标题
+		Cid    int      `json:"cid"`    // 视频1P cid
+		Owner  struct { // UP 信息
+			Name string `json:"name"` // UP 昵称
+		}
+		Pages []struct { // 分 P 列表
 			Cid  int    `json:"cid"`  // 分 P cid
 			Page int    `json:"page"` // 分 P 序号
 			Part string `json:"part"` // 分 P 标题
