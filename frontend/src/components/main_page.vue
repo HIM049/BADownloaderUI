@@ -2,7 +2,6 @@
 import { reactive, computed, ref } from 'vue'
 import { SearchFavListInformation, MakeAndSaveList, StartDownload , MakeUpEditor } from '../../wailsjs/go/main/App'
 import loadingAnimation from './loading.vue'
-import queryavlistInf from './query_favlist_inf.vue'
 
 const parms = reactive({
   favListID: "",

@@ -34,6 +34,13 @@ func (a *App) startup(ctx context.Context) {
 	_ = os.MkdirAll(cfg.CachePath+"/cover", 0755)
 }
 
+// 程序关闭时
+func (a *App) shutdown(ctx context.Context) {
+	// 清理缓存
+	cfg := GetConfig()
+	os.RemoveAll(cfg.CachePath)
+}
+
 // 查询并返回收藏夹信息
 func (a *App) SearchFavListInformation(favListID string) FavList {
 	listInf, err := GetFavListObj(favListID, 1, 1)
