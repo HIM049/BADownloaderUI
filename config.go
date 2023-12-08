@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -14,7 +14,7 @@ type Config struct {
 }
 
 // 获取设置内容
-func GetConfig() Config {
+func GetConfig(ctx context.Context) Config {
 	for {
 		// 判断设置文件是否已经存在
 		if !IsFileExists("./config.json") {
@@ -22,16 +22,14 @@ func GetConfig() Config {
 			cfg := bulidConfig()
 			err := SaveJsonFile("./config.json", &cfg)
 			if err != nil {
-				// runtime.LogError(a.ctx, "写入设置文件失败："+err.Error())
-				fmt.Printf("写入设置文件失败：%s", err)
+				runtime.LogErrorf(ctx, "写入设置文件失败：%s\n", err)
 			}
 		} else {
 			// 文件已存在
 			var cfg Config
 			err := LoadJsonFile("./config.json", &cfg)
 			if err != nil {
-				// runtime.LogError(a.ctx, "读取设置文件失败："+err.Error())
-				fmt.Printf("读取设置文件失败：%s", err)
+				runtime.LogErrorf(ctx, "读取设置文件失败：%s\n", err)
 			}
 			return cfg
 		}
@@ -42,7 +40,7 @@ func GetConfig() Config {
 func (a *App) SaveConfig(cfg Config) {
 	err := SaveJsonFile("./config.json", cfg)
 	if err != nil {
-		runtime.LogError(a.ctx, "写入设置文件失败："+err.Error())
+		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s\n", err)
 	}
 }
 

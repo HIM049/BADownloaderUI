@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"sync"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// 下载列表中歌曲的函数（参数直接读取 config ）
+// 下载列表中歌曲的函数
 func DownloadList(ctx context.Context, cfg *Config) error {
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
@@ -24,7 +23,6 @@ func DownloadList(ctx context.Context, cfg *Config) error {
 	// 遍历下载队列
 	for _, video := range list {
 		go func(v VideoInformationList) {
-			fmt.Println("调用下载")
 
 			sem <- struct{}{} // 给通道中填入数据
 			wg.Add(1)         // 任务 +1
@@ -36,25 +34,22 @@ func DownloadList(ctx context.Context, cfg *Config) error {
 				err := GetAndDownload(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid)+".m4a")
 				if err == nil {
 					// 下载成功
-					runtime.LogInfo(ctx, "下载成功")
 					break
 				}
-				runtime.LogErrorf(ctx, "下载时出现错误：%s (重试 %s )\n", err, strconv.Itoa(i+1))
+				runtime.LogErrorf(ctx, "下载时出现错误：%s (重试 %d )\n", err, i+1)
 			}
 
 			// 下载完成后
 			defer func() {
-				// progressBar.Increment()
+				runtime.LogInfo(ctx, "下载成功")
 				<-sem     // 释放一个并发槽
 				wg.Done() // 发出任务完成通知
 			}()
 		}(video)
 
 		go func(v VideoInformationList) {
-			// fmt.Println("调用下载")
 			// 下载完成后
 			defer func() {
-				// progressBar.Increment()
 				<-sem     // 释放一个并发槽
 				wg.Done() // 发出任务完成通知
 			}()

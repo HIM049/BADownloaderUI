@@ -6,7 +6,7 @@ import (
 
 // 创建并保存视频列表
 func (a *App) MakeAndSaveList(favlistID string, downloadCount int, downloadCompilation bool) error {
-	cfg := GetConfig()
+	cfg := GetConfig(a.ctx)
 	data, err := makeVideoList(a, favlistID, downloadCount, downloadCompilation)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 			videoInf, err := GetVideoPageInformationObj(listVideo.Bvid)
 			if err != nil {
 				// 视频失效
-				runtime.LogError(a.ctx, "获取 "+listVideo.Bvid+" 信息时发生错误: "+err.Error())
+				runtime.LogErrorf(a.ctx, "获取 "+listVideo.Bvid+" 信息时发生错误: %s\n", err)
 				continue
 			}
 

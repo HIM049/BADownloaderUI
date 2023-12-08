@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 
@@ -27,7 +26,7 @@ func (a *App) startup(ctx context.Context) {
 	// 程序初始化
 	runtime.LogInfo(a.ctx, "正在创建文件夹")
 
-	cfg := GetConfig()
+	cfg := GetConfig(a.ctx)
 	_ = os.MkdirAll(cfg.DownloadPath, 0755)
 	_ = os.MkdirAll(cfg.CachePath, 0755)
 	_ = os.MkdirAll(cfg.CachePath+"/music", 0755)
@@ -37,7 +36,7 @@ func (a *App) startup(ctx context.Context) {
 // 程序关闭时
 func (a *App) shutdown(ctx context.Context) {
 	// 清理缓存
-	cfg := GetConfig()
+	cfg := GetConfig(a.ctx)
 	os.RemoveAll(cfg.CachePath)
 }
 
@@ -45,8 +44,7 @@ func (a *App) shutdown(ctx context.Context) {
 func (a *App) SearchFavListInformation(favListID string) FavList {
 	listInf, err := GetFavListObj(favListID, 1, 1)
 	if err != nil {
-		runtime.LogError(a.ctx, "获取收藏夹内容时出现错误："+err.Error())
-		// fmt.Printf("获取收藏夹内容时出现错误：%s", err)
+		runtime.LogErrorf(a.ctx, "获取收藏夹内容时出现错误：%s\n", err)
 		return FavList{}
 	}
 	return *listInf
@@ -60,41 +58,36 @@ type DownloadOption struct {
 
 // 执行下载操作时
 func (a *App) StartDownload(DownOpt DownloadOption) {
-	// fmt.Println(DownOpt)
-	cfg := GetConfig()
+	cfg := GetConfig(a.ctx)
 
 	// 下载歌曲
 	runtime.LogInfo(a.ctx, "开始下载")
 	err := DownloadList(a.ctx, &cfg)
 	if err != nil {
-		runtime.LogError(a.ctx, "下载错误："+err.Error())
+		runtime.LogErrorf(a.ctx, "下载错误：%s\n", err)
 	}
 	runtime.LogInfo(a.ctx, "下载完成")
 
-	func() {
-		fmt.Println("aaaa?")
-	}()
-
 	// 写入歌曲元数据
 	runtime.LogInfo(a.ctx, "开始写入元数据")
-	err = ConcurrentChangeTag(&cfg, &DownOpt, ".m4a")
+	err = ConcurrentChangeTag(a.ctx, &cfg, &DownOpt, ".m4a")
 	if err != nil {
-		runtime.LogError(a.ctx, "写入歌曲元数据时发生错误："+err.Error())
+		runtime.LogErrorf(a.ctx, "写入歌曲元数据时发生错误：%s\n", err)
 	}
 	runtime.LogInfo(a.ctx, "元数据写入完成")
 
-	// // 改名并输出到下载文件夹
-	// runtime.LogInfo(a.ctx, "开始输出")
-	// err = ConcurrentChangeName(cfg.DownloadThreads, cfg.VideoListPath, ".m4a", cfg.CachePath+"/music/", cfg.DownloadPath+"/")
+	// 改名并输出到下载文件夹
+	runtime.LogInfo(a.ctx, "开始输出")
+	err = ConcurrentChangeName(a.ctx, cfg.DownloadThreads, cfg.VideoListPath, ".m4a", cfg.CachePath+"/music/", cfg.DownloadPath+"/")
 
-	// if err != nil {
-	// 	runtime.LogError(a.ctx, "输出文件时发生错误："+err.Error())
-	// }
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s\n", err)
+	}
 
 }
 
 func (a *App) MakeUpEditor() {
-	cfg := GetConfig()
+	cfg := GetConfig(a.ctx)
 
 	// 获取系统默认的文本编辑器
 	editor := os.Getenv("EDITOR")
@@ -108,7 +101,7 @@ func (a *App) MakeUpEditor() {
 	// 启动命令
 	err := cmd.Start()
 	if err != nil {
-		fmt.Println("无法启动编辑器:", err)
+		runtime.LogInfof(a.ctx, "无法启动编辑器:%\n", err)
 		return
 	}
 }

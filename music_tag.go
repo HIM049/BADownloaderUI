@@ -1,16 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	tag "github.com/gcottom/audiometa"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // 写入元数据
-func ConcurrentChangeTag(cfg *Config, opt *DownloadOption, audioType string) error {
+func ConcurrentChangeTag(ctx context.Context, cfg *Config, opt *DownloadOption, audioType string) error {
 	sem := make(chan struct{}, cfg.DownloadThreads)
 	var wg sync.WaitGroup
 
@@ -48,10 +50,11 @@ func ConcurrentChangeTag(cfg *Config, opt *DownloadOption, audioType string) err
 			// 写入歌曲元数据
 			err = ChangeTag(file, songName, songCover, songAuthor)
 			if err != nil {
-				fmt.Printf("写入元数据时发生错误：%s\n", err)
+				runtime.LogErrorf(ctx, "写入元数据时发生错误：%s\n", err)
 			}
 			// 下载完成后
 			defer func() {
+				runtime.LogInfo(ctx, "元数据添加完成")
 				<-sem     // 释放一个并发槽
 				wg.Done() // 发出任务完成通知
 			}()
@@ -59,11 +62,12 @@ func ConcurrentChangeTag(cfg *Config, opt *DownloadOption, audioType string) err
 	}
 	// 等待任务执行完成
 	wg.Wait()
+	time.Sleep(1 * time.Second)
 	return nil
 }
 
 // 重命名和移动文件
-func ConcurrentChangeName(threads int, videolistPath, audioType, aideoSourcePath, aideoDestPath string) error {
+func ConcurrentChangeName(ctx context.Context, threads int, videolistPath, audioType, aideoSourcePath, aideoDestPath string) error {
 	sem := make(chan struct{}, threads)
 	var wg sync.WaitGroup
 
@@ -94,6 +98,7 @@ func ConcurrentChangeName(threads int, videolistPath, audioType, aideoSourcePath
 
 			// 下载完成后
 			defer func() {
+				runtime.LogInfo(ctx, "输出完成")
 				<-sem     // 释放一个并发槽
 				wg.Done() // 发出任务完成通知
 			}()
@@ -101,6 +106,7 @@ func ConcurrentChangeName(threads int, videolistPath, audioType, aideoSourcePath
 	}
 	// 等待任务执行完成
 	wg.Wait()
+	time.Sleep(1 * time.Second)
 	return nil
 }
 
