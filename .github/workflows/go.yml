@@ -1,0 +1,25 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Wails Bun Build Action (windows)
+      # You may pin to the exact commit or the version.
+      # uses: cryptodeal/wails-bun-build-action@92cb2b7027a9cf33c3c626e0d002e957cd0cc655
+      uses: cryptodeal/wails-bun-build-action@v0.0.3
+      with:
+        # The name of the binary file
+        build-name: BillAudioDownloader
+        # Platform to build for
+        build-platform: windows/amd64
+              
