@@ -27,10 +27,8 @@ func DownloadList(ctx context.Context, cfg *Config) error {
 			sem <- struct{}{} // 给通道中填入数据
 			wg.Add(1)         // 任务 +1
 
-			// TODO：下载重试次数可设定
-
 			// 下载重试
-			for i := 0; i < 10; i++ {
+			for i := 0; i < cfg.RetryCount; i++ {
 				err := GetAndDownload(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid)+".m4a")
 				if err == nil {
 					// 下载成功

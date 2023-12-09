@@ -11,6 +11,7 @@ type Config struct {
 	CachePath       string `json:"cache_path"`
 	VideoListPath   string `json:"videolist_path"`
 	DownloadThreads int    `json:"download_threads"`
+	RetryCount      int    `json:"retry_count"`
 }
 
 // 获取设置内容
@@ -57,5 +58,6 @@ func bulidConfig() *Config {
 		CachePath:       "./Cache",
 		VideoListPath:   "./Cache/video_list.json",
 		DownloadThreads: 5,
+		RetryCount:      10,
 	}
 }

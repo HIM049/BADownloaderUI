@@ -5,6 +5,7 @@ export namespace main {
 	    cache_path: string;
 	    videolist_path: string;
 	    download_threads: number;
+	    retry_count: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -16,6 +17,7 @@ export namespace main {
 	        this.cache_path = source["cache_path"];
 	        this.videolist_path = source["videolist_path"];
 	        this.download_threads = source["download_threads"];
+	        this.retry_count = source["retry_count"];
 	    }
 	}
 	export class DownloadOption {

@@ -11,6 +11,7 @@ const config = reactive({
     cache_path: "",
     videolist_path: "",
     download_threads: 0,
+    retry_count: 0,
 })
 
 function loadConfig() {
@@ -19,11 +20,13 @@ function loadConfig() {
         config.cache_path = result.cache_path
         config.videolist_path = result.videolist_path
         config.download_threads = result.download_threads
+        config.retry_count = result.retry_count
     })
 }
 
 function saveConfig() {
     config.download_threads = parseInt(config.download_threads)
+    config.retry_count = parseInt(config.retry_count)
     SaveConfig(config)
 }
 
@@ -35,7 +38,7 @@ function saveConfig() {
             <p>保存</p>
         </button>
         <button class="harf-button" @click.prevent="loadConfig">
-            <p>加载</p>
+            <p>重载</p>
         </button>
     </div>
     <form class="card">
@@ -56,6 +59,10 @@ function saveConfig() {
             <li class="option-list config-option">
                 <label for="downloadThreads">运行线程数</label> <br>
                 <input type="text" class="input" id="downloadThreads" v-model="config.download_threads">
+            </li>
+            <li class="option-list config-option">
+                <label for="retryCount">下载重试次数</label> <br>
+                <input type="text" class="input" id="retryCount" v-model="config.retry_count">
             </li>
         </ol>
 
