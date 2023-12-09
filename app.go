@@ -78,7 +78,7 @@ func (a *App) StartDownload(DownOpt DownloadOption) {
 
 	// 改名并输出到下载文件夹
 	runtime.LogInfo(a.ctx, "开始输出")
-	err = ConcurrentChangeName(a.ctx, cfg.DownloadThreads, cfg.VideoListPath, ".m4a", cfg.CachePath+"/music/", cfg.DownloadPath+"/")
+	err = ConcurrentChangeName(a.ctx, &cfg, ".m4a")
 
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s\n", err)

@@ -67,13 +67,13 @@ func ConcurrentChangeTag(ctx context.Context, cfg *Config, opt *DownloadOption, 
 }
 
 // 重命名和移动文件
-func ConcurrentChangeName(ctx context.Context, threads int, videolistPath, audioType, aideoSourcePath, aideoDestPath string) error {
-	sem := make(chan struct{}, threads)
+func ConcurrentChangeName(ctx context.Context, cfg *Config, audioType string) error {
+	sem := make(chan struct{}, cfg.DownloadThreads)
 	var wg sync.WaitGroup
 
 	// 获取任务队列
 	var list []VideoInformationList
-	err := LoadJsonFile(videolistPath, &list)
+	err := LoadJsonFile(cfg.VideoListPath, &list)
 	if err != nil {
 		return err
 	}
@@ -90,8 +90,11 @@ func ConcurrentChangeName(ctx context.Context, threads int, videolistPath, audio
 			if v.IsPage {
 				NfileName = v.Title + "(" + v.PageTitle + ")"
 			}
+
+			sourcePath := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + audioType
+			destPath := cfg.DownloadPath + "/" + NfileName + audioType
 			// 重命名歌曲文件并移动位置
-			err = RenameAndMoveFile(aideoSourcePath+strconv.Itoa(v.Cid)+audioType, aideoDestPath+NfileName+audioType)
+			err = RenameAndMoveFile(sourcePath, destPath)
 			if err != nil {
 				return
 			}

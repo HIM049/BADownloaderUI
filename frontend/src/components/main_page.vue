@@ -6,6 +6,8 @@ import loadingAnimation from './loading.vue'
 const parms = reactive({
   favListID: "",
 })
+
+// 查询函数返回值
 const resp = reactive({
   title: "",
   cover: "",
@@ -14,6 +16,7 @@ const resp = reactive({
   up_avatar: "",
 })
 
+// 下载设置
 const options = reactive({
   downCount: "0",
   downPart: true,
@@ -21,6 +24,8 @@ const options = reactive({
   songCover: true,
   songAuthor: true,
 })
+
+// 组件显示状态
 const status = reactive({
   favListInf: false,
   makeingList: false,
@@ -28,8 +33,8 @@ const status = reactive({
   editlistButton: false,
   downloadButton: false,
 })
-const downFileType = ref("mp3")
 
+// const downFileType = ref("mp3")
 
 // 742380048
 
