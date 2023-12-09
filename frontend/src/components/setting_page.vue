@@ -57,7 +57,7 @@ function saveConfig() {
                 <input type="text" class="input" id="videolistPath" v-model="config.videolist_path">
             </li>
             <li class="option-list config-option">
-                <label for="downloadThreads">运行线程数</label> <br>
+                <label for="downloadThreads">最大线程数</label> <br>
                 <input type="text" class="input" id="downloadThreads" v-model="config.download_threads">
             </li>
             <li class="option-list config-option">

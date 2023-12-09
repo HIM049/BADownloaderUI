@@ -44,7 +44,7 @@ func (a *App) shutdown(ctx context.Context) {
 func (a *App) SearchFavListInformation(favListID string) FavList {
 	listInf, err := GetFavListObj(favListID, 1, 1)
 	if err != nil {
-		runtime.LogErrorf(a.ctx, "获取收藏夹内容时出现错误：%s\n", err)
+		runtime.LogErrorf(a.ctx, "获取收藏夹内容时出现错误：%s", err)
 		return FavList{}
 	}
 	return *listInf
@@ -54,36 +54,6 @@ type DownloadOption struct {
 	SongName   bool `json:"song_name"`
 	SongCover  bool `json:"song_cover"`
 	SongAuthor bool `json:"song_author"`
-}
-
-// 执行下载操作时
-func (a *App) StartDownload(DownOpt DownloadOption) {
-	cfg := GetConfig(a.ctx)
-
-	// 下载歌曲
-	runtime.LogInfo(a.ctx, "开始下载")
-	err := DownloadList(a.ctx, &cfg)
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "下载错误：%s\n", err)
-	}
-	runtime.LogInfo(a.ctx, "下载完成")
-
-	// 写入歌曲元数据
-	runtime.LogInfo(a.ctx, "开始写入元数据")
-	err = ConcurrentChangeTag(a.ctx, &cfg, &DownOpt, ".m4a")
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "写入歌曲元数据时发生错误：%s\n", err)
-	}
-	runtime.LogInfo(a.ctx, "元数据写入完成")
-
-	// 改名并输出到下载文件夹
-	runtime.LogInfo(a.ctx, "开始输出")
-	err = ConcurrentChangeName(a.ctx, &cfg, ".m4a")
-
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s\n", err)
-	}
-
 }
 
 // 唤起系统文本编辑器
@@ -102,7 +72,7 @@ func (a *App) MakeUpEditor() {
 	// 启动命令
 	err := cmd.Start()
 	if err != nil {
-		runtime.LogInfof(a.ctx, "无法启动编辑器:%\n", err)
+		runtime.LogInfof(a.ctx, "无法启动编辑器:%s", err)
 		return
 	}
 }

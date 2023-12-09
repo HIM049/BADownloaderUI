@@ -76,7 +76,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 			videoInf, err := GetVideoPageInformationObj(listVideo.Bvid)
 			if err != nil {
 				// 视频失效
-				runtime.LogErrorf(a.ctx, "获取 "+listVideo.Bvid+" 信息时发生错误: %s\n", err)
+				runtime.LogErrorf(a.ctx, "获取 "+listVideo.Bvid+" 信息时发生错误: %s", err)
 				continue
 			}
 

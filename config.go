@@ -23,14 +23,14 @@ func GetConfig(ctx context.Context) Config {
 			cfg := bulidConfig()
 			err := SaveJsonFile("./config.json", &cfg)
 			if err != nil {
-				runtime.LogErrorf(ctx, "写入设置文件失败：%s\n", err)
+				runtime.LogErrorf(ctx, "写入设置文件失败：%s", err)
 			}
 		} else {
 			// 文件已存在
 			var cfg Config
 			err := LoadJsonFile("./config.json", &cfg)
 			if err != nil {
-				runtime.LogErrorf(ctx, "读取设置文件失败：%s\n", err)
+				runtime.LogErrorf(ctx, "读取设置文件失败：%s", err)
 			}
 			return cfg
 		}
@@ -47,7 +47,7 @@ func (a *App) LoadConfig() Config {
 func (a *App) SaveConfig(cfg Config) {
 	err := SaveJsonFile("./config.json", cfg)
 	if err != nil {
-		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s\n", err)
+		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s", err)
 	}
 }
 
