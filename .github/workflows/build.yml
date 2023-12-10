@@ -29,17 +29,17 @@ jobs:
         # Node js version
         node-version: 16.x
         
-    - name: Upload to Release Action
-      # You may pin to the exact commit or the version.
-      # uses: Shopify/upload-to-release@c77c9b3e5d288adaef98a7007bf92340ec6ce03b
-      uses: Shopify/upload-to-release@v2.0.0
-      with:
-        # Artifact name
-        name: BiliAudioDownloader-win-amd64.exe
-        # Path to the file to upload
-        path: ./build/bin/BiliAudioDownloader.exe
-        # secrets.GITHUB_TOKEN
-        repo-token: ${{ secrets.ACCESS_TOKEN }}
+    # - name: Upload to Release Action
+    #   # You may pin to the exact commit or the version.
+    #   # uses: Shopify/upload-to-release@c77c9b3e5d288adaef98a7007bf92340ec6ce03b
+    #   uses: Shopify/upload-to-release@v2.0.0
+    #   with:
+    #     # Artifact name
+    #     name: BiliAudioDownloader-win-amd64.exe
+    #     # Path to the file to upload
+    #     path: ./build/bin/BiliAudioDownloader.exe
+    #     # secrets.GITHUB_TOKEN
+    #     repo-token: ${{ secrets.ACCESS_TOKEN }}
           
       
                   
