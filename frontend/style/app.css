@@ -3,12 +3,6 @@
     margin: 0 auto;
 }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px 40px;
-}
-
 #app-function {
     /* 主功能容器 */
     width: 70%;
@@ -52,10 +46,12 @@
 
 .information-box .favlist-box {
     display: flex;
+    justify-content: space-around;
 }
 
 .information-box .favlist-box img {
     width: 150px;
+    border-radius: var(--el-border-radius-base);
 }
 
 .option-list {

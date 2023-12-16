@@ -2,12 +2,6 @@
 import { reactive, ref, onMounted } from 'vue'
 import { LoadConfig, SaveConfig, RefreshConfig } from '../../wailsjs/go/main/App'
 
-const num = ref(1)
-const handleChange = (value) => {
-    console.log(value)
-}
-
-
 onMounted(() => {
     loadConfig()
 })
@@ -56,7 +50,7 @@ function refreshConfig() {
     <form class="card">
         <h3>软件选项</h3>
         
-        <el-form label-position="right" label-width="100px" style="max-width: 460px">
+        <el-form label-position="right" label-width="100px">
             <el-form-item label="音频保存路径">
                 <el-input v-model="config.download_path" @change="saveConfig" />
             </el-form-item>
