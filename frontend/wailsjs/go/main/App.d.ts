@@ -8,6 +8,8 @@ export function MakeAndSaveList(arg1:string,arg2:number,arg3:boolean):Promise<vo
 
 export function MakeUpEditor():Promise<void>;
 
+export function RefreshConfig():Promise<void>;
+
 export function SaveConfig(arg1:main.Config):Promise<void>;
 
 export function SearchFavListInformation(arg1:string):Promise<main.FavList>;

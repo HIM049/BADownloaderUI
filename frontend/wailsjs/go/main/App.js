@@ -14,6 +14,10 @@ export function MakeUpEditor() {
   return window['go']['main']['App']['MakeUpEditor']();
 }
 
+export function RefreshConfig() {
+  return window['go']['main']['App']['RefreshConfig']();
+}
+
 export function SaveConfig(arg1) {
   return window['go']['main']['App']['SaveConfig'](arg1);
 }

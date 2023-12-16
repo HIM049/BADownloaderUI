@@ -37,6 +37,15 @@ func GetConfig(ctx context.Context) Config {
 	}
 }
 
+// 重置设置文件
+func (a *App) RefreshConfig() {
+	cfg := bulidConfig()
+	err := SaveJsonFile("./config.json", &cfg)
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s", err)
+	}
+}
+
 // 读取设置
 func (a *App) LoadConfig() Config {
 	cfg := GetConfig(a.ctx)
