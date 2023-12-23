@@ -1,4 +1,6 @@
-![icon128](https://github.com/HIM049/BADownloaderUI/assets/67405384/12bc18a6-4e1e-4878-a18f-c3b6fd70120e)
+<div align="center" style="padding: 20px;">
+  <img src="https://github.com/HIM049/BADownloaderUI/assets/67405384/12bc18a6-4e1e-4878-a18f-c3b6fd70120e"/>
+</div>
 
 # Bili Audio Downloader UI - 使用 wails CLI 重构的全新版本
 
