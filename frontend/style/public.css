@@ -21,7 +21,7 @@ img {
 }
 
 body {
-    background-color: var(--backgroundColour);
+    background-color: #f2f3f5;
     margin: 0;
     padding: 0;
 }
