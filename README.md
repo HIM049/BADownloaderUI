@@ -1,3 +1,5 @@
+![icon128](https://github.com/HIM049/BADownloaderUI/assets/67405384/12bc18a6-4e1e-4878-a18f-c3b6fd70120e)
+
 # Bili Audio Downloader UI - 使用 wails CLI 重构的全新版本
 
 考虑到以往 Bili Audio Downloader 使用命令行操作的不便，于是有了这个完全重构的带 UI 版本！  
