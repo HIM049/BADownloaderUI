@@ -50,6 +50,38 @@ export namespace main {
 	        this.message = source["message"];
 	    }
 	}
+	export class VideoInformationList {
+	    bvid: string;
+	    cid: number;
+	    title: string;
+	    song_name: string;
+	    author: string;
+	    cover: string;
+	    videos: number;
+	    list_id: number;
+	    is_page: boolean;
+	    page_title: string;
+	    page_id: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new VideoInformationList(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bvid = source["bvid"];
+	        this.cid = source["cid"];
+	        this.title = source["title"];
+	        this.song_name = source["song_name"];
+	        this.author = source["author"];
+	        this.cover = source["cover"];
+	        this.videos = source["videos"];
+	        this.list_id = source["list_id"];
+	        this.is_page = source["is_page"];
+	        this.page_title = source["page_title"];
+	        this.page_id = source["page_id"];
+	    }
+	}
 
 }
 

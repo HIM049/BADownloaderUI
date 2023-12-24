@@ -4,6 +4,28 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+func (a *App) GetVideoList() []VideoInformationList {
+	cfg := GetConfig(a.ctx)
+
+	var list []VideoInformationList
+	err := LoadJsonFile(cfg.VideoListPath, &list)
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "读取视频列表时发生错误：%s", err)
+	}
+
+	return list
+}
+
+func (a *App) SaveVideoList(data any) error {
+	cfg := GetConfig(a.ctx)
+
+	err := SaveJsonFile(cfg.VideoListPath, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // 创建并保存视频列表
 func (a *App) MakeAndSaveList(favlistID string, downloadCount int, downloadCompilation bool) error {
 	cfg := GetConfig(a.ctx)

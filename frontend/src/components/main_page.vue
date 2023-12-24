@@ -110,6 +110,7 @@ function creatVideoList() {
     MakeAndSaveList(parms.favListID, Number(parms.options.downCount), parms.options.downPart).then(result => {
         if (result != null) {
             // 创建失败
+            loading.close()
             ElMessage.error(result);
         } else {
             // 创建成功
