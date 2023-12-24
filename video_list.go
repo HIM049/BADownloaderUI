@@ -62,7 +62,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 		pageSize := 20
 
 		// 处理非完整尾页
-		if i+1 == pageCount {
+		if i+1 == pageCount && downloadCount%20 != 0 {
 			pageSize = downloadCount % 20
 		}
 
