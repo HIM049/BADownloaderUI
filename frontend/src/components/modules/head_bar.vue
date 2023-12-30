@@ -1,7 +1,10 @@
 <template>
     <el-header>
         <h1>Bili Audio Downloader</h1>
-        <el-button size="large"  circle @click="$emit('page-switch')"><el-icon><Setting/></el-icon> </el-button>
+        <div>
+            <el-button size="large"  circle @click="$emit('switch-sdown')"><el-icon><Download /></el-icon> </el-button>
+            <el-button size="large"  circle @click="$emit('switch-setting')"><el-icon><Setting/></el-icon> </el-button>
+        </div>
     </el-header>
 </template>
 

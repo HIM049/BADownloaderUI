@@ -31,6 +31,8 @@ func (a *App) startup(ctx context.Context) {
 	_ = os.MkdirAll(cfg.CachePath, 0755)
 	_ = os.MkdirAll(cfg.CachePath+"/music", 0755)
 	_ = os.MkdirAll(cfg.CachePath+"/cover", 0755)
+	_ = os.MkdirAll(cfg.CachePath+"/single/cover", 0755)
+	_ = os.MkdirAll(cfg.CachePath+"/single/music", 0755)
 }
 
 // 程序关闭时
@@ -48,6 +50,17 @@ func (a *App) SearchFavListInformation(favListID string) FavList {
 		return FavList{}
 	}
 	return *listInf
+}
+
+// 查询并返回歌曲信息
+func (a *App) SearchSongInformation(auid string) AudioInf {
+	runtime.LogInfo(a.ctx, auid)
+	audioInf, err := GetAudioInfObj(auid)
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "获取歌曲详情时出现错误：%s", err)
+		return AudioInf{}
+	}
+	return *audioInf
 }
 
 type DownloadOption struct {

@@ -1,6 +1,6 @@
 <template>
     <el-container direction="vertical">
-        <HeadBar @page-switch="isSetting = !isSetting" />
+        <HeadBar @switch-setting="isSetting = !isSetting" @switch-sdown="isSdown = !isSdown" />
         <transition name="el-fade-in-linear">
             <el-steps :space="150" :active="pageNum" finish-status="success" align-center style="justify-content: center;"
                 v-show="status.showStep">
@@ -21,6 +21,7 @@
 
 <script setup>
 import SettingPage from '../components/setting_page.vue'
+import SingleDownload from '../components/single_downlaod.vue'
 import HeadBar from '../components/modules/head_bar.vue'
 import HomePage from '../components/home_page.vue'
 import OptionPage from '../components/option_page.vue'
@@ -32,6 +33,7 @@ import { MakeAndSaveList, StartDownload } from '../../wailsjs/go/main/App'
 
 const pageNum = ref(0)
 const isSetting = ref(false)
+const isSdown = ref(false)
 const page = shallowRef(HomePage)
 const footbarText = ref("继续")
 
@@ -61,6 +63,20 @@ const parms = reactive({
 watch(isSetting, (newValue)=>{
     if (newValue) {
         page.value = SettingPage;
+        status.showBack = false;
+        status.showNext = false;
+        status.showStep = false;
+    } else {
+        page.value = HomePage;
+        status.showNext = true;
+        pageNum.value = 0;
+    }
+})
+
+// 切换到单曲下载
+watch(isSdown, (newValue)=>{
+    if (newValue) {
+        page.value = SingleDownload;
         status.showBack = false;
         status.showNext = false;
         status.showStep = false;
@@ -110,6 +126,7 @@ function creatVideoList() {
     MakeAndSaveList(parms.favListID, Number(parms.options.downCount), parms.options.downPart).then(result => {
         if (result != null) {
             // 创建失败
+            loading.close()
             ElMessage.error(result);
         } else {
             // 创建成功

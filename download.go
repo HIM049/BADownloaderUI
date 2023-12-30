@@ -76,6 +76,36 @@ func (a *App) StartDownload(opt DownloadOption) {
 	wg.Wait()
 }
 
+func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, title string) {
+	cfg := GetConfig(a.ctx)
+
+	obj, err := GetAudioObj(auid, "2")
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "获取音频流时发生错误：%s", err)
+	}
+
+	// 下载封面图片
+	err = SaveFromURL(obj.Data.Cover, cfg.CachePath+"/single/cover/"+auid+".jpg")
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
+	}
+	// 下载媒体流
+	err = StreamingDownloader(obj.Data.Cdns[0], cfg.CachePath+"/single/music/"+auid+".m4a")
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "保存媒体流时发生错误：%s", err)
+	}
+	// 写入元数据
+	err = SingleChangeTag(&cfg, &opt, auid, songName, songAuthor, ".m4a")
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "写入元数据时发生错误：%s", err)
+	}
+	// 输出文件
+	err = SingleOutputFile(&cfg, auid, title, ".m4a")
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
+	}
+}
+
 // 获取并下载媒体流
 func GetAndDownload(bvid string, cid int, filePathAndName string) error {
 	// 获取 B 站视频流地址
