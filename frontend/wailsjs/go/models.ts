@@ -1,5 +1,19 @@
 export namespace main {
 	
+	export class AudioInf {
+	    code: number;
+	    msg: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AudioInf(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.msg = source["msg"];
+	    }
+	}
 	export class Config {
 	    download_path: string;
 	    cache_path: string;

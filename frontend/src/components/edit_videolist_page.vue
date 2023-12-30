@@ -48,7 +48,6 @@ function makeUpEditor() {
 onMounted(() => {
     GetVideoList().then(result => {
         videoList.value = result
-        console.log(videoList.value);
     })
 })
 
