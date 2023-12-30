@@ -34,7 +34,7 @@ import { MakeAndSaveList, StartDownload } from '../../wailsjs/go/main/App'
 const pageNum = ref(0)
 const isSetting = ref(false)
 const isSdown = ref(false)
-const page = shallowRef(SingleDownload)
+const page = shallowRef(HomePage)
 const footbarText = ref("继续")
 
 const status = reactive({
