@@ -98,6 +98,14 @@ type VideoInformation struct {
 			Page int    `json:"page"` // 分 P 序号
 			Part string `json:"part"` // 分 P 标题
 		}
+		Subtitle struct {
+			List []struct {
+				Id           int    `json:"id"`           // 字幕 ID
+				Lan          string `json:"lan"`          // 字幕语言
+				Lan_doc      string `json:"lan_doc"`      // 字幕语言名称
+				Subtitle_url string `json:"subtitle_url"` // 字幕 json URL
+			}
+		}
 	}
 }
 
