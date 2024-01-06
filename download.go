@@ -42,13 +42,6 @@ func (a *App) StartDownload(opt DownloadOption) {
 			}
 			runtime.LogInfof(a.ctx, "(视频%d) 下载视频成功", num)
 
-			// 下载封面图片
-			err = SaveFromURL(v.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
-			if err != nil {
-				runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
-			}
-			runtime.LogInfof(a.ctx, "(视频%d) 下载封面成功", num)
-
 			// 写入元数据
 			err = ChangeTag(&cfg, &opt, &v, audioType)
 			if err != nil {
@@ -69,6 +62,15 @@ func (a *App) StartDownload(opt DownloadOption) {
 				wg.Done() // 发出任务完成通知
 			}()
 
+		}(video, i)
+
+		go func(v VideoInformationList, num int) {
+			// 下载封面图片
+			err = SaveFromURL(v.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
+			if err != nil {
+				runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
+			}
+			runtime.LogInfof(a.ctx, "(视频%d) 下载封面成功", num)
 		}(video, i)
 		time.Sleep(10 * time.Millisecond)
 	}
