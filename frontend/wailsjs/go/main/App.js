@@ -14,6 +14,10 @@ export function LoadConfig() {
   return window['go']['main']['App']['LoadConfig']();
 }
 
+export function LoginBilibili() {
+  return window['go']['main']['App']['LoginBilibili']();
+}
+
 export function MakeAndSaveList(arg1, arg2, arg3) {
   return window['go']['main']['App']['MakeAndSaveList'](arg1, arg2, arg3);
 }

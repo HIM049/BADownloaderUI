@@ -8,6 +8,8 @@ export function GetVideoList():Promise<Array<main.VideoInformationList>>;
 
 export function LoadConfig():Promise<main.Config>;
 
+export function LoginBilibili():Promise<void>;
+
 export function MakeAndSaveList(arg1:string,arg2:number,arg3:boolean):Promise<void>;
 
 export function MakeUpEditor():Promise<void>;
