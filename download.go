@@ -66,7 +66,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 
 		go func(v VideoInformationList, num int) {
 			// 下载封面图片
-			err = SaveFromURL(v.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
+			err = SaveFromURL(v.Meta.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 			}

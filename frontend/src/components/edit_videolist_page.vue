@@ -12,13 +12,13 @@
                             <el-button class="button" text>{{ video.bvid }}</el-button>
                         </div>
                     </template>
-                    <img :src="video.cover" style="width: 200px;">
+                    <img :src="video.Meta.cover" style="width: 200px;">
                     <el-form label-position="right" style="width: 70%;" :model="video" >
                         <el-form-item label="曲名">
-                            <el-input v-model="video.song_name" />
+                            <el-input v-model="video.Meta.song_name" />
                         </el-form-item>
                         <el-form-item label="歌手">
-                            <el-input v-model="video.author" />
+                            <el-input v-model="video.Meta.author" />
                         </el-form-item>
                         <!-- <el-form-item label="Activity form">
                             <el-input v-model="video" />

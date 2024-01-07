@@ -13,8 +13,8 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList, audioT
 	// 准备参数
 	file := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + audioType
 	songCover := cfg.CachePath + "/cover/" + strconv.Itoa(v.Cid) + ".jpg"
-	songName := v.SongName
-	songAuthor := v.Author
+	songName := v.Meta.SongName
+	songAuthor := v.Meta.Author
 
 	// 打开歌曲元数据
 	tags, err := tag.OpenTag(file)
