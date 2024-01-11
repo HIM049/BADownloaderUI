@@ -8,10 +8,13 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+const (
+	AudioType = ".m4a"
+)
+
 func (a *App) StartDownload(opt DownloadOption) {
 	// 初始化参数
 	cfg := GetConfig(a.ctx)
-	audioType := ".m4a"
 
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
@@ -33,7 +36,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 			runtime.LogInfof(a.ctx, "开始下载视频%d", num)
 			// 下载视频
 			for i := 0; i < cfg.RetryCount; i++ {
-				err := GetAndDownload(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid)+".m4a")
+				err := GetAndDownloadSingle(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid)+AudioType)
 				if err != nil {
 					// 下载失败
 					runtime.LogErrorf(a.ctx, "(视频%d) 下载视频时出现错误：%s  (重试 %d )", num, err, i+1)
@@ -50,14 +53,14 @@ func (a *App) StartDownload(opt DownloadOption) {
 			runtime.LogInfof(a.ctx, "(视频%d) 下载封面成功", num)
 
 			// 写入元数据
-			err = ChangeTag(&cfg, &opt, &v, audioType)
+			err = ChangeTag(&cfg, &opt, &v)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
 			}
 			runtime.LogInfof(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
-			err = OutputFile(&cfg, &v, audioType)
+			err = OutputFile(&cfg, &v)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			}
@@ -90,24 +93,24 @@ func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, titl
 		runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 	}
 	// 下载媒体流
-	err = StreamingDownloader(obj.Data.Cdns[0], cfg.CachePath+"/single/music/"+auid+".m4a")
+	err = StreamingDownloader(obj.Data.Cdns[0], cfg.CachePath+"/single/music/"+auid+AudioType)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "保存媒体流时发生错误：%s", err)
 	}
 	// 写入元数据
-	err = SingleChangeTag(&cfg, &opt, auid, songName, songAuthor, ".m4a")
+	err = SingleChangeTag(&cfg, &opt, auid, songName, songAuthor)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "写入元数据时发生错误：%s", err)
 	}
 	// 输出文件
-	err = SingleOutputFile(&cfg, auid, title, ".m4a")
+	err = SingleOutputFile(&cfg, auid, title)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 	}
 }
 
 // 获取并下载媒体流
-func GetAndDownload(bvid string, cid int, filePathAndName string) error {
+func GetAndDownloadSingle(bvid string, cid int, filePathAndName string) error {
 	// 获取 B 站视频流地址
 	video, err := GetVideoObj(bvid, cid)
 	if err != nil {

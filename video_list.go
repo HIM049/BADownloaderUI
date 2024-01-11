@@ -60,7 +60,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 	var videoList []VideoInformationList
 
 	// 请求收藏夹基础数据，初始化循环
-	favlist, err := GetFavListObj(favlistID, 1, 1)
+	favlist, err := GetFavListObj(1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 		}
 
 		// 获取当前分页信息
-		favlist, err := GetFavListObj(favlistID, pageSize, i+1)
+		favlist, err := GetFavListObj(pageSize, i+1)
 		if err != nil {
 			return nil, err
 		}

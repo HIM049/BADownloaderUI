@@ -61,9 +61,9 @@ func getFavList(favListId string, ps int, pn int) (string, error) {
 	return bodyString, nil
 }
 
-func GetFavListObj(favListId string, ps int, pn int) (*FavList, error) {
+func GetFavListObj(ps int, pn int) (*FavList, error) {
 	var obj FavList
-	body, err := getFavList(favListId, ps, pn)
+	body, err := getFavList(FavListID, ps, pn)
 	if err != nil {
 		return nil, err
 	}
@@ -268,16 +268,15 @@ type AudioStream struct {
 }
 
 func getAudio(auid, quality string) (string, error) {
-	// 设置 URL 并发送 GET 请求
-	params := url.Values{}
+	// 设置 URL 参数并发送 GET 请求
+	params := url.Values{
+		"songid":    {auid},
+		"quality":   {quality},
+		"privilege": {"2"},
+		"mid":       {"2"},
+		"platform":  {"web"},
+	}
 	Url, _ := url.Parse("https://api.bilibili.com/audio/music-service-c/url")
-
-	// 设置 URL 参数
-	params.Set("songid", auid)
-	params.Set("quality", quality)
-	params.Set("privilege", "2")
-	params.Set("mid", "2")
-	params.Set("platform", "web")
 
 	Url.RawQuery = params.Encode()
 	urlPath := Url.String()

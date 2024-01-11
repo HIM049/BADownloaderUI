@@ -2,16 +2,17 @@ package main
 
 import (
 	"os"
+	"path"
 	"strconv"
 
 	tag "github.com/gcottom/audiometa"
 )
 
 // 修改 TAG
-func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList, audioType string) error {
+func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList) error {
 
 	// 准备参数
-	file := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + audioType
+	file := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + AudioType
 	songCover := cfg.CachePath + "/cover/" + strconv.Itoa(v.Cid) + ".jpg"
 	songName := v.SongName
 	songAuthor := v.Author
@@ -48,7 +49,7 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList, audioT
 }
 
 // 输出文件
-func OutputFile(cfg *Config, v *VideoInformationList, audioType string) error {
+func OutputFile(cfg *Config, v *VideoInformationList) error {
 	// 处理音频标题
 	NfileName := v.Title
 	// 如果是分 P （以分 P 命名为主）
@@ -56,8 +57,8 @@ func OutputFile(cfg *Config, v *VideoInformationList, audioType string) error {
 		NfileName = v.Title + "(" + v.PageTitle + ")"
 	}
 
-	sourcePath := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + audioType
-	destPath := cfg.DownloadPath + "/" + NfileName + audioType
+	sourcePath := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + AudioType
+	destPath := cfg.DownloadPath + "/" + NfileName + AudioType
 	// 重命名歌曲文件并移动位置
 	err := RenameAndMoveFile(sourcePath, destPath)
 	if err != nil {
@@ -67,10 +68,10 @@ func OutputFile(cfg *Config, v *VideoInformationList, audioType string) error {
 }
 
 // 修改 TAG
-func SingleChangeTag(cfg *Config, opt *DownloadOption, auid, songName, songAuthor, audioType string) error {
+func SingleChangeTag(cfg *Config, opt *DownloadOption, auid, songName, songAuthor string) error {
 
 	// 准备参数
-	file := cfg.CachePath + "/single/music/" + auid + audioType
+	file := cfg.CachePath + "/single/music/" + auid + AudioType
 	songCover := cfg.CachePath + "/single/cover/" + auid + ".jpg"
 
 	// 打开歌曲元数据
@@ -105,10 +106,11 @@ func SingleChangeTag(cfg *Config, opt *DownloadOption, auid, songName, songAutho
 }
 
 // 输出文件
-func SingleOutputFile(cfg *Config, uuid, Title, audioType string) error {
+func SingleOutputFile(cfg *Config, uuid, Title string) error {
 
-	sourcePath := cfg.CachePath + "/single/music/" + uuid + audioType
-	destPath := cfg.DownloadPath + "/" + Title + audioType
+	sourcePath := path.Join(cfg.CachePath, "single/music", uuid+AudioType)
+	destPath := path.Join(cfg.DownloadPath, Title+AudioType)
+
 	// 重命名歌曲文件并移动位置
 	err := RenameAndMoveFile(sourcePath, destPath)
 	if err != nil {
