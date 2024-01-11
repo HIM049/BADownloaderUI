@@ -49,16 +49,10 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList) error 
 }
 
 // 输出文件
-func OutputFile(cfg *Config, v *VideoInformationList) error {
-	// 处理音频标题
-	NfileName := v.Title
-	// 如果是分 P （以分 P 命名为主）
-	if v.IsPage {
-		NfileName = v.Title + "(" + v.PageTitle + ")"
-	}
+func OutputFile(cfg *Config, v *VideoInformationList, fileName string) error {
+	sourcePath := path.Join(cfg.CachePath, "music", strconv.Itoa(v.Cid)+AudioType)
+	destPath := path.Join(cfg.DownloadPath, FavListID, fileName)
 
-	sourcePath := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + AudioType
-	destPath := cfg.DownloadPath + "/" + NfileName + AudioType
 	// 重命名歌曲文件并移动位置
 	err := RenameAndMoveFile(sourcePath, destPath)
 	if err != nil {

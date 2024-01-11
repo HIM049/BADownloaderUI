@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path"
 	"strconv"
 	"sync"
 	"time"
@@ -15,6 +17,7 @@ const (
 func (a *App) StartDownload(opt DownloadOption) {
 	// 初始化参数
 	cfg := GetConfig(a.ctx)
+	_ = os.MkdirAll(path.Join(cfg.DownloadPath, FavListID), 0755)
 
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
@@ -32,9 +35,28 @@ func (a *App) StartDownload(opt DownloadOption) {
 		go func(v VideoInformationList, num int) {
 			sem <- struct{}{} // 给通道中填入数据
 			wg.Add(1)         // 任务 +1
+			// 下载完成后
+			defer func() {
+				<-sem     // 释放一个并发槽
+				wg.Done() // 发出任务完成通知
+			}()
+
+			// 下载视频
+			// 处理音频标题
+			NfileName := v.Title
+			// 如果是分 P （以分 P 命名为主）
+			if v.IsPage {
+				NfileName += "(" + v.PageTitle + ")"
+			}
+
+			//判断是否已下载
+			finalFile := path.Join(cfg.DownloadPath, FavListID, NfileName+AudioType)
+			runtime.LogInfof(a.ctx, "正在检查文件... %s", finalFile)
+			if IsFileExists(finalFile) {
+				return
+			}
 
 			runtime.LogInfof(a.ctx, "开始下载视频%d", num)
-			// 下载视频
 			for i := 0; i < cfg.RetryCount; i++ {
 				err := GetAndDownloadSingle(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid)+AudioType)
 				if err != nil {
@@ -60,18 +82,11 @@ func (a *App) StartDownload(opt DownloadOption) {
 			runtime.LogInfof(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
-			err = OutputFile(&cfg, &v)
+			err = OutputFile(&cfg, &v, NfileName+AudioType)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			}
 			runtime.LogInfof(a.ctx, "(视频%d) 输出文件成功", num)
-
-			// 下载完成后
-			defer func() {
-				<-sem     // 释放一个并发槽
-				wg.Done() // 发出任务完成通知
-			}()
-
 		}(video, i)
 		time.Sleep(10 * time.Millisecond)
 	}
