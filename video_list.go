@@ -94,11 +94,12 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 		}
 
 		// 获取当前分页信息
-		favlist, err := GetFavListObj(favlistID, pageSize, i+1)
+		favlist, err := GetFavListObj(favlistID, 20, i+1)
 		if err != nil {
 			return nil, err
 		}
-		for j, listVideo := range favlist.Data.Medias {
+		for j := 0; j < pageSize; j++ {
+			listVideo := favlist.Data.Medias[j]
 			// 获取当前视频详细信息
 			videoInf, err := GetVideoPageInformationObj(listVideo.Bvid)
 			if err != nil {
