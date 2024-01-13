@@ -24,7 +24,10 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList, audioT
 
 	// 封面
 	if opt.SongCover {
-		tags.SetAlbumArtFromFilePath(songCover)
+		err := tags.SetAlbumArtFromFilePath(songCover)
+		if err != nil {
+			return err
+		}
 	}
 	// 歌曲名
 	if opt.SongName {
