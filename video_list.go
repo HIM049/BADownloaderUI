@@ -50,6 +50,7 @@ type VideoInformationList struct {
 	IsPage    bool   `json:"is_page"`
 	PageTitle string `json:"page_title"`
 	PageID    int    `json:"page_id"`
+	Format    string `json:"format"`
 	Meta      MetaInformation
 }
 
@@ -143,6 +144,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 						IsPage:    true,
 						PageTitle: CheckFileName(pages.Part),
 						PageID:    pages.Page,
+						Format:    ".m4a",
 						Meta:      metaInf,
 					}
 					// 组合数据
@@ -163,6 +165,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 					Videos: videoInf.Data.Videos,
 					ListID: (i * 20) + j,
 					IsPage: false,
+					Format: ".m4a",
 					Meta:   metaInf,
 				}
 				// 组合数据

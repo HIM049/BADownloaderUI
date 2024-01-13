@@ -5,12 +5,14 @@ go 1.18
 require (
 	github.com/gcottom/audiometa v1.2.5
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/wailsapp/wails/v2 v2.6.0
 )
 
 require (
 	github.com/Sorrow446/go-mp4tag v0.0.0-20220705231847-a6f24ef004f0 // indirect
 	github.com/abema/go-mp4 v0.7.2 // indirect
+	github.com/aws/aws-sdk-go v1.38.20 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/bogem/id3v2 v1.2.0 // indirect
 	github.com/go-flac/flacpicture v0.3.0 // indirect
@@ -19,6 +21,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/labstack/echo/v4 v4.10.2 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.0 // indirect
@@ -32,6 +35,7 @@ require (
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/sunfish-shogi/bufseekio v0.1.0 // indirect
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
+	github.com/u2takey/go-utils v0.3.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.1 // indirect

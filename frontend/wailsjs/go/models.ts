@@ -111,6 +111,7 @@ export namespace main {
 	    is_page: boolean;
 	    page_title: string;
 	    page_id: number;
+	    format: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new VideoInformationList(source);
@@ -126,6 +127,7 @@ export namespace main {
 	        this.is_page = source["is_page"];
 	        this.page_title = source["page_title"];
 	        this.page_id = source["page_id"];
+	        this.format = source["format"];
 	    }
 	}
 

@@ -30,31 +30,59 @@ func (a *App) StartDownload(opt DownloadOption) {
 			sem <- struct{}{} // 给通道中填入数据
 			wg.Add(1)         // 任务 +1
 
-			runtime.LogInfof(a.ctx, "开始下载视频%d", num)
+			runtime.LogDebugf(a.ctx, "开始下载视频%d", num)
+			musicPathAndName := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid)
+
 			// 下载视频
 			for i := 0; i < cfg.RetryCount; i++ {
-				err := GetAndDownload(v.Bvid, v.Cid, cfg.CachePath+"/music/"+strconv.Itoa(v.Cid)+".m4a")
+				err := GetAndDownload(v.Bvid, v.Cid, musicPathAndName+".m4a")
 				if err != nil {
 					// 下载失败
 					runtime.LogErrorf(a.ctx, "(视频%d) 下载视频时出现错误：%s  (重试 %d )", num, err, i+1)
 					continue
 				}
 			}
-			runtime.LogInfof(a.ctx, "(视频%d) 下载视频成功", num)
+			runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
 
-			// 写入元数据
-			err = ChangeTag(&cfg, &opt, &v, audioType)
-			if err != nil {
-				runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
-			}
-			runtime.LogInfof(a.ctx, "(视频%d) 写入元数据成功", num)
+			if v.Format == ".m4a" {
+				runtime.LogDebug(a.ctx, "是 M4A 文件")
 
-			// 输出文件
-			err = OutputFile(&cfg, &v, audioType)
-			if err != nil {
-				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
+				// 转码文件
+				err = ConventFile(musicPathAndName+".m4a", musicPathAndName+".mp3")
+				if err != nil {
+					runtime.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
+				}
+				runtime.LogDebugf(a.ctx, "(视频%d) 转码文件成功", num)
+
+				// 写入元数据
+				err = ChangeTag(&cfg, &opt, &v, ".mp3")
+				if err != nil {
+					runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
+				}
+				runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
+
+				// 输出文件
+				err = OutputFile(&cfg, &v, ".mp3")
+				if err != nil {
+					runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
+				}
+				runtime.LogDebugf(a.ctx, "(视频%d) 输出文件成功", num)
+			} else {
+				// 写入元数据
+				err = ChangeTag(&cfg, &opt, &v, v.Format)
+				if err != nil {
+					runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
+				}
+				runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
+
+				// 输出文件
+				err = OutputFile(&cfg, &v, audioType)
+				if err != nil {
+					runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
+				}
+				runtime.LogDebugf(a.ctx, "(视频%d) 输出文件成功", num)
+
 			}
-			runtime.LogInfof(a.ctx, "(视频%d) 输出文件成功", num)
 
 			// 下载完成后
 			defer func() {
@@ -70,7 +98,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 			}
-			runtime.LogInfof(a.ctx, "(视频%d) 下载封面成功", num)
+			runtime.LogDebugf(a.ctx, "(视频%d) 下载封面成功", num)
 		}(video, i)
 		time.Sleep(10 * time.Millisecond)
 	}
