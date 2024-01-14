@@ -3,9 +3,76 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
 	"os"
 	"regexp"
+	"time"
+
+	qrcode "github.com/skip2/go-qrcode"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
+
+func (a *App) LoginBilibili() error {
+	cfg := GetConfig(a.ctx)
+
+	// 获取二维码和请求密钥
+	url, key, err := GetLoginKey()
+	if err != nil {
+		return err
+	}
+
+	// 生成二维码
+	err = qrcode.WriteFile(url, qrcode.Medium, 256, cfg.CachePath+"/qr.png")
+	if err != nil {
+		return err
+	}
+
+	// 请求登录
+	cookies, err := func() (*[]*http.Cookie, error) {
+		for {
+			time.Sleep(3 * time.Second)
+			returnObj, cookies, err := CheckLoginStatus(key)
+			if err != nil {
+				return nil, err
+			}
+			switch returnObj.Data.Code {
+			case 0:
+				// 登录成功
+				runtime.LogInfo(a.ctx, "登录成功")
+				return cookies, nil
+			case 86038:
+				// 二维码失效
+				runtime.LogInfo(a.ctx, "二维码已失效")
+				return nil, errors.New("二维码已失效")
+			case 86090:
+				// 扫描成功，待确认
+				runtime.LogInfo(a.ctx, "扫描成功，待确认")
+			case 86101:
+				// 未扫描
+				runtime.LogInfo(a.ctx, "未扫描")
+			}
+		}
+	}()
+	if err != nil {
+		return err
+	}
+
+	// for _, cookie := range *cookies {
+	// 	fmt.Println("Cookie:", cookie.Name, ": ", cookie.Value)
+	// }
+	cfg.Account.SESSDATA = (*cookies)[0].Value
+	cfg.Account.Bili_jct = (*cookies)[1].Value
+	cfg.Account.DedeUserID = (*cookies)[2].Value
+	cfg.Account.DedeUserID__ckMd5 = (*cookies)[3].Value
+	cfg.Account.Sid = (*cookies)[4].Value
+
+	err = SaveConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // 保存 JSON
 func SaveJsonFile(filePath string, theData any) error {

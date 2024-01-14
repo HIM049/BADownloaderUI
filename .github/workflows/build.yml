@@ -8,10 +8,13 @@ on:
 
 jobs:
 
-  build:
+  build-macos-version:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
+
+    - name: Install ExPackages
+      run: "npm install -D unplugin-vue-components unplugin-auto-import"
     
     - name: Wails Build Action (macos)
       # You may pin to the exact commit or the version.
@@ -19,10 +22,29 @@ jobs:
       uses: dAppServer/wails-build-action@v2.2 
       with:
         # The name of the binary file
-        build-name: BiliAudioDownloader.exe
+        build-name: BADownloader
         # Platform to build for
         build-platform: darwin
-        
+
+  build-windows-version:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install ExPackages
+      run: "npm install -D unplugin-vue-components unplugin-auto-import"
+    
+    - name: Wails Build Action (windows)
+      # You may pin to the exact commit or the version.
+      # uses: cryptodeal/wails-bun-build-action@92cb2b7027a9cf33c3c626e0d002e957cd0cc655
+      uses: dAppServer/wails-build-action@v2.2 
+      with:
+        # The name of the binary file
+        build-name: BADownloader.exe
+        # Platform to build for
+        build-platform: windows
+
+
     # - name: Upload to Release Action
     #   # You may pin to the exact commit or the version.
     #   # uses: Shopify/upload-to-release@c77c9b3e5d288adaef98a7007bf92340ec6ce03b

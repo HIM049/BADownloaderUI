@@ -45,14 +45,20 @@ type VideoInformationList struct {
 	Bvid      string `json:"bvid"`
 	Cid       int    `json:"cid"`
 	Title     string `json:"title"`
-	SongName  string `json:"song_name"`
-	Author    string `json:"author"`
-	Cover     string `json:"cover"`
 	Videos    int    `json:"videos"`
 	ListID    int    `json:"list_id"`
 	IsPage    bool   `json:"is_page"`
 	PageTitle string `json:"page_title"`
 	PageID    int    `json:"page_id"`
+	Format    string `json:"format"`
+	Meta      MetaInformation
+}
+
+type MetaInformation struct {
+	SongName    string `json:"song_name"`
+	Cover       string `json:"cover"`
+	Author      string `json:"author"`
+	Lyrics_path string `json:"lyrics_path"`
 }
 
 // 创建视频任务列表
@@ -89,11 +95,12 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 		}
 
 		// 获取当前分页信息
-		favlist, err := GetFavListObj(favlistID, pageSize, i+1)
+		favlist, err := GetFavListObj(favlistID, 20, i+1)
 		if err != nil {
 			return nil, err
 		}
-		for j, listVideo := range favlist.Data.Medias {
+		for j := 0; j < pageSize; j++ {
+			listVideo := favlist.Data.Medias[j]
 			// 获取当前视频详细信息
 			videoInf, err := GetVideoPageInformationObj(listVideo.Bvid)
 			if err != nil {
@@ -121,35 +128,45 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 						songName = CheckFileName(pages.Part)
 					}
 
+					metaInf := MetaInformation{
+						SongName: songName,
+						Author:   videoInf.Data.Owner.Name,
+						Cover:    videoInf.Data.Pic,
+					}
+
 					// 填充 Page 数据
 					videoPage := VideoInformationList{
 						Bvid:      videoInf.Data.Bvid,
 						Cid:       pages.Cid,
 						Title:     CheckFileName(videoInf.Data.Title),
-						SongName:  songName,
-						Author:    videoInf.Data.Owner.Name,
-						Cover:     videoInf.Data.Pic,
 						Videos:    videoInf.Data.Videos,
 						ListID:    (i * 20) + j,
 						IsPage:    true,
 						PageTitle: CheckFileName(pages.Part),
 						PageID:    pages.Page,
+						Format:    ".m4a",
+						Meta:      metaInf,
 					}
 					// 组合数据
 					videoList = append(videoList, videoPage)
 				}
 			} else {
 				// 如果是单 P
-				video := VideoInformationList{
-					Bvid:     videoInf.Data.Bvid,
-					Cid:      videoInf.Data.Cid,
-					Title:    CheckFileName(videoInf.Data.Title),
+
+				metaInf := MetaInformation{
 					SongName: songName,
 					Author:   videoInf.Data.Owner.Name,
 					Cover:    videoInf.Data.Pic,
-					Videos:   videoInf.Data.Videos,
-					ListID:   (i * 20) + j,
-					IsPage:   false,
+				}
+				video := VideoInformationList{
+					Bvid:   videoInf.Data.Bvid,
+					Cid:    videoInf.Data.Cid,
+					Title:  CheckFileName(videoInf.Data.Title),
+					Videos: videoInf.Data.Videos,
+					ListID: (i * 20) + j,
+					IsPage: false,
+					Format: ".m4a",
+					Meta:   metaInf,
 				}
 				// 组合数据
 				videoList = append(videoList, video)

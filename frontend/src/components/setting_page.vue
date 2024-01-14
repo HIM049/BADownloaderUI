@@ -1,47 +1,3 @@
-<script setup>
-import { reactive, ref, onMounted } from 'vue'
-import { LoadConfig, SaveConfig, RefreshConfig } from '../../wailsjs/go/main/App'
-
-onMounted(() => {
-    loadConfig()
-})
-
-const config = reactive({
-    download_path: "",
-    cache_path: "",
-    videolist_path: "",
-    download_threads: 0,
-    retry_count: 0,
-})
-
-function loadConfig() {
-    LoadConfig().then(result => {
-        config.download_path = result.download_path
-        config.cache_path = result.cache_path
-        config.videolist_path = result.videolist_path
-        config.download_threads = result.download_threads
-        config.retry_count = result.retry_count
-    })
-}
-
-function saveConfig() {
-    config.download_threads = parseInt(config.download_threads)
-    config.retry_count = parseInt(config.retry_count)
-    SaveConfig(config)
-    ElMessage.success("保存成功")
-}
-
-function refreshConfig() {
-    RefreshConfig().then(result => {
-        loadConfig()
-    })
-    
-    ElMessage.warning("已重置配置文件")
-}
-
-</script>
-
-
 <template>
     <el-main style="width: 75%; margin: 0 auto;">
         <el-row class="button-board">            
@@ -70,7 +26,60 @@ function refreshConfig() {
             </el-form>
         </form>
     </el-main>
+    <FootBar :status="status" text="" @back="$emit('back')" @next="$emit('next')" />
 </template>
+
+<script setup>
+import FootBar from '../components/modules/footer.vue'
+import { reactive, ref, onMounted } from 'vue'
+import { LoadConfig, SaveConfig, RefreshConfig } from '../../wailsjs/go/main/App'
+
+// 底栏状态
+const status = reactive({
+    showBack: true,
+    showNext: false,
+    allowBack: true,
+    allowNext: false,
+})
+
+onMounted(() => {
+    loadConfig()
+})
+
+const config = reactive({
+    download_path: "",
+    cache_path: "",
+    videolist_path: "",
+    download_threads: 0,
+    retry_count: 0,
+})
+
+function loadConfig() {
+    LoadConfig().then(result => {
+        config.download_path     = result.download_path
+        config.cache_path        = result.cache_path
+        config.videolist_path    = result.videolist_path
+        config.download_threads  = result.download_threads
+        config.retry_count       = result.retry_count
+    })
+}
+
+function saveConfig() {
+    config.download_threads = parseInt(config.download_threads)
+    config.retry_count = parseInt(config.retry_count)
+    SaveConfig(config)
+    ElMessage.success("保存成功")
+}
+
+function refreshConfig() {
+    RefreshConfig().then(result => {
+        loadConfig()
+    })
+    
+    ElMessage.warning("已重置配置文件")
+}
+
+</script>
 
 <style>
 .button-board {

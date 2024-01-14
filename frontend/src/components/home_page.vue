@@ -1,7 +1,8 @@
 <template>
+    <StepBar :pageNum="step" v-show="status.showStep" />
     <el-main>
         <div id="icon-banner">
-            <img src="./image/icon-non-bg.png" style="width: 350px;" v-show="!props.buttonStatus.showStep">
+            <img src="./image/icon-non-bg.png" style="width: 350px;" v-show="!status.showStep">
         </div>
         <!-- 收藏夹信息输入 -->
         <div id="fav-input" class="fav-input">
@@ -9,35 +10,40 @@
                 @input="queryFavListInformation" clearable>
 
                 <template #prepend>
-                    <el-button @click="queryFavListInformation" ><el-icon><Search /></el-icon></el-button>
+                    <el-button @click="queryFavListInformation"><el-icon>
+                            <Search />
+                        </el-icon></el-button>
                 </template>
             </el-input>
         </div>
         <transition name="el-fade-in-linear">
-            <favInf :resp="resp" v-show="props.buttonStatus.showStep" />
+            <favInf :resp="resp" v-show="status.showStep" />
         </transition>
     </el-main>
+    <FootBar :status="status" text="继续" @back="$emit('back')" @next="$emit('next')" />
 </template>
 
 <script setup>
+import StepBar from '../components/modules/step_bar.vue'
+import FootBar from '../components/modules/footer.vue'
+import favInf from './modules/fav_information.vue'
 import { reactive, computed, ref } from 'vue'
 import { SearchFavListInformation } from '../../wailsjs/go/main/App'
-import favInf from './modules/fav_information.vue'
-// const emit = defineEmits(['allowNext, disableNext'])
 
-const props = defineProps(['buttonStatus', 'parms'])
-const emit = defineEmits(['update:buttonStatus', 'update:parms'])
+const step = 0
+const props = defineProps(['parms'])
+const emit = defineEmits(['update:parms', 'back', 'next'])
+
+// 底栏状态
+const status = reactive({
+    showBack: false,
+    showNext: true,
+    allowBack: true,
+    allowNext: false,
+    showStep: false,
+})
 
 const inputFavID = ref("")
-
-const buttonStatus = computed({
-    get() {
-        return props.buttonStatus
-    },
-    set(buttonStatus) {
-        emit('update:buttonStatus', buttonStatus)
-    }
-})
 
 const parms = computed({
     get() {
@@ -56,10 +62,6 @@ const resp = reactive({
     up_name: "",
     up_avatar: "",
 })
-
-// const status = reactive({
-//     showInfCard: false,
-// })
 
 function extractURL(url) {
     // 尝试创建 URL 对象
@@ -98,17 +100,16 @@ function queryFavListInformation() {
 
 
             // 开放创建列表按钮
-            props.buttonStatus.allowNext = true;
+            status.allowNext = true;
         } else {
             // 无效的收藏夹
             resp.title = "无效的收藏夹";
             ElMessage.warning("无效的收藏夹");
             // 关闭创建列表按钮
-            props.buttonStatus.allowNext = false;
+            status.allowNext = false;
         }
         // 展示收藏夹信息        
-        // status.showInfCard = true;
-        props.buttonStatus.showStep = true;
+        status.showStep = true;
     })
 }
 </script>
