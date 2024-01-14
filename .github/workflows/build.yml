@@ -25,6 +25,8 @@ jobs:
         build-name: BADownloader-macos
         # Platform to build for
         build-platform: darwin
+    - name: List Folder
+      run: "ls -a"
 
   build-windows-version:
     runs-on: windows-latest
@@ -40,7 +42,7 @@ jobs:
       uses: dAppServer/wails-build-action@v2.2 
       with:
         # The name of the binary file
-        build-name: BADownloader-windows
+        build-name: BADownloader-windows.exe
         # Platform to build for
         build-platform: windows
 
