@@ -22,7 +22,7 @@ jobs:
       uses: dAppServer/wails-build-action@v2.2 
       with:
         # The name of the binary file
-        build-name: 'BADownloader-macos'
+        build-name: BADownloader
         # Platform to build for
         build-platform: darwin
 
@@ -40,7 +40,7 @@ jobs:
       uses: dAppServer/wails-build-action@v2.2 
       with:
         # The name of the binary file
-        build-name: BADownloader-windows.exe
+        build-name: BADownloader.exe
         # Platform to build for
         build-platform: windows
 
