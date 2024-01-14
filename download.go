@@ -88,6 +88,8 @@ func (a *App) StartDownload(opt DownloadOption) {
 			defer func() {
 				<-sem     // 释放一个并发槽
 				wg.Done() // 发出任务完成通知
+
+				runtime.EventsEmit(a.ctx, "downloadFinish")
 			}()
 
 		}(video, i)
