@@ -8,6 +8,15 @@
 这是我第一次使用类似 wails 以及 Vue 来进行开发，经验不足，请多包涵。如有好的修改建议欢迎向我提出！  
 （受个人安排影响， PR 和信息处理回复的周期大约为 7 天）  
 
+## 下载
+软件的预编译版本请移步至 [Releases](https://github.com/HIM049/BADownloaderUI/releases) 页面下载。  
+如果你是 scoop 包管理器的用户，也可以在由 [Weidows](https://github.com/Weidows) 整理的软件仓库中下载使用该软件。
+
+```
+scoop bucket add apps https://github.com/kkzzhizhou/scoop-apps
+scoop install BADownloaderUI
+```
+
 ## 使用说明
 - 下载 Bili Audio Downloader 的可执行文件，并放入到一个文件夹中
 - 运行程序，程序会在目录下生成其配置文件以及缓存目录等
