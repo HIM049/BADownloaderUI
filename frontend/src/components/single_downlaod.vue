@@ -46,12 +46,23 @@
         </transition>
 
     </el-main>
+    <FootBar :status="status" text="" @back="$emit('back')" @next="$emit('next')" />
 </template>
 
 <script setup>
+import FootBar from '../components/modules/footer.vue'
 import { reactive, computed, ref } from 'vue'
 import { AudioDownload, SearchSongInformation } from '../../wailsjs/go/main/App'
 import { ElMessage } from 'element-plus';
+
+// 底栏状态
+const status = reactive({
+    showBack: true,
+    showNext: false,
+    allowBack: true,
+    allowNext: false,
+    showInf: false,
+})
 
 const parms = reactive({
     song_name: "",
@@ -66,9 +77,6 @@ const parms = reactive({
 
 const auid = ref("")
 
-const status = reactive({
-    showInf: false,
-})
 const songInf = reactive({
     auid: "0",
     title: "",
