@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	DownloadPath    string `json:"download_path"`
-	CachePath       string `json:"cache_path"`
+	DownloadPath string `json:"download_path"`
+	CachePath    string `json:"cache_path"`
+	// TODO: 是否删掉, 改为使用 ${FavListID}.json
 	VideoListPath   string `json:"videolist_path"`
 	DownloadThreads int    `json:"download_threads"`
 	RetryCount      int    `json:"retry_count"`

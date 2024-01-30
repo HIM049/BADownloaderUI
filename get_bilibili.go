@@ -147,12 +147,12 @@ type FavList struct {
 	}
 }
 
-func getFavList(favListId string, ps int, pn int) (string, error) {
+func getFavList(ps int, pn int) (string, error) {
 	// 设置 URL 并发送 GET 请求
 	params := url.Values{}
 	Url, _ := url.Parse("https://api.bilibili.com/x/v3/fav/resource/list")
 	// 设置 URL 参数
-	params.Set("media_id", favListId)
+	params.Set("media_id", FavListID)
 	params.Set("ps", strconv.Itoa(ps))
 	params.Set("platform", "web")
 	params.Set("pn", strconv.Itoa(pn))
@@ -171,9 +171,9 @@ func getFavList(favListId string, ps int, pn int) (string, error) {
 	return bodyString, nil
 }
 
-func GetFavListObj(favListId string, ps int, pn int) (*FavList, error) {
+func GetFavListObj(ps int, pn int) (*FavList, error) {
 	var obj FavList
-	body, err := getFavList(favListId, ps, pn)
+	body, err := getFavList(ps, pn)
 	if err != nil {
 		return nil, err
 	}
