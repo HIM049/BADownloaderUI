@@ -29,7 +29,7 @@ func (a *App) SaveVideoList(data any) error {
 // 创建并保存视频列表
 func (a *App) MakeAndSaveList(favlistID string, downloadCount int, downloadCompilation bool) error {
 	cfg := GetConfig(a.ctx)
-	data, err := makeVideoList(a, favlistID, downloadCount, downloadCompilation)
+	data, err := makeVideoList(a, downloadCount, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -62,11 +62,11 @@ type MetaInformation struct {
 }
 
 // 创建视频任务列表
-func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilation bool) (*[]VideoInformationList, error) {
+func makeVideoList(a *App, downloadCount int, downloadCompilation bool) (*[]VideoInformationList, error) {
 	var videoList []VideoInformationList
 
 	// 请求收藏夹基础数据，初始化循环
-	favlist, err := GetFavListObj(favlistID, 1, 1)
+	favlist, err := GetFavListObj(1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func makeVideoList(a *App, favlistID string, downloadCount int, downloadCompilat
 		}
 
 		// 获取当前分页信息
-		favlist, err := GetFavListObj(favlistID, 20, i+1)
+		favlist, err := GetFavListObj(20, i+1)
 		if err != nil {
 			return nil, err
 		}

@@ -17,7 +17,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "BiliAudioDownloader 3.3.1",
+		Title:  "BiliAudioDownloader 3.4.0",
 		Width:  1024,
 		Height: 720,
 		AssetServer: &assetserver.Options{

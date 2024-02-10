@@ -8,6 +8,10 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+var (
+	FavListID = ""
+)
+
 // App struct
 type App struct {
 	ctx context.Context
@@ -44,7 +48,8 @@ func (a *App) shutdown(ctx context.Context) {
 
 // 查询并返回收藏夹信息
 func (a *App) SearchFavListInformation(favListID string) FavList {
-	listInf, err := GetFavListObj(favListID, 1, 1)
+	FavListID = favListID
+	listInf, err := GetFavListObj(1, 1)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取收藏夹内容时出现错误：%s", err)
 		return FavList{}

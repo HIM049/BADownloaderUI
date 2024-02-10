@@ -147,12 +147,12 @@ type FavList struct {
 	}
 }
 
-func getFavList(favListId string, ps int, pn int) (string, error) {
+func getFavList(ps int, pn int) (string, error) {
 	// 设置 URL 并发送 GET 请求
 	params := url.Values{}
 	Url, _ := url.Parse("https://api.bilibili.com/x/v3/fav/resource/list")
 	// 设置 URL 参数
-	params.Set("media_id", favListId)
+	params.Set("media_id", FavListID)
 	params.Set("ps", strconv.Itoa(ps))
 	params.Set("platform", "web")
 	params.Set("pn", strconv.Itoa(pn))
@@ -171,9 +171,9 @@ func getFavList(favListId string, ps int, pn int) (string, error) {
 	return bodyString, nil
 }
 
-func GetFavListObj(favListId string, ps int, pn int) (*FavList, error) {
+func GetFavListObj(ps int, pn int) (*FavList, error) {
 	var obj FavList
-	body, err := getFavList(favListId, ps, pn)
+	body, err := getFavList(ps, pn)
 	if err != nil {
 		return nil, err
 	}
@@ -428,6 +428,13 @@ func GetAudioObj(auid, quality string) (*AudioStream, error) {
 // 用于下载音频流的函数
 // 传入流 URL 和文件名
 func StreamingDownloader(audioURL string, filePathAndName string) error {
+	// 先判断文件是否存在，如果存在则跳过下载，否则创建文件
+	out, err := os.Create(filePathAndName)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
 	// 音频流下载函数。接收音频url和文件名。
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", audioURL, nil)
@@ -441,12 +448,6 @@ func StreamingDownloader(audioURL string, filePathAndName string) error {
 	}
 	defer response.Body.Close()
 
-	out, err := os.Create(filePathAndName)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
 	_, err = io.Copy(out, response.Body)
 	if err != nil {
 		return err
@@ -456,19 +457,18 @@ func StreamingDownloader(audioURL string, filePathAndName string) error {
 
 // 从 URL 下载图片
 func SaveFromURL(url string, filePath string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
 	// 发起 HTTP 请求获取图片内容
 	response, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer response.Body.Close()
-
-	// 创建目标文件
-	file, err := os.Create(filePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
 
 	// 将图片内容写入文件
 	_, err = io.Copy(file, response.Body)
