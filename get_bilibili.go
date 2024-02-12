@@ -8,20 +8,76 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+
+	"github.com/tidwall/gjson"
 )
 
-// 用于获取登录 KEY 和 QR code 的函数
-type GetLoginKeyReturn struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Data    struct {
-		Url        string `json:"url"`
-		Qrcode_key string `json:"qrcode_key"`
+type Video struct {
+	Bvid string `json:"bvid"`
+	Meta struct {
+		Title string `json:"title"`
+		Cover string `json:"cover"`
+	}
+	Videos []Videos
+}
+type Videos struct {
+	Cid    int    `json:"cid"`
+	Part   string `json:"part"`
+	Stream struct {
+		Audio struct {
+			Id      int    `json:"id"`       // 音质代码
+			BaseUrl string `json:"base_url"` // 音频流
+		}
+		Flac struct {
+			Id      int    `json:"id"`       // 音质代码
+			BaseUrl string `json:"base_url"` // 音频流
+		}
 	}
 }
 
-func getLoginKey() (string, error) {
-	resp, err := http.Get("https://passport.bilibili.com/x/passport-login/web/qrcode/generate")
+// 以 BVID 为单位请求视频详细信息
+func (v *Video) BvQuery() error {
+	json, err := getVideoPageInformation(v.Bvid)
+	if err != nil {
+		return err
+	}
+
+	// 错误检查
+	if checkObj(int(gjson.Get(json, "code").Int())) {
+		return errors.New(gjson.Get(json, "message").String())
+	}
+
+	// 将信息写入结构体
+	v.Meta.Title = gjson.Get(json, "data.title").String()
+	v.Meta.Cover = gjson.Get(json, "data.pic").String()
+
+	// 根据分 P 数量写入对应信息
+	for i := 0; i < int(gjson.Get(json, "data.videos").Int()); i++ {
+
+		videos := Videos{
+			Cid:  int(gjson.Get(json, "data.pages."+strconv.Itoa(i)+".cid").Int()),
+			Part: gjson.Get(json, "data.pages."+strconv.Itoa(i)+".part").String(),
+		}
+		v.Videos = append(v.Videos, videos)
+	}
+
+	return nil
+}
+
+// 请求视频详细信息
+// https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/info.md
+// TODO：重新添加字幕信息
+func getVideoPageInformation(bvid string) (string, error) {
+	// 设置 URL 并发送 GET 请求
+	params := url.Values{}
+	Url, _ := url.Parse("https://api.bilibili.com/x/web-interface/view")
+
+	// 设置 URL 参数
+	params.Set("bvid", bvid)
+
+	Url.RawQuery = params.Encode()
+	urlPath := Url.String()
+	resp, err := http.Get(urlPath)
 	if err != nil {
 		return "", err
 	}
@@ -31,6 +87,65 @@ func getLoginKey() (string, error) {
 	defer resp.Body.Close()
 	return bodyString, nil
 }
+
+// 获取视频流
+// TODO：请求前检查数据
+func (v *Video) GetStream() error {
+	for i := 0; i < len(v.Videos); i++ {
+		json, err := getVideoStream(v.Bvid, strconv.Itoa(v.Videos[i].Cid))
+		if err != nil {
+			return err
+		}
+		// 错误检查
+		if checkObj(int(gjson.Get(json, "code").Int())) {
+			return errors.New(gjson.Get(json, "message").String())
+		}
+		v.Videos[i].Stream.Audio.Id = int(gjson.Get(json, "data.dash.audio.0.id").Int())
+		v.Videos[i].Stream.Audio.BaseUrl = gjson.Get(json, "data.dash.audio.0.base_url").String()
+		v.Videos[i].Stream.Flac.Id = int(gjson.Get(json, "data.dash.flac.id").Int())
+		v.Videos[i].Stream.Flac.BaseUrl = gjson.Get(json, "data.dash.flac.base_url").String()
+
+	}
+	return nil
+}
+
+// 获取视频流
+// https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md#%E8%8E%B7%E5%8F%96%E8%A7%86%E9%A2%91%E6%B5%81%E5%9C%B0%E5%9D%80_web%E7%AB%AF
+// TODO：更换新链，增加 wbi 签名验证
+func getVideoStream(bvid, cid string) (string, error) {
+	// 设置 URL 并发送 GET 请求
+	params := url.Values{}
+	Url, _ := url.Parse("https://api.bilibili.com/x/player/playurl")
+
+	// 设置 URL 参数
+	params.Set("bvid", bvid)
+	params.Set("cid", cid)
+	params.Set("fnval", "16")
+
+	Url.RawQuery = params.Encode()
+	urlPath := Url.String()
+	resp, err := http.Get(urlPath)
+	if err != nil {
+		return "", err
+	}
+	// 将 body 转为字符串并返回
+	body, _ := io.ReadAll(resp.Body)
+	bodyString := string(body)
+	defer resp.Body.Close()
+	return bodyString, nil
+}
+
+// 登录密钥请求返回内容
+type GetLoginKeyReturn struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Url        string `json:"url"`
+		Qrcode_key string `json:"qrcode_key"`
+	}
+}
+
+// 获取登录密钥
 func GetLoginKey() (string, string, error) {
 	var obj GetLoginKeyReturn
 	body, err := getLoginKey()
@@ -46,6 +161,19 @@ func GetLoginKey() (string, string, error) {
 		return "", "", errors.New(obj.Message)
 	}
 	return obj.Data.Url, obj.Data.Qrcode_key, nil
+}
+
+// 请求登录密钥
+func getLoginKey() (string, error) {
+	resp, err := http.Get("https://passport.bilibili.com/x/passport-login/web/qrcode/generate")
+	if err != nil {
+		return "", err
+	}
+	// 将 body 转为字符串并返回
+	body, _ := io.ReadAll(resp.Body)
+	bodyString := string(body)
+	defer resp.Body.Close()
+	return bodyString, nil
 }
 
 // 获取 用户收藏的视频收藏夹 函数
@@ -166,9 +294,6 @@ func checkLoginStatus(qrcode_key string) (string, *[]*http.Cookie, error) {
 
 	// 读取 Set-Cookie 头部信息
 	cookies := resp.Cookies()
-	// for _, cookie := range cookies {
-	// 	fmt.Println("Cookie:", cookie.Name, "=", cookie.Value)
-	// }
 
 	// 将 body 转为字符串并返回
 	body, _ := io.ReadAll(resp.Body)
@@ -222,15 +347,15 @@ type FavList struct {
 	}
 }
 
-func getFavList(ps int, pn int) (string, error) {
+func getFavList(FavListID, ps, pn string) (string, error) {
 	// 设置 URL 并发送 GET 请求
 	params := url.Values{}
 	Url, _ := url.Parse("https://api.bilibili.com/x/v3/fav/resource/list")
 	// 设置 URL 参数
 	params.Set("media_id", FavListID)
-	params.Set("ps", strconv.Itoa(ps))
+	params.Set("ps", ps)
 	params.Set("platform", "web")
-	params.Set("pn", strconv.Itoa(pn))
+	params.Set("pn", pn)
 
 	Url.RawQuery = params.Encode()
 	urlPath := Url.String()
@@ -246,9 +371,9 @@ func getFavList(ps int, pn int) (string, error) {
 	return bodyString, nil
 }
 
-func GetFavListObj(ps int, pn int) (*FavList, error) {
+func GetFavListObj(ps, pn int) (*FavList, error) {
 	var obj FavList
-	body, err := getFavList(ps, pn)
+	body, err := getFavList(FavListID, strconv.Itoa(ps), strconv.Itoa(pn))
 	if err != nil {
 		return nil, err
 	}
@@ -257,137 +382,6 @@ func GetFavListObj(ps int, pn int) (*FavList, error) {
 		return nil, err
 	}
 	// 错误检查
-	if checkObj(obj.Code) {
-		return nil, errors.New(obj.Message)
-	}
-	return &obj, nil
-}
-
-// 用于获取视频的详细信息
-// 传入 BVID
-// 获得如下结构体
-type VideoInformation struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Data    struct {
-		Bvid   string   `json:"bvid"`   // 稿件 BVID
-		Videos int      `json:"videos"` // 稿件分 P 总数
-		Pic    string   `json:"pic"`    // 稿件封面图片url
-		Title  string   `json:"title"`  // 稿件标题
-		Cid    int      `json:"cid"`    // 视频1P cid
-		Owner  struct { // UP 信息
-			Name string `json:"name"` // UP 昵称
-		}
-		Pages []struct { // 分 P 列表
-			Cid  int    `json:"cid"`  // 分 P cid
-			Page int    `json:"page"` // 分 P 序号
-			Part string `json:"part"` // 分 P 标题
-		}
-		Subtitle struct {
-			List []struct {
-				Id           int    `json:"id"`           // 字幕 ID
-				Lan          string `json:"lan"`          // 字幕语言
-				Lan_doc      string `json:"lan_doc"`      // 字幕语言名称
-				Subtitle_url string `json:"subtitle_url"` // 字幕 json URL
-			}
-		}
-	}
-}
-
-func getVideoPageInformation(bvid string) (string, error) {
-	// 设置 URL 并发送 GET 请求
-	params := url.Values{}
-	Url, _ := url.Parse("https://api.bilibili.com/x/web-interface/view")
-
-	// 设置 URL 参数
-	params.Set("bvid", bvid)
-
-	Url.RawQuery = params.Encode()
-	urlPath := Url.String()
-	resp, err := http.Get(urlPath)
-	if err != nil {
-		return "", err
-	}
-	// 将 body 转为字符串并返回
-	body, _ := io.ReadAll(resp.Body)
-	bodyString := string(body)
-	defer resp.Body.Close()
-	return bodyString, nil
-}
-
-func GetVideoPageInformationObj(bvid string) (*VideoInformation, error) {
-	var obj VideoInformation
-	body, err := getVideoPageInformation(bvid)
-	if err != nil {
-		return nil, err
-	}
-	err = decodeJson(body, &obj)
-	if err != nil {
-		return nil, err
-	}
-	// 错误检查
-	if checkObj(obj.Code) {
-		return nil, errors.New(obj.Message)
-	}
-	return &obj, nil
-}
-
-// 用于获取视频流的详细信息
-// 传入 BVID 和 CID
-// 获得如下结构体
-type Video struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Data    struct {
-		Dash struct {
-			Audio []struct {
-				Id       int    `json:"id"`
-				BaseUrl  string `json:"baseUrl"`
-				MimeType string `json:"mimeType"`
-			}
-			Flac struct {
-				Audio struct {
-					Id       int    `json:"id"`
-					BaseUrl  string `json:"baseUrl"`
-					MimeType string `json:"mimeType"`
-				}
-			}
-		}
-	}
-}
-
-func getVideo(bvid string, cid int) (string, error) {
-	// 设置 URL 并发送 GET 请求
-	params := url.Values{}
-	Url, _ := url.Parse("https://api.bilibili.com/x/player/playurl")
-
-	// 设置 URL 参数
-	params.Set("bvid", bvid)
-	params.Set("cid", strconv.Itoa(cid))
-	params.Set("fnval", "16")
-
-	Url.RawQuery = params.Encode()
-	urlPath := Url.String()
-	resp, err := http.Get(urlPath)
-	if err != nil {
-		return "", err
-	}
-	// 将 body 转为字符串并返回
-	body, _ := io.ReadAll(resp.Body)
-	bodyString := string(body)
-	defer resp.Body.Close()
-	return bodyString, nil
-}
-func GetVideoObj(bvid string, cid int) (*Video, error) {
-	var obj Video
-	body, err := getVideo(bvid, cid)
-	if err != nil {
-		return nil, err
-	}
-	err = decodeJson(body, &obj)
-	if err != nil {
-		return nil, err
-	}
 	if checkObj(obj.Code) {
 		return nil, errors.New(obj.Message)
 	}
@@ -395,7 +389,6 @@ func GetVideoObj(bvid string, cid int) (*Video, error) {
 }
 
 // 用于获取 AUID 音频流信息
-// 获得如下结构体
 type AudioInf struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
@@ -448,7 +441,6 @@ func GetAudioInfObj(auid string) (*AudioInf, error) {
 }
 
 // 用于获取 AUID 音频流
-// 获得如下结构体
 type AudioStream struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
@@ -502,7 +494,7 @@ func GetAudioObj(auid, quality string) (*AudioStream, error) {
 
 // 用于下载音频流的函数
 // 传入流 URL 和文件名
-func StreamingDownloader(audioURL string, filePathAndName string) error {
+func StreamingDownloader(audioURL, filePathAndName string) error {
 	// 先判断文件是否存在，如果存在则跳过下载，否则创建文件
 	out, err := os.Create(filePathAndName)
 	if err != nil {
