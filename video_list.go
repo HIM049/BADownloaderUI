@@ -49,6 +49,7 @@ func (video *Video) TransToVideoInfList() *[]VideoInformationList {
 		list.Cid = part.Cid
 		list.Title = CheckFileName(video.Meta.Title)
 		list.PageTitle = CheckFileName(part.Part)
+		list.Format = AudioType.m4a
 		// 音频流
 		list.Audio.Audio.Quality = part.Stream.Audio.Id
 		list.Audio.Audio.Stream = part.Stream.Audio.BaseUrl
@@ -56,7 +57,7 @@ func (video *Video) TransToVideoInfList() *[]VideoInformationList {
 		list.Audio.Flac.Stream = part.Stream.Flac.BaseUrl
 		// 元数据
 		list.Meta.Cover = video.Meta.Cover
-		// list.Meta.Author =
+		list.Meta.Author = video.Up.Name
 		// list.Meta.Lyrics_path =
 
 		// 处理音频标题（单 P 视频）
