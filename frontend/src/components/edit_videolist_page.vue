@@ -4,7 +4,7 @@
         <div>
             <li v-for="(video, index) in videoList" style="list-style-type: none;">
                 <!-- {{ index }} {{ video.title }} -->
-                <el-card class="video-card" style="margin-bottom: 10px;">
+                <el-card class="video-card">
                     <template #header>
                         <div class="card-header">
                             <span>{{ video.title }}</span>
@@ -105,6 +105,13 @@ function saveVideoList() {
 </script>
 
 <style>
+/* 列表卡片样式 */
+.video-card {
+    width: 60%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
 .card-header {
     display: flex;
     justify-content: space-between;

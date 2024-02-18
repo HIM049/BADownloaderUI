@@ -26,21 +26,12 @@
             </el-form>
         </form>
     </el-main>
-    <FootBar :status="status" text="" @back="$emit('back')" @next="$emit('next')" />
 </template>
 
 <script setup>
 import FootBar from '../components/modules/footer.vue'
 import { reactive, ref, onMounted } from 'vue'
 import { LoadConfig, SaveConfig, RefreshConfig } from '../../wailsjs/go/main/App'
-
-// 底栏状态
-const status = reactive({
-    showBack: true,
-    showNext: false,
-    allowBack: true,
-    allowNext: false,
-})
 
 onMounted(() => {
     loadConfig()

@@ -1,9 +1,10 @@
 <template>
-    <StepBar :pageNum="step" v-show="status.showStep" />
+        
+    <StepBar :pageNum="step" />
     <el-main>
-        <div id="icon-banner">
+        <!-- <div id="icon-banner">
             <img src="./image/icon-non-bg.png" style="width: 350px;" v-show="!status.showStep">
-        </div>
+        </div> -->
         <!-- 收藏夹信息输入 -->
         <div id="fav-input" class="fav-input">
             <el-input v-model="inputFavID" size="large" placeholder="请输入 收藏夹 ID / 收藏夹 URL" class="input-with-select"
@@ -40,7 +41,7 @@ const status = reactive({
     showNext: true,
     allowBack: true,
     allowNext: false,
-    showStep: false,
+    // showStep: false,
 })
 
 const inputFavID = ref("")

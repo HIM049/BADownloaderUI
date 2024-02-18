@@ -46,7 +46,6 @@
         </transition>
 
     </el-main>
-    <FootBar :status="status" text="" @back="$emit('back')" @next="$emit('next')" />
 </template>
 
 <script setup>
@@ -55,12 +54,8 @@ import { reactive, computed, ref } from 'vue'
 import { AudioDownload, SearchSongInformation } from '../../wailsjs/go/main/App'
 import { ElMessage } from 'element-plus';
 
-// 底栏状态
+// 展示状态
 const status = reactive({
-    showBack: true,
-    showNext: false,
-    allowBack: true,
-    allowNext: false,
     showInf: false,
 })
 
