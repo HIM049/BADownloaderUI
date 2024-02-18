@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gcottom/audiometa v1.2.5
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	github.com/tidwall/gjson v1.17.0
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/wailsapp/wails/v2 v2.6.0
 )
@@ -34,6 +35,8 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/sunfish-shogi/bufseekio v0.1.0 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

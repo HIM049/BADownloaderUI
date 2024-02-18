@@ -12,7 +12,7 @@ export function LoginBilibili():Promise<void>;
 
 export function MakeAndSaveList(arg1:string,arg2:number,arg3:boolean):Promise<void>;
 
-export function MakeUpEditor():Promise<void>;
+export function QueryFavCollect():Promise<main.userfavoritesCollect>;
 
 export function RefreshConfig():Promise<void>;
 

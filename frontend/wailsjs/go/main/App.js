@@ -22,8 +22,8 @@ export function MakeAndSaveList(arg1, arg2, arg3) {
   return window['go']['main']['App']['MakeAndSaveList'](arg1, arg2, arg3);
 }
 
-export function MakeUpEditor() {
-  return window['go']['main']['App']['MakeUpEditor']();
+export function QueryFavCollect() {
+  return window['go']['main']['App']['QueryFavCollect']();
 }
 
 export function RefreshConfig() {
