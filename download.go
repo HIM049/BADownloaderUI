@@ -64,7 +64,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 			// 下载视频
 			for i := 0; i < cfg.RetryCount; i++ {
 
-				err := v.GetStream()
+				err := v.GetStream("")
 				if err != nil {
 					// 获取流失败
 					runtime.LogErrorf(a.ctx, "(视频%d) 获取媒体流时出现错误：%s  (重试 %d )", num, err, i+1)

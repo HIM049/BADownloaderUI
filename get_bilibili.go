@@ -46,8 +46,8 @@ type Videos struct {
 }
 
 // 以 BVID 为单位请求视频详细信息
-func (v *Video) BvQuery() error {
-	json, err := getVideoPageInformation(v.Bvid)
+func (v *Video) BvQuery(sessdata string) error {
+	json, err := getVideoPageInformation(v.Bvid, sessdata)
 	if err != nil {
 		return err
 	}
@@ -81,32 +81,47 @@ func (v *Video) BvQuery() error {
 // 请求视频详细信息
 // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/info.md
 // TODO：重新添加字幕信息
-func getVideoPageInformation(bvid string) (string, error) {
-	// 设置 URL 并发送 GET 请求
-	params := url.Values{}
-	Url, _ := url.Parse("https://api.bilibili.com/x/web-interface/view")
-
-	// 设置 URL 参数
-	params.Set("bvid", bvid)
-
-	Url.RawQuery = params.Encode()
-	urlPath := Url.String()
-	resp, err := http.Get(urlPath)
+func getVideoPageInformation(bvid, sessdata string) (string, error) {
+	// 创建请求
+	req, err := http.NewRequest("GET", "https://api.bilibili.com/x/web-interface/view", nil)
 	if err != nil {
 		return "", err
 	}
+
+	// 添加 Cookie 到请求头
+	if sessdata != "" {
+		req.Header.Add("Cookie", "SESSDATA="+sessdata)
+	}
+
+	// 设置 URL 参数
+	q := req.URL.Query()
+	q.Add("bvid", bvid)
+	req.URL.RawQuery = q.Encode()
+
+	// 创建 HTTP 客户端并发送请求
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// 检查响应状态
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New("Error: " + strconv.Itoa(resp.StatusCode))
+	}
+
 	// 将 body 转为字符串并返回
 	body, _ := io.ReadAll(resp.Body)
 	bodyString := string(body)
-	defer resp.Body.Close()
 	return bodyString, nil
 }
 
 // 获取视频流
 // TODO：请求前检查数据
-func (v *VideoInformationList) GetStream() error {
+func (v *VideoInformationList) GetStream(sessdata string) error {
 	// 请求信息
-	json, err := getVideoStream(v.Bvid, strconv.Itoa(v.Cid))
+	json, err := getVideoStream(v.Bvid, strconv.Itoa(v.Cid), sessdata)
 	if err != nil {
 		return err
 	}
@@ -125,26 +140,41 @@ func (v *VideoInformationList) GetStream() error {
 // 获取视频流
 // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md#%E8%8E%B7%E5%8F%96%E8%A7%86%E9%A2%91%E6%B5%81%E5%9C%B0%E5%9D%80_web%E7%AB%AF
 // TODO：更换新链，增加 wbi 签名验证
-func getVideoStream(bvid, cid string) (string, error) {
-	// 设置 URL 并发送 GET 请求
-	params := url.Values{}
-	Url, _ := url.Parse("https://api.bilibili.com/x/player/playurl")
-
-	// 设置 URL 参数
-	params.Set("bvid", bvid)
-	params.Set("cid", cid)
-	params.Set("fnval", "16")
-
-	Url.RawQuery = params.Encode()
-	urlPath := Url.String()
-	resp, err := http.Get(urlPath)
+func getVideoStream(bvid, cid, sessdata string) (string, error) {
+	// 创建请求
+	req, err := http.NewRequest("GET", "https://api.bilibili.com/x/player/playurl", nil)
 	if err != nil {
 		return "", err
 	}
+
+	// 添加 Cookie 到请求头
+	if sessdata != "" {
+		req.Header.Add("Cookie", "SESSDATA="+sessdata)
+	}
+
+	// 设置 URL 参数
+	q := req.URL.Query()
+	q.Add("bvid", bvid)
+	q.Add("cid", cid)
+	q.Add("fnval", "16")
+	req.URL.RawQuery = q.Encode()
+
+	// 创建 HTTP 客户端并发送请求
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// 检查响应状态
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New("Error: " + strconv.Itoa(resp.StatusCode))
+	}
+
 	// 将 body 转为字符串并返回
 	body, _ := io.ReadAll(resp.Body)
 	bodyString := string(body)
-	defer resp.Body.Close()
 	return bodyString, nil
 }
 
@@ -189,81 +219,6 @@ func getLoginKey() (string, error) {
 	return bodyString, nil
 }
 
-// 获取 用户收藏的视频收藏夹 函数
-type userfavoritesCollect struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Data    struct {
-		Count int `json:"count"`
-		List  []struct {
-			Id          int    `json:"id"`          // 收藏夹ml
-			Fid         int    `json:"fid"`         // 原始收藏夹mlid
-			Mid         int    `json:"mid"`         // 创建用户mid
-			Title       string `json:"title"`       // 收藏夹标题
-			Cover       string `json:"cover"`       // 收藏夹封面图片url
-			Media_count int    `json:"media_count"` // 收藏夹视频数量
-		}
-	}
-}
-
-func getUserfavoritesCollect(sessdata, pageSize, pageNumber, mid string) (string, error) {
-	// 创建一个 HTTP 客户端
-	client := &http.Client{}
-
-	// 创建一个 GET 请求
-	req, err := http.NewRequest("GET", "https://api.bilibili.com/x/v3/fav/folder/collected/list", nil)
-	if err != nil {
-		return "", err
-	}
-
-	// 添加 Cookie 到请求头
-	req.Header.Add("Cookie", "SESSDATA="+sessdata)
-
-	// 添加参数到请求的查询字符串
-	q := req.URL.Query()
-	q.Add("ps", pageSize)    // 每页项数
-	q.Add("pn", pageNumber)  // 页码
-	q.Add("up_mid", mid)     // 用户 mid
-	q.Add("platform", "web") // 平台
-	req.URL.RawQuery = q.Encode()
-
-	// 发送请求并获取响应
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	// 检查响应状态码
-	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("Error:" + strconv.Itoa(resp.StatusCode))
-	}
-
-	// 将 body 转为字符串并返回
-	body, _ := io.ReadAll(resp.Body)
-	bodyString := string(body)
-	defer resp.Body.Close()
-	return bodyString, nil
-}
-
-func GetUserFavoritesCollect(account Account, pageSize, pageNumber int) (*userfavoritesCollect, error) {
-	var obj userfavoritesCollect
-	body, err := getUserfavoritesCollect(account.SESSDATA, strconv.Itoa(pageSize), strconv.Itoa(pageNumber), account.DedeUserID)
-	if err != nil {
-		return nil, err
-	}
-	err = decodeJson(body, &obj)
-	if err != nil {
-		return nil, err
-	}
-	// 错误检查
-	if checkObj(obj.Code) {
-		return nil, errors.New(obj.Message)
-	}
-
-	return &obj, nil
-}
-
 // 用于检查扫码状态和获取 cookie 的函数
 type checkLoginReturn struct {
 	Code    int    `json:"code"`
@@ -277,7 +232,7 @@ type checkLoginReturn struct {
 	}
 }
 
-// 定义一个带有参数和cookie的get请求函数，返回响应和错误
+// 检查扫码状态
 func checkLoginStatus(qrcode_key string) (string, *[]*http.Cookie, error) {
 	// 创建一个 HTTP 客户端
 	client := &http.Client{}
@@ -331,6 +286,80 @@ func CheckLoginStatus(qrcode_key string) (*checkLoginReturn, *[]*http.Cookie, er
 	}
 
 	return &obj, cookies, nil
+}
+
+// 获取 用户收藏的视频收藏夹 函数
+type userfavoritesCollect struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Count int `json:"count"`
+		List  []struct {
+			Id          int    `json:"id"`          // 收藏夹ml
+			Fid         int    `json:"fid"`         // 原始收藏夹mlid
+			Mid         int    `json:"mid"`         // 创建用户mid
+			Title       string `json:"title"`       // 收藏夹标题
+			Cover       string `json:"cover"`       // 收藏夹封面图片url
+			Media_count int    `json:"media_count"` // 收藏夹视频数量
+		}
+	}
+}
+
+func getUserfavoritesCollect(sessdata, mid, pageSize, pageNumber string) (string, error) {
+	// 创建请求
+	req, err := http.NewRequest("GET", "https://api.bilibili.com/x/v3/fav/folder/collected/list", nil)
+	if err != nil {
+		return "", err
+	}
+
+	// 添加 Cookie 到请求头
+	if sessdata != "" {
+		req.Header.Add("Cookie", "SESSDATA="+sessdata)
+	}
+
+	// 设置 URL 参数
+	q := req.URL.Query()
+	q.Add("ps", pageSize)    // 每页项数
+	q.Add("pn", pageNumber)  // 页码
+	q.Add("up_mid", mid)     // 用户 mid
+	q.Add("platform", "web") // 平台
+	req.URL.RawQuery = q.Encode()
+
+	// 创建 HTTP 客户端并发送请求
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// 检查响应状态
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New("Error: " + strconv.Itoa(resp.StatusCode))
+	}
+
+	// 将 body 转为字符串并返回
+	body, _ := io.ReadAll(resp.Body)
+	bodyString := string(body)
+	return bodyString, nil
+}
+
+func GetUserFavoritesCollect(sessdata, mid string, pageSize, pageNumber int) (*userfavoritesCollect, error) {
+	var obj userfavoritesCollect
+	body, err := getUserfavoritesCollect(sessdata, mid, strconv.Itoa(pageSize), strconv.Itoa(pageNumber))
+	if err != nil {
+		return nil, err
+	}
+	err = decodeJson(body, &obj)
+	if err != nil {
+		return nil, err
+	}
+	// 错误检查
+	if checkObj(obj.Code) {
+		return nil, errors.New(obj.Message)
+	}
+
+	return &obj, nil
 }
 
 // 用于获取收藏夹基本信息的函数

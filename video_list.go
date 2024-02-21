@@ -150,7 +150,7 @@ func makeVideoList(a *App, downloadCount int, downloadCompilation bool) (*[]Vide
 			// 获取当前视频详细信息
 			video := new(Video)
 			video.Bvid = favlist.Data.Medias[j].Bvid
-			err := video.BvQuery()
+			err := video.BvQuery("")
 			if err != nil {
 				// 视频失效
 				runtime.LogErrorf(a.ctx, "获取 "+video.Bvid+" 信息时发生错误: %s", err)
