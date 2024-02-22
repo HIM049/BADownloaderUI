@@ -78,7 +78,7 @@ func (a *App) LoginBilibili() error {
 func (a *App) QueryFavCollect() (*userfavoritesCollect, error) {
 	cfg := GetConfig(a.ctx)
 
-	obj, err := GetUserFavoritesCollect(cfg.Account, 20, 1)
+	obj, err := GetUserFavoritesCollect(cfg.Account.SESSDATA, cfg.Account.DedeUserID, 20, 1)
 	if err != nil {
 		return nil, err
 	}
