@@ -11,18 +11,23 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
+// 全局版本号
+const APP_VERSION string = "3.4.0"
+
 func main() {
 	// Create an instance of the app structure
-	app := NewApp()
+	app := &App{}
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "BiliAudioDownloader 3.4.0",
+		Title:  "BiliAudioDownloader " + APP_VERSION,
 		Width:  1024,
 		Height: 720,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
+		Frameless:        true, // 无边框窗口
+		DisableResize:    true, // 禁用缩放
 		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
 		// OnStartup:        beforeRunFunc,
 		OnStartup:  app.startup,
