@@ -1,64 +1,79 @@
 <template>
-    <el-main>
-        <div style="width: 700px; margin: 0 auto 10px auto;">
-            <h1 style="font-size: 20px; padding-bottom: 10px;">单曲下载器</h1>
-            <el-input v-model="auid" size="large" placeholder="请输入 AUID 的数字部分" class="input-with-select"
-                @input="searchSongInformation" clearable>
+    <FramePage title="单曲下载">
+        <var-input placeholder="纯数字 AUID" v-model="auid" clearable 
+        style="margin-bottom: 25px;" >
+            <template #prepend-icon>
+                <var-icon name="magnify" />
+            </template>
+        </var-input>
 
-                <template #prepend>
-                    <el-button @click="searchSongInformation"><el-icon>
-                            <Search />
-                        </el-icon></el-button>
-                </template>
-            </el-input>
-        </div>
+        <var-card 
+            title="搜索结果" :src="songInf.cover" layout="row" ripple outline
+            v-show="InfCard"
+            style="margin-bottom: 20px" >
+            <template #description>
+                <var-divider />
+                <div>
+                    <var-cell><var-input variant="outlined" placeholder="曲名" size="small" v-model="parms.song_name" /></var-cell>
+                    <var-cell><var-input variant="outlined" placeholder="歌手" size="small" v-model="parms.author" /></var-cell>
+                </div>
+            </template>            
+        </var-card>
 
-        <transition name="el-fade-in-linear">
-            <el-card class="video-card" style="width: 600px; margin: 0 auto;" v-show="status.showInf">
-                <template #header>
-                    <div class="card-header">
-                        <span>{{ songInf.title }}</span>
-                        <el-button class="button" text>AU{{ songInf.auid }}</el-button>
-                    </div>
-                </template>
-                <img :src="songInf.cover" style="width: 200px;">
-                <el-form label-position="right" style="width: 50%;" :model="songInf">
-                    <el-form-item label="曲名">
-                        <el-input v-model="parms.song_name" />
-                    </el-form-item>
-                    <el-form-item label="歌手">
-                        <el-input v-model="parms.author" />
-                    </el-form-item>
-                    <el-form-item label="歌曲名称">
-                        <el-switch v-model="parms.options.songName" style="--el-switch-on-color: #13ce66;" />
-                    </el-form-item>
-                    <el-form-item label="歌曲封面">
-                        <el-switch v-model="parms.options.songCover" style="--el-switch-on-color: #13ce66;" />
-                    </el-form-item>
-                    <el-form-item label="歌曲作者">
-                        <el-switch v-model="parms.options.songAuthor" style="--el-switch-on-color: #13ce66;" />
-                    </el-form-item>
-                </el-form>
-                <template #footer>
-                    <el-button class="button" type="success" @click="audioDownload" plain>开始下载</el-button>
-                </template>
-            </el-card>
-        </transition>
+        <var-card 
+            title="下载选项" ripple outline
+            style="margin-bottom: 20px"  >
+            <template #description>
+                <var-divider />
+                <div style="margin-left: 20px;">
+                    <var-cell> 歌曲名称
+                        <template #extra>
+                            <var-switch v-model="parms.options.songName" @click.stop />
+                        </template>
+                    </var-cell>
 
-    </el-main>
+                    <var-cell> 歌曲封面
+                        <template #extra>
+                            <var-switch v-model="parms.options.songCover" @click.stop />
+                        </template>
+                    </var-cell>
+
+                    <var-cell> 歌曲作者
+                        <template #extra>
+                            <var-switch v-model="parms.options.songAuthor" @click.stop />
+                        </template>
+                    </var-cell>
+                </div>
+            </template>
+        </var-card>
+
+        <var-space justify="flex-end">
+            <var-button type="primary" @click="audioDownload">开始下载</var-button>
+            <var-button type="primary" @click="searchSongInformation">检查</var-button>
+        </var-space>
+
+    </FramePage>
 </template>
 
 <script setup>
-import FootBar from '../components/modules/footer.vue'
-import { reactive, computed, ref } from 'vue'
+import FramePage from '../components/modules/frame_page.vue'
+import { reactive, ref, watch } from 'vue'
 import { AudioDownload, SearchSongInformation } from '../../wailsjs/go/main/App'
-import { ElMessage } from 'element-plus';
+import { Snackbar } from '@varlet/ui'
+
 
 // 展示状态
-const status = reactive({
-    showInf: false,
+const InfCard = ref(false)
+
+const auid = ref('')
+
+// 歌曲信息
+const songInf = reactive({
+    title: "",
+    cover: "",
 })
 
+// 下载参数
 const parms = reactive({
     song_name: "",
     author: "",
@@ -70,52 +85,39 @@ const parms = reactive({
     })
 })
 
-const auid = ref("")
-
-const songInf = reactive({
-    auid: "0",
-    title: "",
-    cover: "",
-})
-
-function searchSongInformation() {
-    SearchSongInformation(auid.value).then(result => {
-        if (result.code == "0") {
-            songInf.auid = result.Data.id
+// 输入的 ID 变化时查询歌曲信息
+watch(auid, (newid) => {
+    SearchSongInformation(newid).then(result => {
+        console.log(newid);
+        console.log(result);
+        if (result.msg == "success") {
             songInf.title = result.Data.title
             songInf.cover = result.Data.cover
             parms.song_name = result.Data.title
             parms.author = result.Data.author
 
-            status.showInf = true
+            InfCard.value = true
         } else {
-            ElMessage.warning("无效的收藏夹");
+            Snackbar.warning("无效的 AUID");
+            InfCard.value = false
         }
     })
-}
+})
 
+// 下载歌曲
 function audioDownload() {
-    ElMessage.success("开始下载")
+    if (InfCard.value == false) {
+        Snackbar.warning("无效的 AUID");
+        return
+    }
+    Snackbar.success("开始下载")
     var opt = {
         song_name: parms.options.songName,
         song_cover: parms.options.songCover,
         song_author: parms.options.songAuthor,
     }
-    AudioDownload(opt, auid.value, parms.song_name, parms.author, songInf.title).then(result => {
-        ElMessage.success("下载完成")
+    AudioDownload(opt, auid, parms.song_name, parms.author, songInf.title).then(result => {
+        Snackbar.success("下载完成")
     })
 }
 </script>
-
-<style>
-.el-card__body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.el-card__footer {
-    display: flex;
-    justify-content: flex-end;
-}
-</style>
