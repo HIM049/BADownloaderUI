@@ -36,7 +36,6 @@
 
                     <var-space justify="flex-end">
                         <var-button type="danger" @click="refreshConfig">重置设置</var-button>
-                        <var-button type="primary" @click="loadConfig">放弃更改</var-button>
                         <var-button type="success" @click="saveConfig">保存更改</var-button>
                     </var-space>
                 </var-space>
@@ -47,7 +46,6 @@
 </template>
 
 <script setup>
-import FootBar from '../components/modules/footer.vue'
 import { reactive, ref, onMounted } from 'vue'
 import { LoadConfig, SaveConfig, RefreshConfig } from '../../wailsjs/go/main/App'
 import { Snackbar } from '@varlet/ui'

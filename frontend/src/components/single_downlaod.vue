@@ -49,7 +49,6 @@
 
         <var-space justify="flex-end">
             <var-button type="primary" @click="audioDownload">开始下载</var-button>
-            <var-button type="primary" @click="searchSongInformation">检查</var-button>
         </var-space>
 
     </FramePage>
@@ -88,8 +87,6 @@ const parms = reactive({
 // 输入的 ID 变化时查询歌曲信息
 watch(auid, (newid) => {
     SearchSongInformation(newid).then(result => {
-        console.log(newid);
-        console.log(result);
         if (result.msg == "success") {
             songInf.title = result.Data.title
             songInf.cover = result.Data.cover
