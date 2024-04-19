@@ -1,26 +1,4 @@
 <template>
-    <!-- <el-main>
-        <div id="options">
-            <el-form class="option-card" label-position="right" label-width="100px">
-                <h3>下载选项</h3>
-
-                <el-form-item label="下载全部">
-                    <el-switch v-model="downAll" style="--el-switch-on-color: #13ce66;"
-                        @click="parms.options.downCount = 0" />
-                </el-form-item>
-
-                <el-form-item label="下载数量">
-                    <el-input-number v-model="parms.options.downCount" :min="0" :max="parms.count" :disabled="downAll" />
-                </el-form-item>
-
-                <el-form-item label="下载分集">
-                    <el-switch v-model="parms.options.downPart" style="--el-switch-on-color: #13ce66;" />
-                </el-form-item>
-
-            </el-form>
-
-        </div>
-    </el-main> -->
     <FramePage title="设定下载选项">
         <var-card 
             title="元数据选项" ripple outline style="margin-bottom: 20px"  >
@@ -29,19 +7,19 @@
                 <div style="margin-left: 20px;">
                     <var-cell> 下载全部
                         <template #extra>
-                            <var-switch v-model="downAll" @click="parms.options.downCount = 0" />
+                            <var-switch v-model="downAll" @click="parms.options.downCount = 0" variant />
                         </template>
                     </var-cell>
 
                     <var-cell> 下载数量
                         <template #extra>
-                            <var-counter :min="0" :max="parms.count" v-model="parms.options.downCount"/>
+                            <var-counter :min="0" :max="parms.count" v-model="parms.options.downCount" :disabled="downAll"/>
                         </template>
                     </var-cell>
 
                     <var-cell> 下载分集
                         <template #extra>
-                            <var-switch v-model="parms.options.downPart" />
+                            <var-switch v-model="parms.options.downPart" variant />
                         </template>
                     </var-cell>
                 </div>
@@ -55,19 +33,19 @@
                 <div style="margin-left: 20px;">
                     <var-cell> 歌曲名称
                         <template #extra>
-                            <var-switch v-model="parms.options.songName" @click.stop />
+                            <var-switch v-model="parms.options.songName" @click.stop variant />
                         </template>
                     </var-cell>
 
                     <var-cell> 歌曲封面
                         <template #extra>
-                            <var-switch v-model="parms.options.songCover" @click.stop />
+                            <var-switch v-model="parms.options.songCover" @click.stop variant />
                         </template>
                     </var-cell>
 
                     <var-cell> 歌曲作者
                         <template #extra>
-                            <var-switch v-model="parms.options.songAuthor" @click.stop />
+                            <var-switch v-model="parms.options.songAuthor" @click.stop variant />
                         </template>
                     </var-cell>
                 </div>
@@ -92,7 +70,7 @@ const parms = computed({
         emit('update:parms', parms)
     }
 })
-// 下载全部（无作用）
+// 下载全部开关状态
 const downAll = ref(true)
 
 </script>

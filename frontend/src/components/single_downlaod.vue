@@ -28,19 +28,19 @@
                 <div style="margin-left: 20px;">
                     <var-cell> 歌曲名称
                         <template #extra>
-                            <var-switch v-model="parms.options.songName" @click.stop />
+                            <var-switch v-model="parms.options.songName" @click.stop variant />
                         </template>
                     </var-cell>
 
                     <var-cell> 歌曲封面
                         <template #extra>
-                            <var-switch v-model="parms.options.songCover" @click.stop />
+                            <var-switch v-model="parms.options.songCover" @click.stop variant />
                         </template>
                     </var-cell>
 
                     <var-cell> 歌曲作者
                         <template #extra>
-                            <var-switch v-model="parms.options.songAuthor" @click.stop />
+                            <var-switch v-model="parms.options.songAuthor" @click.stop variant />
                         </template>
                     </var-cell>
                 </div>

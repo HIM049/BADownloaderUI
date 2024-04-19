@@ -67,7 +67,6 @@ function extractURL(url) {
         var parsedUrl = new URL(url);
     } catch (error) {
         // 不是 URL ，直接返回
-        console.log(error);
         return url
     }
     // 提取特定参数
