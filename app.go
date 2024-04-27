@@ -40,6 +40,10 @@ func (a *App) shutdown(ctx context.Context) {
 	// os.RemoveAll(cfg.CachePath)
 }
 
+func (a *App) GetAppVersion() string {
+	return APP_VERSION
+}
+
 // 查询并返回收藏夹信息
 func (a *App) SearchFavListInformation(favListID string) FavList {
 	FavListID = favListID

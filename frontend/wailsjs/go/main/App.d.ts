@@ -6,6 +6,8 @@ export function AudioDownload(arg1:main.DownloadOption,arg2:string,arg3:string,a
 
 export function Checkffmpeg():Promise<boolean>;
 
+export function GetAppVersion():Promise<string>;
+
 export function GetVideoList():Promise<Array<main.VideoInformationList>>;
 
 export function LoadConfig():Promise<main.Config>;

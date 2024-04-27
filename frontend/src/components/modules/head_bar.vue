@@ -10,6 +10,7 @@
                     <p>udio</p>
                     <p style="color: #ffabab;">D</p>
                     <p>ownloader</p>
+                    <p style="font-size: 12px; display: flex; padding-left: 10px; align-items: center;">{{ APP_VERSION }}</p>
                 </div>
             </div>
             <div id="ctl-buttons">
@@ -24,8 +25,16 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { WindowMinimise, Quit } from '../../../wailsjs/runtime'
+import { GetAppVersion } from '../../../wailsjs/go/main/App'
 
+const APP_VERSION = ref(null)
+onMounted(() => {
+    GetAppVersion().then(result => {
+        APP_VERSION.value = result
+    })
+})
 </script>
 
 <style>

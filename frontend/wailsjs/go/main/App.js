@@ -10,6 +10,10 @@ export function Checkffmpeg() {
   return window['go']['main']['App']['Checkffmpeg']();
 }
 
+export function GetAppVersion() {
+  return window['go']['main']['App']['GetAppVersion']();
+}
+
 export function GetVideoList() {
   return window['go']['main']['App']['GetVideoList']();
 }
