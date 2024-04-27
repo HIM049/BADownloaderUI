@@ -40,6 +40,7 @@ export namespace main {
 	    videolist_path: string;
 	    download_threads: number;
 	    retry_count: number;
+	    convert_format: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -52,6 +53,7 @@ export namespace main {
 	        this.videolist_path = source["videolist_path"];
 	        this.download_threads = source["download_threads"];
 	        this.retry_count = source["retry_count"];
+	        this.convert_format = source["convert_format"];
 	    }
 	}
 	export class DownloadOption {
@@ -106,11 +108,7 @@ export namespace main {
 	    bvid: string;
 	    cid: number;
 	    title: string;
-	    videos: number;
-	    list_id: number;
-	    is_page: boolean;
 	    page_title: string;
-	    page_id: number;
 	    format: string;
 	
 	    static createFrom(source: any = {}) {
@@ -122,12 +120,22 @@ export namespace main {
 	        this.bvid = source["bvid"];
 	        this.cid = source["cid"];
 	        this.title = source["title"];
-	        this.videos = source["videos"];
-	        this.list_id = source["list_id"];
-	        this.is_page = source["is_page"];
 	        this.page_title = source["page_title"];
-	        this.page_id = source["page_id"];
 	        this.format = source["format"];
+	    }
+	}
+	export class userfavoritesCollect {
+	    code: number;
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new userfavoritesCollect(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.message = source["message"];
 	    }
 	}
 

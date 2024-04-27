@@ -6,6 +6,14 @@ export function AudioDownload(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['AudioDownload'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function Checkffmpeg() {
+  return window['go']['main']['App']['Checkffmpeg']();
+}
+
+export function GetAppVersion() {
+  return window['go']['main']['App']['GetAppVersion']();
+}
+
 export function GetVideoList() {
   return window['go']['main']['App']['GetVideoList']();
 }
@@ -22,8 +30,8 @@ export function MakeAndSaveList(arg1, arg2, arg3) {
   return window['go']['main']['App']['MakeAndSaveList'](arg1, arg2, arg3);
 }
 
-export function MakeUpEditor() {
-  return window['go']['main']['App']['MakeUpEditor']();
+export function QueryFavCollect() {
+  return window['go']['main']['App']['QueryFavCollect']();
 }
 
 export function RefreshConfig() {

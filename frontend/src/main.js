@@ -1,10 +1,6 @@
-import {createApp} from 'vue'
 import App from './App.vue'
-// element 图标组件
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import Varlet from '@varlet/ui'
+import { createApp } from 'vue'
+import '@varlet/ui/es/style'
 
-const app = createApp(App)
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
-}
-app.mount('#app')
+createApp(App).use(Varlet).mount('#app')

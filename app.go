@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"os"
-	"os/exec"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -15,11 +14,6 @@ var (
 // App struct
 type App struct {
 	ctx context.Context
-}
-
-// NewApp creates a new App application struct
-func NewApp() *App {
-	return &App{}
 }
 
 // startup is called when the app starts. The context is saved
@@ -42,8 +36,12 @@ func (a *App) startup(ctx context.Context) {
 // 程序关闭时
 func (a *App) shutdown(ctx context.Context) {
 	// 清理缓存
-	cfg := GetConfig(a.ctx)
-	os.RemoveAll(cfg.CachePath)
+	// cfg := GetConfig(a.ctx)
+	// os.RemoveAll(cfg.CachePath)
+}
+
+func (a *App) GetAppVersion() string {
+	return APP_VERSION
 }
 
 // 查询并返回收藏夹信息
@@ -72,25 +70,4 @@ type DownloadOption struct {
 	SongName   bool `json:"song_name"`
 	SongCover  bool `json:"song_cover"`
 	SongAuthor bool `json:"song_author"`
-}
-
-// 唤起系统文本编辑器
-func (a *App) MakeUpEditor() {
-	cfg := GetConfig(a.ctx)
-
-	// 获取系统默认的文本编辑器
-	editor := os.Getenv("EDITOR")
-	if editor == "" {
-		editor = "notepad"
-	}
-
-	// 创建命令
-	cmd := exec.Command(editor, cfg.VideoListPath)
-
-	// 启动命令
-	err := cmd.Start()
-	if err != nil {
-		runtime.LogInfof(a.ctx, "无法启动编辑器:%s", err)
-		return
-	}
 }

@@ -47,12 +47,12 @@ func (a *App) StartDownload(opt DownloadOption) {
 			// 处理音频标题
 			finalfileName := v.Title
 			// 如果是分 P （以分 P 命名为主）
-			if v.IsPage {
+			if true {
 				finalfileName += "(" + v.PageTitle + ")"
 			}
 
 			//判断是否已下载
-			finalFile := path.Join(cfg.DownloadPath, FavListID, finalfileName+AudioType.mp3)
+			finalFile := path.Join(cfg.DownloadPath, FavListID, v.Title+AudioType.mp3)
 			if IsFileExists(finalFile) {
 				runtime.LogInfof(a.ctx, "跳过已下载: %s", finalFile)
 				return
@@ -63,24 +63,38 @@ func (a *App) StartDownload(opt DownloadOption) {
 
 			// 下载视频
 			for i := 0; i < cfg.RetryCount; i++ {
-				err := GetAndDownload(v.Bvid, v.Cid, musicPathAndName+AudioType.m4a)
+
+				err := v.GetStream("")
 				if err != nil {
-					// 下载失败
-					runtime.LogErrorf(a.ctx, "(视频%d) 下载视频时出现错误：%s  (重试 %d )", num, err, i+1)
+					// 获取流失败
+					runtime.LogErrorf(a.ctx, "(视频%d) 获取媒体流时出现错误：%s  (重试 %d )", num, err, i+1)
 					continue
 				}
+				// 下载媒体流
+				err = StreamingDownloader(v.Audio.Audio.Stream, musicPathAndName+AudioType.m4a)
+				if err != nil {
+					// 下载失败
+					runtime.LogErrorf(a.ctx, "(视频%d) 下载时出现错误：%s  (重试 %d )", num, err, i+1)
+					continue
+				}
+
 			}
 			runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
 
-			if v.Format == AudioType.m4a {
-				runtime.LogDebug(a.ctx, "是 M4A 文件")
+			// 判断文件类型并转码
+			if v.Format == AudioType.m4a && cfg.ConvertFormat {
+				runtime.LogDebugf(a.ctx, "(视频%d) 转码为 MP3", num)
+				finalfileName = finalfileName + AudioType.mp3
 
 				// 转码文件
-				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
+				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName)
 				if err != nil {
 					runtime.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
 				}
 				runtime.LogDebugf(a.ctx, "(视频%d) 转码文件成功", num)
+			} else {
+				runtime.LogDebugf(a.ctx, "(视频%d) 不转码", num)
+				finalfileName = finalfileName + AudioType.m4a
 			}
 
 			// 写入元数据
@@ -91,7 +105,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 			runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
-			err = OutputFile(&cfg, &v, finalfileName+AudioType.mp3)
+			err = OutputFile(&cfg, &v, finalfileName)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			}
@@ -143,17 +157,17 @@ func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, titl
 	}
 }
 
-// 获取并下载媒体流
-func GetAndDownload(bvid string, cid int, filePathAndName string) error {
-	// 获取 B 站视频流地址
-	video, err := GetVideoObj(bvid, cid)
-	if err != nil {
-		return err
-	}
-	// 下载媒体流
-	err = StreamingDownloader(video.Data.Dash.Audio[0].BaseUrl, filePathAndName)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// // 获取并下载媒体流
+// func GetAndDownload(bvid string, cid int, filePathAndName string) error {
+// 	// 获取 B 站视频流地址
+// 	video, err := GetVideoObj(bvid, cid)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	// 下载媒体流
+// 	err = StreamingDownloader(video.Data.Dash.Audio[0].BaseUrl, filePathAndName)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }

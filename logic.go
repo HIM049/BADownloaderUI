@@ -74,6 +74,17 @@ func (a *App) LoginBilibili() error {
 	return nil
 }
 
+// 查询用户收藏的收藏夹
+func (a *App) QueryFavCollect() (*userfavoritesCollect, error) {
+	cfg := GetConfig(a.ctx)
+
+	obj, err := GetUserFavoritesCollect(cfg.Account.SESSDATA, cfg.Account.DedeUserID, 20, 1)
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
+}
+
 // 保存 JSON
 func SaveJsonFile(filePath string, theData any) error {
 	data, err := json.MarshalIndent(theData, "", "    ")

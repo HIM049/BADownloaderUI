@@ -4,6 +4,10 @@ import {main} from '../models';
 
 export function AudioDownload(arg1:main.DownloadOption,arg2:string,arg3:string,arg4:string,arg5:string):Promise<void>;
 
+export function Checkffmpeg():Promise<boolean>;
+
+export function GetAppVersion():Promise<string>;
+
 export function GetVideoList():Promise<Array<main.VideoInformationList>>;
 
 export function LoadConfig():Promise<main.Config>;
@@ -12,7 +16,7 @@ export function LoginBilibili():Promise<void>;
 
 export function MakeAndSaveList(arg1:string,arg2:number,arg3:boolean):Promise<void>;
 
-export function MakeUpEditor():Promise<void>;
+export function QueryFavCollect():Promise<main.userfavoritesCollect>;
 
 export function RefreshConfig():Promise<void>;
 
