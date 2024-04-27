@@ -1,55 +1,24 @@
 <template>
-    <!-- <el-main style="display: flex; justify-content: center;">
-        <div>
-            <li v-for="(video, index) in videoList" style="list-style-type: none;">
-                <el-card class="video-card">
-                    <template #header>
-                        <div class="card-header">
-                            <span>{{ video.title }}</span>
-                            <el-button class="button" text>{{ video.bvid }}</el-button>
-                        </div>
-                    </template>
-<img :src="video.Meta.cover" style="width: 200px;">
-<el-form label-position="right" style="width: 70%;" :model="video">
-    <el-form-item label="曲名">
-        <el-input v-model="video.Meta.song_name" />
-    </el-form-item>
-    <el-form-item label="歌手">
-        <el-input v-model="video.Meta.author" />
-    </el-form-item>
-</el-form>
-<template #footer>
-                        <el-button class="button" type="success" @click="saveVideoList" plain>Save</el-button>
-                    </template>
-</el-card>
-</li>
-</div>
-</el-main> -->
     <FramePage title="列表编辑" style="width: 50%; margin: 0 auto;">
-        <!-- <var-card outline title="点击按钮生成列表">
-            <template #extra>
-                <var-space>
-                    <var-button type="primary" @click="makeList">生成列表</var-button>
-                </var-space>
-            </template>
-        </var-card> -->
 
         <li v-for="(video, index) in videoList" style="list-style-type: none;">
             <var-card :title="video.title" :src="video.Meta.cover" layout="row" outlines style="margin-bottom: 20px;">
-                <template #extra>
+                
+
+                <template #description>
+                    <var-divider />
+                    <div>
+                        <var-cell><var-input variant="outlined" placeholder="曲名" size="small" v-model="video.Meta.song_name" @change="saveVideoList" /></var-cell>
+                        <var-cell><var-input variant="outlined" placeholder="歌手" size="small" v-model="video.Meta.author" @change="saveVideoList" /></var-cell>
+                    </div>
+                </template>   
+
+                <!-- <template #extra>
                     <var-space justify="flex-end">
-                        <var-button type="primary">编辑</var-button>
+                        <var-button type="primary" @click="saveVideoList">保存</var-button>
                     </var-space>
-                </template>
+                </template> -->
             </var-card>
-            <!-- <el-form label-position="right" style="width: 70%;" :model="video">
-                    <el-form-item label="曲名">
-                        <el-input v-model="video.Meta.song_name" />
-                    </el-form-item>
-                    <el-form-item label="歌手">
-                        <el-input v-model="video.Meta.author" />
-                    </el-form-item>
-                </el-form> -->
         </li>
     </FramePage>
 </template>

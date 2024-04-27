@@ -39,7 +39,7 @@ import OptionPage from '../components/collect_download/option_page.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
-import { MakeAndSaveList } from '../../wailsjs/go/main/App'
+import { MakeAndSaveList, StartDownload } from '../../wailsjs/go/main/App'
 import { Snackbar } from '@varlet/ui'
 
 // 页面索引值
@@ -102,15 +102,23 @@ watch(pageIndex, (newPageIndex) => {
             status.loading = false;
         })
     }
-    // 是否进入下载页面
-    if (newPageIndex > 2) {
+    // 下载页面
+    if (newPageIndex == 3) {
         status.allowNext = false
-    } else {
-        status.allowNext = true
+        status.allowBack = false
+        var opt = {
+            song_name: parms.options.songName,
+            song_cover: parms.options.songCover,
+            song_author: parms.options.songAuthor,
+        }
+        StartDownload(opt).then(result => {
+            status.allowNext = true
+        })
     }
     // 回到首页
     if (newPageIndex > 3) {
         pageIndex.value = 0;
+        window.location.reload();
     }
 })
 </script>
