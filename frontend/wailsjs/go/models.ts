@@ -40,6 +40,7 @@ export namespace main {
 	    videolist_path: string;
 	    download_threads: number;
 	    retry_count: number;
+	    convert_format: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -52,6 +53,7 @@ export namespace main {
 	        this.videolist_path = source["videolist_path"];
 	        this.download_threads = source["download_threads"];
 	        this.retry_count = source["retry_count"];
+	        this.convert_format = source["convert_format"];
 	    }
 	}
 	export class DownloadOption {

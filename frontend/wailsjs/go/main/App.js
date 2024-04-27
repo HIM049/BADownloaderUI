@@ -6,6 +6,10 @@ export function AudioDownload(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['AudioDownload'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function Checkffmpeg() {
+  return window['go']['main']['App']['Checkffmpeg']();
+}
+
 export function GetVideoList() {
   return window['go']['main']['App']['GetVideoList']();
 }

@@ -13,6 +13,7 @@ type Config struct {
 	VideoListPath   string `json:"videolist_path"`
 	DownloadThreads int    `json:"download_threads"`
 	RetryCount      int    `json:"retry_count"`
+	ConvertFormat   bool   `json:"convert_format"`
 	Account         Account
 }
 
@@ -87,6 +88,7 @@ func bulidConfig() *Config {
 		VideoListPath:   "./Cache/video_list.json",
 		DownloadThreads: 5,
 		RetryCount:      10,
+		ConvertFormat:   Checkffmpeg(),
 		Account: Account{
 			SESSDATA:          "",
 			Bili_jct:          "",

@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function AudioDownload(arg1:main.DownloadOption,arg2:string,arg3:string,arg4:string,arg5:string):Promise<void>;
 
+export function Checkffmpeg():Promise<boolean>;
+
 export function GetVideoList():Promise<Array<main.VideoInformationList>>;
 
 export function LoadConfig():Promise<main.Config>;

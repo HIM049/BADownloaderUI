@@ -82,15 +82,19 @@ func (a *App) StartDownload(opt DownloadOption) {
 			runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
 
 			// 判断文件类型并转码
-			if v.Format == AudioType.m4a {
-				runtime.LogDebug(a.ctx, "是 M4A 文件")
+			if v.Format == AudioType.m4a && cfg.ConvertFormat {
+				runtime.LogDebugf(a.ctx, "(视频%d) 转码为 MP3", num)
+				finalfileName = finalfileName + AudioType.mp3
 
 				// 转码文件
-				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
+				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName)
 				if err != nil {
 					runtime.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
 				}
 				runtime.LogDebugf(a.ctx, "(视频%d) 转码文件成功", num)
+			} else {
+				runtime.LogDebugf(a.ctx, "(视频%d) 不转码", num)
+				finalfileName = finalfileName + AudioType.m4a
 			}
 
 			// 写入元数据
@@ -101,7 +105,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 			runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
-			err = OutputFile(&cfg, &v, finalfileName+AudioType.mp3)
+			err = OutputFile(&cfg, &v, finalfileName)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			}
