@@ -11,11 +11,12 @@ import (
 // 修改 TAG
 func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList) error {
 
-	file := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + AudioType.m4a
 	// 准备参数
+	fileType := AudioType.m4a
 	if cfg.ConvertFormat {
-		file = cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + AudioType.m4a
+		fileType = AudioType.mp3
 	}
+	file := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + fileType
 	songCover := cfg.CachePath + "/cover/" + strconv.Itoa(v.Cid) + ".jpg"
 	songName := v.Meta.SongName
 	songAuthor := v.Meta.Author

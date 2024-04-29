@@ -87,7 +87,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 				finalfileName = finalfileName + AudioType.mp3
 
 				// 转码文件
-				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName)
+				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
 				if err != nil {
 					runtime.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
 				}
