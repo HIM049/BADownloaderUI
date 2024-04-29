@@ -16,19 +16,25 @@
 
                     <var-divider />
 
-                    <var-cell> 使用 ffmpeg 转码音频
-                        <template #extra>
-                            <var-switch v-model="config.convert_format" variant @change="setConvertFormat" />
-                        </template>
-                    </var-cell>
+                    <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%;">
+                        <var-cell> 使用 ffmpeg 转码音频
+                            <template #extra>
+                                <var-switch v-model="config.convert_format" variant @change="setConvertFormat" />
+                            </template>
+                        </var-cell>
+                    </var-tooltip>
 
                     <var-divider />
+                    
+                    <div style="display: flex; justify-content: space-between; padding: 10px 12px;">
+                        最大下载线程数
+                        <var-counter v-model="config.download_threads" @change="changeCfg" />
+                    </div>
 
-                    <label>最大线程数</label>
-                    <var-counter v-model="config.download_threads" @change="changeCfg" />
-
-                    <label>下载重试次数</label>
-                    <var-counter v-model="config.retry_count" @change="changeCfg" />
+                    <div style="display: flex; justify-content: space-between; padding: 10px 12px;">
+                        下载重试次数
+                        <var-counter v-model="config.retry_count" @change="changeCfg" />
+                    </div>
 
                     <var-space justify="flex-end">
                         <var-button type="danger" @click="refreshConfig">重置设置</var-button>
@@ -99,7 +105,7 @@ function setConvertFormat() {
             saveConfig()
         } else {
             config.convert_format = false
-            Snackbar.warning("未检测到 ffmpeg 安装，请检查环境变量")
+            Snackbar.warning("未检测到 ffmpeg 安装")
         }
     })
 }
