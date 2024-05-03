@@ -39,7 +39,7 @@ import OptionPage from '../components/collect_download/option_page.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
-import { MakeAndSaveList, StartDownload } from '../../wailsjs/go/main/App'
+import { MakeAndSaveList, MakeAndSaveCompList, StartDownload } from '../../wailsjs/go/main/App'
 import { Snackbar } from '@varlet/ui'
 
 // 页面索引值
@@ -51,7 +51,9 @@ const scrollTop = ref(10)
 // 收藏夹信息
 const parms = reactive({
     favListID: "",
+    mid: null,
     count: 0,
+    isComp: null,
     // 下载设置
     options: reactive({
         downCount: 0,
@@ -91,16 +93,29 @@ watch(pageIndex, (newPageIndex) => {
     // 列表编辑页面
     if (newPageIndex == 2) {
         status.loading = true;
-        MakeAndSaveList(parms.favListID, Number(parms.options.downCount), parms.options.downPart).then(result => {
-            if (result != null) {
-                // 创建失败
-                Snackbar.error(result);
-            } else {
-                // 创建成功
-                Snackbar.success("创建完成");
-            }
-            status.loading = false;
-        })
+        if (!parms.isComp) {
+            MakeAndSaveList(parms.favListID, Number(parms.options.downCount), parms.options.downPart).then(result => {
+                if (result != null) {
+                    // 创建失败
+                    Snackbar.error(result);
+                } else {
+                    // 创建成功
+                    Snackbar.success("创建完成");
+                }
+                status.loading = false;
+            })
+        } else {
+            MakeAndSaveCompList(Number(parms.mid), Number(parms.favListID), Number(parms.options.downCount), parms.options.downPart).then(result => {
+                if (result != null) {
+                    // 创建失败
+                    Snackbar.error(result);
+                } else {
+                    // 创建成功
+                    Snackbar.success("创建完成");
+                }
+                status.loading = false;
+            })
+        }
     }
     // 下载页面
     if (newPageIndex == 3) {
@@ -111,7 +126,7 @@ watch(pageIndex, (newPageIndex) => {
             song_cover: parms.options.songCover,
             song_author: parms.options.songAuthor,
         }
-        StartDownload(opt).then(result => {
+        StartDownload(parms.favListID, opt).then(result => {
             status.allowNext = true
         })
     }

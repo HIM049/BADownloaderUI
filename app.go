@@ -4,11 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/myuser/bilibili"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-)
-
-var (
-	FavListID = ""
 )
 
 // App struct
@@ -45,23 +42,32 @@ func (a *App) GetAppVersion() string {
 }
 
 // 查询并返回收藏夹信息
-func (a *App) SearchFavListInformation(favListID string) FavList {
-	FavListID = favListID
-	listInf, err := GetFavListObj(1, 1)
+func (a *App) SearchFavListInformation(favListID string) bilibili.FavList {
+	listInf, err := bilibili.GetFavListObj(favListID, 1, 1)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取收藏夹内容时出现错误：%s", err)
-		return FavList{}
+		return bilibili.FavList{}
+	}
+	return *listInf
+}
+
+// 查询并返回收藏夹信息
+func (a *App) SearchCompListInformation(mid, sid int) bilibili.CompliationInformation {
+	listInf, err := bilibili.GetCompliationObj(mid, sid, 1, 1)
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "获取合集内容时出现错误：%s", err)
+		return bilibili.CompliationInformation{}
 	}
 	return *listInf
 }
 
 // 查询并返回歌曲信息
-func (a *App) SearchSongInformation(auid string) AudioInf {
+func (a *App) SearchSongInformation(auid string) bilibili.AudioInf {
 	runtime.LogInfo(a.ctx, auid)
-	audioInf, err := GetAudioInfObj(auid)
+	audioInf, err := bilibili.GetAudioInfObj(auid)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取歌曲详情时出现错误：%s", err)
-		return AudioInf{}
+		return bilibili.AudioInf{}
 	}
 	return *audioInf
 }

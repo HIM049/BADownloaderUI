@@ -40,9 +40,7 @@ const progress = reactive({
 EventsOn("downloadFinish", () => {
     progress.downFinished++
     progress.progressPercent = (progress.downFinished / props.parms.options.downCount) * 100
-    
-    console.log(progress.downFinished);
-    console.log(progress.progressPercent);
+
     // 判断任务是否完成
     if (props.parms.options.downCount == progress.downFinished) {
         progress.successed = true
