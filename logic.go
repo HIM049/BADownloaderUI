@@ -8,30 +8,40 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/myuser/bilibili"
 	qrcode "github.com/skip2/go-qrcode"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+// 登录 bilibili
 func (a *App) LoginBilibili() error {
 	cfg := GetConfig(a.ctx)
 
 	// 获取二维码和请求密钥
-	url, key, err := GetLoginKey()
+	url, key, err := bilibili.GetLoginKey()
 	if err != nil {
 		return err
 	}
 
 	// 生成二维码
-	err = qrcode.WriteFile(url, qrcode.Medium, 256, cfg.CachePath+"/qr.png")
+	qrcodePath := cfg.CachePath + "/qr.png"
+	err = qrcode.WriteFile(url, qrcode.Medium, 256, qrcodePath)
 	if err != nil {
 		return err
 	}
 
+	base64Data, err := bilibili.GetImage(qrcodePath)
+	if err != nil {
+		return err
+	}
+	runtime.EventsEmit(a.ctx, "qrcodeStr", base64Data)
+
 	// 请求登录
 	cookies, err := func() (*[]*http.Cookie, error) {
 		for {
-			time.Sleep(3 * time.Second)
-			returnObj, cookies, err := CheckLoginStatus(key)
+			time.Sleep(2 * time.Second)
+
+			returnObj, cookies, err := bilibili.CheckLoginStatus(key)
 			if err != nil {
 				return nil, err
 			}
@@ -39,17 +49,21 @@ func (a *App) LoginBilibili() error {
 			case 0:
 				// 登录成功
 				runtime.LogInfo(a.ctx, "登录成功")
+				runtime.EventsEmit(a.ctx, "loginStatus", "登录成功")
 				return cookies, nil
 			case 86038:
 				// 二维码失效
 				runtime.LogInfo(a.ctx, "二维码已失效")
+				runtime.EventsEmit(a.ctx, "loginStatus", "二维码已失效")
 				return nil, errors.New("二维码已失效")
 			case 86090:
 				// 扫描成功，待确认
 				runtime.LogInfo(a.ctx, "扫描成功，待确认")
+				runtime.EventsEmit(a.ctx, "loginStatus", "扫描成功，待确认")
 			case 86101:
 				// 未扫描
 				runtime.LogInfo(a.ctx, "未扫描")
+				runtime.EventsEmit(a.ctx, "loginStatus", "请扫描二维码登录")
 			}
 		}
 	}()
@@ -57,9 +71,6 @@ func (a *App) LoginBilibili() error {
 		return err
 	}
 
-	// for _, cookie := range *cookies {
-	// 	fmt.Println("Cookie:", cookie.Name, ": ", cookie.Value)
-	// }
 	cfg.Account.SESSDATA = (*cookies)[0].Value
 	cfg.Account.Bili_jct = (*cookies)[1].Value
 	cfg.Account.DedeUserID = (*cookies)[2].Value
@@ -75,10 +86,10 @@ func (a *App) LoginBilibili() error {
 }
 
 // 查询用户收藏的收藏夹
-func (a *App) QueryFavCollect() (*userfavoritesCollect, error) {
+func (a *App) QueryFavCollect() (*bilibili.UserfavoritesCollect, error) {
 	cfg := GetConfig(a.ctx)
 
-	obj, err := GetUserFavoritesCollect(cfg.Account.SESSDATA, cfg.Account.DedeUserID, 20, 1)
+	obj, err := bilibili.GetUserFavoritesCollect(cfg.Account.SESSDATA, cfg.Account.DedeUserID, 20, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -144,4 +155,14 @@ func ExtractTitle(input string) (string, error) {
 
 	// 返回匹配的书名号内容
 	return matches[1], nil
+}
+
+// 工具函数
+// 检查结构体中的状态码
+func CheckObj(code int) bool {
+	if code == 0 {
+		return false
+	} else {
+		return true
+	}
 }
