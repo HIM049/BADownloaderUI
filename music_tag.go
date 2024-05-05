@@ -56,13 +56,13 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList) error 
 }
 
 // 输出文件
-func OutputFile(cfg *Config, v *VideoInformationList, fileName string) error {
+func OutputFile(cfg *Config, v *VideoInformationList, favlistId, fileName string) error {
 	fileType := AudioType.m4a
 	if cfg.ConvertFormat {
 		fileType = AudioType.mp3
 	}
 	sourcePath := path.Join(cfg.CachePath, "music", strconv.Itoa(v.Cid)+fileType)
-	destPath := path.Join(cfg.DownloadPath, FavListID, fileName)
+	destPath := path.Join(cfg.DownloadPath, favlistId, fileName)
 
 	// 重命名歌曲文件并移动位置
 	err := RenameAndMoveFile(sourcePath, destPath)

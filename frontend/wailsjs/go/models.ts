@@ -1,3 +1,64 @@
+export namespace bilibili {
+	
+	export class AudioInf {
+	    code: number;
+	    msg: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AudioInf(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.msg = source["msg"];
+	    }
+	}
+	export class CompliationInformation {
+	    code: number;
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CompliationInformation(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.message = source["message"];
+	    }
+	}
+	export class FavList {
+	    code: number;
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FavList(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.message = source["message"];
+	    }
+	}
+	export class UserfavoritesCollect {
+	    code: number;
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UserfavoritesCollect(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.message = source["message"];
+	    }
+	}
+
+}
+
 export namespace main {
 	
 	export class Account {
@@ -18,20 +79,6 @@ export namespace main {
 	        this.dede_user_id = source["dede_user_id"];
 	        this.dede_user_id__ck_md5 = source["dede_user_id__ck_md5"];
 	        this.sid = source["sid"];
-	    }
-	}
-	export class AudioInf {
-	    code: number;
-	    msg: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new AudioInf(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.code = source["code"];
-	        this.msg = source["msg"];
 	    }
 	}
 	export class Config {
@@ -72,20 +119,6 @@ export namespace main {
 	        this.song_author = source["song_author"];
 	    }
 	}
-	export class FavList {
-	    code: number;
-	    message: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new FavList(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.code = source["code"];
-	        this.message = source["message"];
-	    }
-	}
 	export class MetaInformation {
 	    song_name: string;
 	    cover: string;
@@ -122,20 +155,6 @@ export namespace main {
 	        this.title = source["title"];
 	        this.page_title = source["page_title"];
 	        this.format = source["format"];
-	    }
-	}
-	export class userfavoritesCollect {
-	    code: number;
-	    message: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new userfavoritesCollect(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.code = source["code"];
-	        this.message = source["message"];
 	    }
 	}
 
