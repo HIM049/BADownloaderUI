@@ -62,6 +62,8 @@ export namespace bilibili {
 export namespace main {
 	
 	export class Account {
+	    is_login: boolean;
+	    use_account: boolean;
 	    sessdata: string;
 	    bili_jct: string;
 	    dede_user_id: string;
@@ -74,6 +76,8 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.is_login = source["is_login"];
+	        this.use_account = source["use_account"];
 	        this.sessdata = source["sessdata"];
 	        this.bili_jct = source["bili_jct"];
 	        this.dede_user_id = source["dede_user_id"];
@@ -88,6 +92,7 @@ export namespace main {
 	    download_threads: number;
 	    retry_count: number;
 	    convert_format: boolean;
+	    delete_cache: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -101,6 +106,7 @@ export namespace main {
 	        this.download_threads = source["download_threads"];
 	        this.retry_count = source["retry_count"];
 	        this.convert_format = source["convert_format"];
+	        this.delete_cache = source["delete_cache"];
 	    }
 	}
 	export class DownloadOption {
