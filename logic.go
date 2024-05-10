@@ -15,7 +15,8 @@ import (
 
 // 登录 bilibili
 func (a *App) LoginBilibili() error {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 
 	// 获取二维码和请求密钥
 	url, key, err := bilibili.GetLoginKey()
@@ -76,8 +77,9 @@ func (a *App) LoginBilibili() error {
 	cfg.Account.DedeUserID = (*cookies)[2].Value
 	cfg.Account.DedeUserID__ckMd5 = (*cookies)[3].Value
 	cfg.Account.Sid = (*cookies)[4].Value
+	cfg.Account.IsLogin = true
 
-	err = SaveConfig(cfg)
+	err = cfg.Save()
 	if err != nil {
 		return err
 	}
@@ -87,7 +89,8 @@ func (a *App) LoginBilibili() error {
 
 // 查询用户收藏的收藏夹
 func (a *App) QueryFavCollect() (*bilibili.UserfavoritesCollect, error) {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 
 	obj, err := bilibili.GetUserFavoritesCollect(cfg.Account.SESSDATA, cfg.Account.DedeUserID, 20, 1)
 	if err != nil {

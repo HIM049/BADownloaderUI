@@ -18,7 +18,8 @@ var AudioType = struct {
 
 func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 	// 初始化参数
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 	_ = os.MkdirAll(path.Join(cfg.DownloadPath, favlistId), 0755)
 
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
@@ -99,14 +100,14 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 			}
 
 			// 写入元数据
-			err = ChangeTag(&cfg, &opt, &v)
+			err = ChangeTag(cfg, &opt, &v)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
 			}
 			runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
-			err = OutputFile(&cfg, &v, favlistId, finalfileName)
+			err = OutputFile(cfg, &v, favlistId, finalfileName)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			}
@@ -129,7 +130,8 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 }
 
 func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, title string) {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 
 	obj, err := bilibili.GetAudioObj(auid, "2")
 	if err != nil {
@@ -147,12 +149,12 @@ func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, titl
 		runtime.LogErrorf(a.ctx, "保存媒体流时发生错误：%s", err)
 	}
 	// 写入元数据
-	err = SingleChangeTag(&cfg, &opt, auid, songName, songAuthor)
+	err = SingleChangeTag(cfg, &opt, auid, songName, songAuthor)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "写入元数据时发生错误：%s", err)
 	}
 	// 输出文件
-	err = SingleOutputFile(&cfg, auid, title)
+	err = SingleOutputFile(cfg, auid, title)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 	}

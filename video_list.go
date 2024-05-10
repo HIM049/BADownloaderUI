@@ -12,7 +12,8 @@ import (
 
 // 读取视频列表
 func (a *App) GetVideoList() []VideoInformationList {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 
 	var list []VideoInformationList
 	err := LoadJsonFile(cfg.VideoListPath, &list)
@@ -25,7 +26,8 @@ func (a *App) GetVideoList() []VideoInformationList {
 
 // 保存视频列表
 func (a *App) SaveVideoList(data any) error {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 
 	err := SaveJsonFile(cfg.VideoListPath, data)
 	if err != nil {
@@ -36,7 +38,8 @@ func (a *App) SaveVideoList(data any) error {
 
 // 创建并保存视频列表
 func (a *App) MakeAndSaveList(favlistID string, downloadCount int, downloadCompilation bool) error {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 	data, err := makeVideoList(a, favlistID, downloadCount, downloadCompilation)
 	if err != nil {
 		return err
@@ -50,7 +53,8 @@ func (a *App) MakeAndSaveList(favlistID string, downloadCount int, downloadCompi
 
 // 创建并保存视频列表（视频合集）
 func (a *App) MakeAndSaveCompList(mid, sid, downloadCount int, downloadCompilation bool) error {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 	data, err := makeVideoListFromComp(a, mid, sid, downloadCount, downloadCompilation)
 	if err != nil {
 		return err

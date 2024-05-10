@@ -1,23 +1,20 @@
 package main
 
-import (
-	"context"
-
-	"github.com/wailsapp/wails/v2/pkg/runtime"
-)
-
 type Config struct {
 	DownloadPath string `json:"download_path"`
 	CachePath    string `json:"cache_path"`
-	// TODO: 是否删掉, 改为使用 ${FavListID}.json
+	// TODO: 改为使用 ID 作为列表文件名
 	VideoListPath   string `json:"videolist_path"`
 	DownloadThreads int    `json:"download_threads"`
 	RetryCount      int    `json:"retry_count"`
 	ConvertFormat   bool   `json:"convert_format"`
+	DeleteCache     bool   `json:"delete_cache"`
 	Account         Account
 }
 
 type Account struct {
+	IsLogin           bool   `json:"is_login"`
+	UseAccount        bool   `json:"use_account"`
 	SESSDATA          string `json:"sessdata"`
 	Bili_jct          string `json:"bili_jct"`
 	DedeUserID        string `json:"dede_user_id"`
@@ -25,71 +22,19 @@ type Account struct {
 	Sid               string `json:"sid"`
 }
 
-// 获取设置内容
-func GetConfig(ctx context.Context) Config {
-	for {
-		// 判断设置文件是否已经存在
-		if !IsFileExists("./config.json") {
-			// 文件不存在
-			cfg := bulidConfig()
-			err := SaveJsonFile("./config.json", &cfg)
-			if err != nil {
-				runtime.LogErrorf(ctx, "写入设置文件失败：%s", err)
-			}
-		} else {
-			// 文件已存在
-			var cfg Config
-			err := LoadJsonFile("./config.json", &cfg)
-			if err != nil {
-				runtime.LogErrorf(ctx, "读取设置文件失败：%s", err)
-			}
-			return cfg
-		}
-	}
-}
-
-// 重置设置文件
-func (a *App) RefreshConfig() {
-	cfg := bulidConfig()
-	err := SaveJsonFile("./config.json", &cfg)
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s", err)
-	}
-}
-
-// 读取设置
-func (a *App) LoadConfig() Config {
-	cfg := GetConfig(a.ctx)
-	return cfg
-}
-
-// 写入设置
-func (a *App) SaveConfig(cfg Config) {
-	err := SaveJsonFile("./config.json", cfg)
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s", err)
-	}
-}
-
-// 写入设置
-func SaveConfig(cfg Config) error {
-	err := SaveJsonFile("./config.json", cfg)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// 创建默认设置结构体
-func bulidConfig() *Config {
-	return &Config{
+// 初始化设置
+func (cfg *Config) init() {
+	*cfg = Config{
 		DownloadPath:    "./Download",
 		CachePath:       "./Cache",
 		VideoListPath:   "./Cache/video_list.json",
 		DownloadThreads: 5,
 		RetryCount:      10,
 		ConvertFormat:   Checkffmpeg(),
+		DeleteCache:     true,
 		Account: Account{
+			IsLogin:           false,
+			UseAccount:        false,
 			SESSDATA:          "",
 			Bili_jct:          "",
 			DedeUserID:        "",
@@ -97,4 +42,38 @@ func bulidConfig() *Config {
 			Sid:               "",
 		},
 	}
+}
+
+// 读取设置文件
+func (cfg *Config) Get() error {
+	for {
+		// 判断设置文件是否已经存在
+		if !IsFileExists("./config.json") {
+			// 文件不存在
+			file := new(Config)
+			file.init()
+			err := file.Save()
+			if err != nil {
+				return err
+			}
+		} else {
+			// 文件已存在
+			var file Config
+			err := LoadJsonFile("./config.json", &file)
+			if err != nil {
+				return err
+			}
+			*cfg = file
+			return nil
+		}
+	}
+}
+
+// 保存设置到文件
+func (cfg *Config) Save() error {
+	err := SaveJsonFile("./config.json", cfg)
+	if err != nil {
+		return err
+	}
+	return nil
 }
