@@ -53,7 +53,7 @@ func GetAudioInfObj(auid string) (*AudioInf, error) {
 	if err != nil {
 		return nil, err
 	}
-	if checkObj(obj.Code) {
+	if CheckObj(obj.Code) {
 		return nil, errors.New(obj.Msg)
 	}
 	return &obj, nil
@@ -105,7 +105,7 @@ func GetAudioObj(auid, quality string) (*AudioStream, error) {
 	if err != nil {
 		return nil, err
 	}
-	if checkObj(obj.Code) {
+	if CheckObj(obj.Code) {
 		return nil, errors.New(obj.Msg)
 	}
 	return &obj, nil

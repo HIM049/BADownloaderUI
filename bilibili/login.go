@@ -29,7 +29,7 @@ func GetLoginKey() (string, string, error) {
 		return "", "", err
 	}
 	// 错误检查
-	if checkObj(obj.Code) {
+	if CheckObj(obj.Code) {
 		return "", "", errors.New(obj.Message)
 	}
 	return obj.Data.Url, obj.Data.Qrcode_key, nil
@@ -110,7 +110,7 @@ func CheckLoginStatus(qrcode_key string) (*checkLoginReturn, *[]*http.Cookie, er
 		return nil, nil, err
 	}
 	// 错误检查
-	if checkObj(obj.Code) {
+	if CheckObj(obj.Code) {
 		return nil, nil, errors.New(obj.Message)
 	}
 

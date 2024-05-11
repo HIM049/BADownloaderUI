@@ -14,6 +14,14 @@ export function GetAppVersion() {
   return window['go']['main']['App']['GetAppVersion']();
 }
 
+export function GetFavCollect(arg1) {
+  return window['go']['main']['App']['GetFavCollect'](arg1);
+}
+
+export function GetUsersCollect() {
+  return window['go']['main']['App']['GetUsersCollect']();
+}
+
 export function GetVideoList() {
   return window['go']['main']['App']['GetVideoList']();
 }
@@ -32,10 +40,6 @@ export function MakeAndSaveCompList(arg1, arg2, arg3, arg4) {
 
 export function MakeAndSaveList(arg1, arg2, arg3) {
   return window['go']['main']['App']['MakeAndSaveList'](arg1, arg2, arg3);
-}
-
-export function QueryFavCollect() {
-  return window['go']['main']['App']['QueryFavCollect']();
 }
 
 export function RefreshConfig() {

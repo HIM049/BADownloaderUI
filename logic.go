@@ -87,18 +87,6 @@ func (a *App) LoginBilibili() error {
 	return nil
 }
 
-// 查询用户收藏的收藏夹
-func (a *App) QueryFavCollect() (*bilibili.UserfavoritesCollect, error) {
-	cfg := new(Config)
-	cfg.Get()
-
-	obj, err := bilibili.GetUserFavoritesCollect(cfg.Account.SESSDATA, cfg.Account.DedeUserID, 20, 1)
-	if err != nil {
-		return nil, err
-	}
-	return obj, nil
-}
-
 // 保存 JSON
 func SaveJsonFile(filePath string, theData any) error {
 	data, err := json.MarshalIndent(theData, "", "    ")

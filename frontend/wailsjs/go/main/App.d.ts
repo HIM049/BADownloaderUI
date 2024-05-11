@@ -9,6 +9,10 @@ export function Checkffmpeg():Promise<boolean>;
 
 export function GetAppVersion():Promise<string>;
 
+export function GetFavCollect(arg1:number):Promise<bilibili.Collects>;
+
+export function GetUsersCollect():Promise<bilibili.Collects>;
+
 export function GetVideoList():Promise<Array<main.VideoInformationList>>;
 
 export function LoadConfig():Promise<main.Config>;
@@ -18,8 +22,6 @@ export function LoginBilibili():Promise<void>;
 export function MakeAndSaveCompList(arg1:number,arg2:number,arg3:number,arg4:boolean):Promise<void>;
 
 export function MakeAndSaveList(arg1:string,arg2:number,arg3:boolean):Promise<void>;
-
-export function QueryFavCollect():Promise<bilibili.UserfavoritesCollect>;
 
 export function RefreshConfig():Promise<void>;
 

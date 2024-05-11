@@ -80,7 +80,7 @@ func GetCompliationObj(mid, sid, ps, pn int) (*CompliationInformation, error) {
 	}
 
 	// 错误检查
-	if checkObj(obj.Code) {
+	if CheckObj(obj.Code) {
 		return nil, errors.New(obj.Message)
 	}
 	return &obj, nil

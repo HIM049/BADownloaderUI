@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/myuser/bilibili"
@@ -300,7 +299,7 @@ func makeVideoListFromComp(a *App, mid, sid, downloadCount int, downloadCompilat
 		pageCount++
 	}
 
-	fmt.Printf("即将下载%d个视频，%d页", downloadCount, pageCount)
+	runtime.LogInfof(a.ctx, "即将下载%d个视频，%d页", downloadCount, pageCount)
 	// 主循环
 	for i := 0; i < pageCount; i++ {
 		pageSize := 20

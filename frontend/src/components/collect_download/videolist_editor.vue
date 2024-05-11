@@ -3,21 +3,13 @@
 
         <li v-for="(video, index) in videoList" style="list-style-type: none;">
             <var-card :title="video.title" :src="video.Meta.cover" layout="row" outlines style="margin-bottom: 20px;">
-                
-
                 <template #description>
                     <var-divider />
                     <div>
                         <var-cell><var-input variant="outlined" placeholder="曲名" size="small" v-model="video.Meta.song_name" @change="saveVideoList" /></var-cell>
                         <var-cell><var-input variant="outlined" placeholder="歌手" size="small" v-model="video.Meta.author" @change="saveVideoList" /></var-cell>
                     </div>
-                </template>   
-
-                <!-- <template #extra>
-                    <var-space justify="flex-end">
-                        <var-button type="primary" @click="saveVideoList">保存</var-button>
-                    </var-space>
-                </template> -->
+                </template>
             </var-card>
         </li>
     </FramePage>
@@ -26,7 +18,7 @@
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { reactive, computed, watch, ref } from 'vue'
-import { MakeAndSaveList, GetVideoList, SaveVideoList } from '../../../wailsjs/go/main/App'
+import { GetVideoList, SaveVideoList } from '../../../wailsjs/go/main/App'
 import { Snackbar, LoadingBar } from '@varlet/ui'
 
 const videoList = ref([])

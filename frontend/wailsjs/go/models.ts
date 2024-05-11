@@ -14,6 +14,20 @@ export namespace bilibili {
 	        this.msg = source["msg"];
 	    }
 	}
+	export class Collects {
+	    user_mid: number;
+	    count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Collects(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.user_mid = source["user_mid"];
+	        this.count = source["count"];
+	    }
+	}
 	export class CompliationInformation {
 	    code: number;
 	    message: string;
@@ -42,18 +56,26 @@ export namespace bilibili {
 	        this.message = source["message"];
 	    }
 	}
-	export class UserfavoritesCollect {
-	    code: number;
-	    message: string;
+	export class meta {
+	    id: number;
+	    mid: number;
+	    attr: number;
+	    title: string;
+	    cover: string;
+	    media_count: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new UserfavoritesCollect(source);
+	        return new meta(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.code = source["code"];
-	        this.message = source["message"];
+	        this.id = source["id"];
+	        this.mid = source["mid"];
+	        this.attr = source["attr"];
+	        this.title = source["title"];
+	        this.cover = source["cover"];
+	        this.media_count = source["media_count"];
 	    }
 	}
 

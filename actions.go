@@ -1,12 +1,52 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/myuser/bilibili"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func (a *App) GetAppVersion() string {
 	return APP_VERSION
+}
+
+// 获取用户创建的收藏夹
+func (a *App) GetUsersCollect() bilibili.Collects {
+	// 获取设置
+	cfg := new(Config)
+	cfg.Get()
+
+	// 获取收藏夹列表
+	collects := new(bilibili.Collects)
+	mid, _ := strconv.Atoi(cfg.Account.DedeUserID)
+	collects.UserMid = mid
+	err := collects.GetUsersCollect(cfg.Account.SESSDATA)
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "获取收藏夹列表失败：%s", err)
+		return bilibili.Collects{}
+	}
+
+	return *collects
+}
+
+// 获取收藏的收藏夹
+func (a *App) GetFavCollect(pn int) bilibili.Collects {
+	// 获取设置
+	cfg := new(Config)
+	cfg.Get()
+
+	// 获取收藏夹列表
+	collects := new(bilibili.Collects)
+	mid, _ := strconv.Atoi(cfg.Account.DedeUserID)
+	collects.UserMid = mid
+	err := collects.GetFavCollect(cfg.Account.SESSDATA, 20, pn)
+	if err != nil {
+		runtime.LogErrorf(a.ctx, "获取收藏夹列表失败：%s", err)
+		return bilibili.Collects{}
+	}
+
+	return *collects
 }
 
 // 查询并返回收藏夹信息
