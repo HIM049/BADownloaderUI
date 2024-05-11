@@ -36,9 +36,11 @@ func (a *App) startup(ctx context.Context) {
 // 程序关闭时
 func (a *App) shutdown(ctx context.Context) {
 	// 清理缓存
-	// cfg := make(config)
-	// cfg.Get()
-	// os.RemoveAll(cfg.CachePath)
+	cfg := new(Config)
+	cfg.Get()
+	if cfg.DeleteCache {
+		os.RemoveAll(cfg.CachePath)
+	}
 }
 
 type DownloadOption struct {

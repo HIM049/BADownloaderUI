@@ -32,7 +32,6 @@ onMounted(() => {
 }),
 
 EventsOn("qrcodeStr", (qr)=>{
-    console.log("收到qrcode");
     qrcodeStr.value = "data:image/png;base64," + qr;
 })
 

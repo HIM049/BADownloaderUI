@@ -26,6 +26,12 @@
                             </template>
                         </var-cell>
                     </var-tooltip>
+                    
+                    <var-cell> 关闭软件后清除缓存
+                        <template #extra>
+                            <var-switch v-model="config.delete_cache" variant @change="changeCfg" />
+                        </template>
+                    </var-cell>
 
                     <var-divider />
                     
@@ -113,7 +119,6 @@ function loadConfig() {
         config.Account.dede_user_id = result.Account.dede_user_id
         config.Account.dede_user_id__ck_md5 = result.Account.dede_user_id__ck_md5
         config.Account.sid = result.Account.sid
-        console.log(result);
     })
 }
 
@@ -156,7 +161,6 @@ function setUseAccount() {
     setTimeout(() => {
             
         if (config.Account.is_login) {
-            console.log(config.Account);
             saveConfig();
         } else {
             config.Account.use_account = false;
