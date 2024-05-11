@@ -6,6 +6,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 //go:embed all:frontend/dist
@@ -26,12 +27,14 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		Frameless:        true, // 无边框窗口
-		DisableResize:    true, // 禁用缩放
+		Frameless:     true, // 无边框窗口
+		DisableResize: true, // 窗口尺寸
+		Windows: &windows.Options{
+			IsZoomControlEnabled: false, // 页面缩放比例
+		},
 		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
-		// OnStartup:        beforeRunFunc,
-		OnStartup:  app.startup,
-		OnShutdown: app.shutdown,
+		OnStartup:        app.startup,
+		OnShutdown:       app.shutdown,
 		Bind: []interface{}{
 			app,
 		},
