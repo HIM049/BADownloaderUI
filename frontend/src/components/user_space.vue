@@ -1,6 +1,6 @@
 <template>
     <FramePage title="个人空间">
-        <var-space style="align-items: center;" justify="center" v-show="!showLoginWindow && !is_login">
+        <var-space style="align-items: center;" justify="center" v-if="!showLoginWindow && !is_login">
             你还没有登录
             <var-button type="primary" @click="login">登录</var-button>
         </var-space>
@@ -12,7 +12,7 @@
             </var-paper>
         </var-collapse-transition>
 
-        <var-paper style="background-color: var(--color-primary-container); margin-bottom: 20px;">
+        <var-paper style="background-color: var(--color-primary-container); margin-bottom: 20px;" v-if="is_login">
             <h3>创建的收藏夹</h3>
             <var-cell v-for="(collect, index) in user_collect" style="margin: 0 10px;">
                 {{ collect.title }}
@@ -22,7 +22,7 @@
             </var-cell>
         </var-paper>
 
-        <var-paper style="background-color: var(--color-primary-container);">
+        <var-paper style="background-color: var(--color-primary-container);" v-if="is_login">
             <h3>收藏和订阅</h3>
             <var-cell v-for="(collect, index) in user_Favourite" style="margin: 0 10px;">
                 {{ collect.title }}

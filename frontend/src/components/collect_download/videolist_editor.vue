@@ -1,5 +1,5 @@
 <template>
-    <FramePage title="列表编辑" style="width: 50%; margin: 0 auto;">
+    <FramePage title="列表编辑" style="width: 50%; margin: 0 auto;" v-if="showList">
 
         <li v-for="(video, index) in videoList" style="list-style-type: none;">
             <var-card :title="video.title" :src="video.Meta.cover" layout="row" outlines style="margin-bottom: 20px;">
@@ -22,7 +22,7 @@ import { GetVideoList, SaveVideoList } from '../../../wailsjs/go/main/App'
 import { Snackbar, LoadingBar } from '@varlet/ui'
 
 const videoList = ref([])
-const show = ref(true)
+const showList = ref(false)
 
 const props = defineProps(['parms', 'status'])
 const emit = defineEmits(['update:parms', 'update:status'])
@@ -49,6 +49,7 @@ watch(props.status, (newValue) => {
     if (newValue.loading == false) {
         GetVideoList().then(result => {
             videoList.value = result
+            showList.value = true
         })
     }
 })
