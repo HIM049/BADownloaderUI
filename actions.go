@@ -51,7 +51,13 @@ func (a *App) GetFavCollect(pn int) bilibili.Collects {
 
 // 查询并返回收藏夹信息
 func (a *App) SearchFavListInformation(favListID string) bilibili.FavList {
-	listInf, err := bilibili.GetFavListObj(favListID, 1, 1)
+	cfg := new(Config)
+	cfg.Get()
+	sessdata := ""
+	if cfg.Account.UseAccount && cfg.Account.IsLogin {
+		sessdata = cfg.Account.SESSDATA
+	}
+	listInf, err := bilibili.GetFavListObj(favListID, sessdata, 1, 1)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取收藏夹内容时出现错误：%s", err)
 		return bilibili.FavList{}

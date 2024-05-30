@@ -220,9 +220,14 @@ func (video *Video) TransToVideoInfList() *[]VideoInformationList {
 // 创建视频任务列表
 func makeVideoList(a *App, favlistId string, downloadCount int, downloadCompilation bool) (*[]VideoInformationList, error) {
 	var videoList []VideoInformationList
-
+	cfg := new(Config)
+	cfg.Get()
+	sessdata := ""
+	if cfg.Account.UseAccount && cfg.Account.IsLogin {
+		sessdata = cfg.Account.SESSDATA
+	}
 	// 请求收藏夹基础数据，初始化循环
-	favlist, err := bilibili.GetFavListObj(favlistId, 1, 1)
+	favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +256,7 @@ func makeVideoList(a *App, favlistId string, downloadCount int, downloadCompilat
 		}
 
 		// 获取当前分页信息
-		favlist, err := bilibili.GetFavListObj(favlistId, 20, i+1)
+		favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 20, i+1)
 		if err != nil {
 			return nil, err
 		}

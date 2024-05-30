@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"net/url"
 	"strconv"
 
 	"github.com/tidwall/gjson"
@@ -37,33 +36,49 @@ type FavList struct {
 	}
 }
 
-func getFavList(id, ps, pn string) (string, error) {
-	// 设置 URL 并发送 GET 请求
-	params := url.Values{}
-	Url, _ := url.Parse("https://api.bilibili.com/x/v3/fav/resource/list")
-	// 设置 URL 参数
-	params.Set("media_id", id)
-	params.Set("ps", ps)
-	params.Set("platform", "web")
-	params.Set("pn", pn)
+func getFavList(id, ps, pn, sessdata string) (string, error) {
 
-	Url.RawQuery = params.Encode()
-	urlPath := Url.String()
-	resp, err := http.Get(urlPath)
+	// 创建请求
+	req, err := http.NewRequest("GET", "https://api.bilibili.com/x/v3/fav/resource/list", nil)
 	if err != nil {
 		return "", err
+	}
+
+	// 添加 Cookie 到请求头
+	if sessdata != "" {
+		req.Header.Add("Cookie", "SESSDATA="+sessdata)
+	}
+
+	// 设置 URL 参数
+	q := req.URL.Query()
+	q.Add("media_id", id)    // 每页项数
+	q.Add("ps", ps)          // 页码
+	q.Add("pn", pn)          // 页码+
+	q.Add("platform", "web") // 平台
+	req.URL.RawQuery = q.Encode()
+
+	// 创建 HTTP 客户端并发送请求
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// 检查响应状态
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New("Error: " + strconv.Itoa(resp.StatusCode))
 	}
 
 	// 将 body 转为字符串并返回
 	body, _ := io.ReadAll(resp.Body)
 	bodyString := string(body)
-	defer resp.Body.Close()
 	return bodyString, nil
 }
 
-func GetFavListObj(id string, ps, pn int) (*FavList, error) {
+func GetFavListObj(id, sessdata string, ps, pn int) (*FavList, error) {
 	var obj FavList
-	body, err := getFavList(id, strconv.Itoa(ps), strconv.Itoa(pn))
+	body, err := getFavList(id, strconv.Itoa(ps), strconv.Itoa(pn), sessdata)
 	if err != nil {
 		return nil, err
 	}
