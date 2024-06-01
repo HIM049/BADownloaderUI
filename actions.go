@@ -60,16 +60,18 @@ func (a *App) SearchFavListInformation(favListID string) bilibili.FavList {
 	listInf, err := bilibili.GetFavListObj(favListID, sessdata, 1, 1)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取收藏夹内容时出现错误：%s", err)
+		runtime.EventsEmit(a.ctx, "error", err.Error())
 		return bilibili.FavList{}
 	}
 	return *listInf
 }
 
-// 查询并返回收藏夹信息
+// 查询并返回合集信息
 func (a *App) SearchCompListInformation(mid, sid int) bilibili.CompliationInformation {
 	listInf, err := bilibili.GetCompliationObj(mid, sid, 1, 1)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取合集内容时出现错误：%s", err)
+		runtime.EventsEmit(a.ctx, "error", err.Error())
 		return bilibili.CompliationInformation{}
 	}
 	return *listInf
@@ -81,6 +83,7 @@ func (a *App) SearchSongInformation(auid string) bilibili.AudioInf {
 	audioInf, err := bilibili.GetAudioInfObj(auid)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取歌曲详情时出现错误：%s", err)
+		runtime.EventsEmit(a.ctx, "error", "获取歌曲时出错:"+err.Error())
 		return bilibili.AudioInf{}
 	}
 	return *audioInf
@@ -93,6 +96,8 @@ func (a *App) RefreshConfig() {
 	err := cfg.Save()
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s", err)
+		runtime.EventsEmit(a.ctx, "error", "写入设置时出错:"+err.Error())
+
 	}
 }
 
@@ -108,5 +113,6 @@ func (a *App) SaveConfig(cfg Config) {
 	err := cfg.Save()
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "写入设置文件失败：%s", err)
+		runtime.EventsEmit(a.ctx, "error", "写入设置时出错:"+err.Error())
 	}
 }

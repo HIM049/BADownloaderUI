@@ -120,7 +120,8 @@ watch(inputFavID, (newid) => {
                 props.status.allowNext = true;
             } else {
                 // 无效的收藏夹
-                Snackbar.warning("无效的收藏夹");
+                // Snackbar.warning("无效的收藏夹");
+                
                 // 关闭创建列表按钮
                 props.status.allowNext = false;
                 InfCard.value = false;

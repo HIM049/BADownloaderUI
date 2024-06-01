@@ -45,7 +45,7 @@
 import FramePage from '../components/modules/frame_page.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
 import { LoginBilibili, LoadConfig, GetUsersCollect, GetFavCollect } from '../../wailsjs/go/main/App'
-import { EventsOn, EventsOnce } from '../../wailsjs/runtime'
+import { EventsOn } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
 const loginText = ref("请扫描二维码登录")
