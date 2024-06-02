@@ -64,6 +64,7 @@ const parms = reactive({
     })
 })
 
+// 页面翻页按钮状态
 const status = reactive({
     showBack: false,
     allowBack: true,

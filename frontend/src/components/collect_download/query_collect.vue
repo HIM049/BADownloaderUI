@@ -61,20 +61,7 @@ const resp = reactive({
     up_avatar: "",
 })
 
-// 在输入字段中提取收藏夹 ID
-// function extractURL(url) {
-//     try {
-//         var parsedUrl = new URL(url);
-//     } catch (error) {
-//         // 不是 URL ，直接返回
-//         return url
-//     }
-//     // 提取特定参数
-//     var searchParams = new URLSearchParams(parsedUrl.search);
-//     var fid = searchParams.get("fid");
-//     return fid
-// }
-
+// 用户输入的 URL 判断
 function extractURL(url) {
     try {   
         var urlParams = new URLSearchParams(new URL(url).search);

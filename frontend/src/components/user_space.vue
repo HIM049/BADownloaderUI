@@ -45,17 +45,17 @@
 import FramePage from '../components/modules/frame_page.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
 import { LoginBilibili, LoadConfig, GetUsersCollect, GetFavCollect } from '../../wailsjs/go/main/App'
-import { EventsOn } from '../../wailsjs/runtime'
+import { EventsOn, ClipboardSetText } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
-const loginText = ref("请扫描二维码登录")
-const qrcodeStr = ref(null)
-const showLoginWindow = ref(false)
-const is_login = ref(false)
-const page_index = ref(1)
+const loginText = ref("请扫描二维码登录") // 登录时的提示字符
+const qrcodeStr = ref(null) // 二维码图片
+const showLoginWindow = ref(false) // 展示登录窗口
+const is_login = ref(false) // 登录状态
+const page_index = ref(1) // 订阅的收藏夹的页码
 
-const user_collect = ref([]);
-const user_Favourite = ref([]);
+const user_collect = ref([]); // 用户创建的收藏夹列表
+const user_Favourite = ref([]); // 用户订阅的收藏夹列表
 const fav_count = ref(0);
 
 onMounted(() => {
@@ -66,22 +66,33 @@ onMounted(() => {
         })
         getFavCollect();
     }
-}),
+});
 
+// 获取订阅收藏夹列表
+function getFavCollect() {
+    GetFavCollect(page_index.value).then(result => {
+        user_Favourite.value = result.List
+        fav_count.value = result.count
+    })
+}
+
+// 订阅的收藏夹翻页
 watch(page_index, (newValue) => {
     if (newValue <= 0) {
         page_index.value = 1;
     }else if (newValue > fav_count.value / 20 + 1) {
         page_index.value = parseInt(fav_count.value / 20 + 1);
     }
-    getFavCollect()
+    getFavCollect();
 
 })
 
+// 获取二维码事件
 EventsOn("qrcodeStr", (qr)=>{
     qrcodeStr.value = "data:image/png;base64," + qr;
 })
 
+// 登录状态事件
 EventsOn("loginStatus", (status) => {
     if (status == "登录成功") {
         Snackbar.success("登录成功");
@@ -97,19 +108,14 @@ EventsOn("loginStatus", (status) => {
     loginText.value = status;
 })
 
-function getFavCollect() {
-    GetFavCollect(page_index.value).then(result => {
-        user_Favourite.value = result.List
-        fav_count.value = result.count
-    })
-}
-
+// 检查登录状态
 function checkLogin() {
     LoadConfig().then(result => {
         is_login.value = result.Account.is_login
     })
 }
 
+// 登录账户
 function login() {
     LoginBilibili().then(result => {
         showLoginWindow.value = false;

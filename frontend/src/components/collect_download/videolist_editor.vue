@@ -54,6 +54,7 @@ watch(props.status, (newValue) => {
     }
 })
 
+// 保存视频列表
 function saveVideoList() {
     SaveVideoList(videoList.value).then(result => {
         if (result != null) {
