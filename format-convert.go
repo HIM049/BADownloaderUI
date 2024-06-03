@@ -2,6 +2,7 @@ package main
 
 import (
 	"os/exec"
+	"syscall"
 
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
@@ -14,7 +15,7 @@ func (a *App) Checkffmpeg() bool {
 // （临时方案）
 func Checkffmpeg() bool {
 	cmd := exec.Command("ffmpeg", "-version")
-	cmd.Stdout = nil
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	err := cmd.Run()
 
 	if err != nil {
@@ -28,9 +29,11 @@ func Checkffmpeg() bool {
 
 // 调用 ffmpeg 转码
 func ConventFile(inputFile, outputFile string) error {
-	err := ffmpeg.Input(inputFile).
-		Output(outputFile, ffmpeg.KwArgs{"qscale": "0"}).
-		OverWriteOutput().ErrorToStdOut().Run()
+	stream := ffmpeg.Input(inputFile).Output(outputFile, ffmpeg.KwArgs{"qscale": "0"})
+	cmd := stream.Compile()
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	err := cmd.Run()
+
 	if err != nil {
 		return err
 	}

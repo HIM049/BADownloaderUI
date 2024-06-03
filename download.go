@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/myuser/bilibili"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -15,10 +16,11 @@ var AudioType = struct {
 	mp3 string
 }{m4a: ".m4a", mp3: ".mp3"}
 
-func (a *App) StartDownload(opt DownloadOption) {
+func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 	// 初始化参数
-	cfg := GetConfig(a.ctx)
-	_ = os.MkdirAll(path.Join(cfg.DownloadPath, FavListID), 0755)
+	cfg := new(Config)
+	cfg.Get()
+	_ = os.MkdirAll(path.Join(cfg.DownloadPath, favlistId), 0755)
 
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
@@ -52,7 +54,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 			}
 
 			//判断是否已下载
-			finalFile := path.Join(cfg.DownloadPath, FavListID, v.Title+AudioType.mp3)
+			finalFile := path.Join(cfg.DownloadPath, favlistId, v.Title+AudioType.mp3)
 			if IsFileExists(finalFile) {
 				runtime.LogInfof(a.ctx, "跳过已下载: %s", finalFile)
 				return
@@ -71,7 +73,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 					continue
 				}
 				// 下载媒体流
-				err = StreamingDownloader(v.Audio.Audio.Stream, musicPathAndName+AudioType.m4a)
+				err = bilibili.StreamingDownloader(v.Audio.Audio.Stream, musicPathAndName+AudioType.m4a)
 				if err != nil {
 					// 下载失败
 					runtime.LogErrorf(a.ctx, "(视频%d) 下载时出现错误：%s  (重试 %d )", num, err, i+1)
@@ -87,7 +89,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 				finalfileName = finalfileName + AudioType.mp3
 
 				// 转码文件
-				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName)
+				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
 				if err != nil {
 					runtime.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
 				}
@@ -98,14 +100,14 @@ func (a *App) StartDownload(opt DownloadOption) {
 			}
 
 			// 写入元数据
-			err = ChangeTag(&cfg, &opt, &v)
+			err = ChangeTag(cfg, &opt, &v)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
 			}
 			runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
-			err = OutputFile(&cfg, &v, finalfileName)
+			err = OutputFile(cfg, &v, favlistId, finalfileName)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			}
@@ -115,7 +117,7 @@ func (a *App) StartDownload(opt DownloadOption) {
 
 		go func(v VideoInformationList, num int) {
 			// 下载封面图片
-			err = SaveFromURL(v.Meta.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
+			err = bilibili.SaveFromURL(v.Meta.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 			}
@@ -128,46 +130,32 @@ func (a *App) StartDownload(opt DownloadOption) {
 }
 
 func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, title string) {
-	cfg := GetConfig(a.ctx)
+	cfg := new(Config)
+	cfg.Get()
 
-	obj, err := GetAudioObj(auid, "2")
+	obj, err := bilibili.GetAudioObj(auid, "2")
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "获取音频流时发生错误：%s", err)
 	}
 
 	// 下载封面图片
-	err = SaveFromURL(obj.Data.Cover, cfg.CachePath+"/single/cover/"+auid+".jpg")
+	err = bilibili.SaveFromURL(obj.Data.Cover, cfg.CachePath+"/single/cover/"+auid+".jpg")
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 	}
 	// 下载媒体流
-	err = StreamingDownloader(obj.Data.Cdns[0], cfg.CachePath+"/single/music/"+auid+AudioType.m4a)
+	err = bilibili.StreamingDownloader(obj.Data.Cdns[0], cfg.CachePath+"/single/music/"+auid+AudioType.m4a)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "保存媒体流时发生错误：%s", err)
 	}
 	// 写入元数据
-	err = SingleChangeTag(&cfg, &opt, auid, songName, songAuthor)
+	err = SingleChangeTag(cfg, &opt, auid, songName, songAuthor)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "写入元数据时发生错误：%s", err)
 	}
 	// 输出文件
-	err = SingleOutputFile(&cfg, auid, title)
+	err = SingleOutputFile(cfg, auid, title)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 	}
 }
-
-// // 获取并下载媒体流
-// func GetAndDownload(bvid string, cid int, filePathAndName string) error {
-// 	// 获取 B 站视频流地址
-// 	video, err := GetVideoObj(bvid, cid)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	// 下载媒体流
-// 	err = StreamingDownloader(video.Data.Dash.Audio[0].BaseUrl, filePathAndName)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }

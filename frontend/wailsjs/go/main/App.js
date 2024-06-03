@@ -14,6 +14,14 @@ export function GetAppVersion() {
   return window['go']['main']['App']['GetAppVersion']();
 }
 
+export function GetFavCollect(arg1) {
+  return window['go']['main']['App']['GetFavCollect'](arg1);
+}
+
+export function GetUsersCollect() {
+  return window['go']['main']['App']['GetUsersCollect']();
+}
+
 export function GetVideoList() {
   return window['go']['main']['App']['GetVideoList']();
 }
@@ -26,12 +34,12 @@ export function LoginBilibili() {
   return window['go']['main']['App']['LoginBilibili']();
 }
 
-export function MakeAndSaveList(arg1, arg2, arg3) {
-  return window['go']['main']['App']['MakeAndSaveList'](arg1, arg2, arg3);
+export function MakeAndSaveCompList(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['App']['MakeAndSaveCompList'](arg1, arg2, arg3, arg4);
 }
 
-export function QueryFavCollect() {
-  return window['go']['main']['App']['QueryFavCollect']();
+export function MakeAndSaveList(arg1, arg2, arg3) {
+  return window['go']['main']['App']['MakeAndSaveList'](arg1, arg2, arg3);
 }
 
 export function RefreshConfig() {
@@ -46,6 +54,10 @@ export function SaveVideoList(arg1) {
   return window['go']['main']['App']['SaveVideoList'](arg1);
 }
 
+export function SearchCompListInformation(arg1, arg2) {
+  return window['go']['main']['App']['SearchCompListInformation'](arg1, arg2);
+}
+
 export function SearchFavListInformation(arg1) {
   return window['go']['main']['App']['SearchFavListInformation'](arg1);
 }
@@ -54,6 +66,6 @@ export function SearchSongInformation(arg1) {
   return window['go']['main']['App']['SearchSongInformation'](arg1);
 }
 
-export function StartDownload(arg1) {
-  return window['go']['main']['App']['StartDownload'](arg1);
+export function StartDownload(arg1, arg2) {
+  return window['go']['main']['App']['StartDownload'](arg1, arg2);
 }

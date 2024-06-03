@@ -61,7 +61,7 @@ import { AudioDownload, SearchSongInformation } from '../../wailsjs/go/main/App'
 import { Snackbar } from '@varlet/ui'
 
 
-// 展示状态
+// 卡片显示状态
 const InfCard = ref(false)
 
 const auid = ref('')

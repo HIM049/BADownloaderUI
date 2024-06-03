@@ -38,10 +38,16 @@ import CollectDownload from '../components/collect_download.vue'
 import SingleDownload from '../components/single_downlaod.vue'
 import SettingPage from '../components/setting_page.vue'
 import { ref } from 'vue'
+import { EventsOn } from '../../wailsjs/runtime'
+import { Snackbar } from '@varlet/ui'
 
 // 分页切换索引
 const activePage = ref(1)
 
+// 全局错误提示
+EventsOn("error", (err) => {
+    Snackbar.warning(err)
+})
 </script>
 
 <style>

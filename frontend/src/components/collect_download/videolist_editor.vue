@@ -1,23 +1,15 @@
 <template>
-    <FramePage title="列表编辑" style="width: 50%; margin: 0 auto;">
+    <FramePage title="列表编辑" style="width: 50%; margin: 0 auto;" v-if="showList">
 
         <li v-for="(video, index) in videoList" style="list-style-type: none;">
             <var-card :title="video.title" :src="video.Meta.cover" layout="row" outlines style="margin-bottom: 20px;">
-                
-
                 <template #description>
                     <var-divider />
                     <div>
                         <var-cell><var-input variant="outlined" placeholder="曲名" size="small" v-model="video.Meta.song_name" @change="saveVideoList" /></var-cell>
                         <var-cell><var-input variant="outlined" placeholder="歌手" size="small" v-model="video.Meta.author" @change="saveVideoList" /></var-cell>
                     </div>
-                </template>   
-
-                <!-- <template #extra>
-                    <var-space justify="flex-end">
-                        <var-button type="primary" @click="saveVideoList">保存</var-button>
-                    </var-space>
-                </template> -->
+                </template>
             </var-card>
         </li>
     </FramePage>
@@ -26,11 +18,11 @@
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { reactive, computed, watch, ref } from 'vue'
-import { MakeAndSaveList, GetVideoList, SaveVideoList } from '../../../wailsjs/go/main/App'
+import { GetVideoList, SaveVideoList } from '../../../wailsjs/go/main/App'
 import { Snackbar, LoadingBar } from '@varlet/ui'
 
 const videoList = ref([])
-const show = ref(true)
+const showList = ref(false)
 
 const props = defineProps(['parms', 'status'])
 const emit = defineEmits(['update:parms', 'update:status'])
@@ -57,10 +49,12 @@ watch(props.status, (newValue) => {
     if (newValue.loading == false) {
         GetVideoList().then(result => {
             videoList.value = result
+            showList.value = true
         })
     }
 })
 
+// 保存视频列表
 function saveVideoList() {
     SaveVideoList(videoList.value).then(result => {
         if (result != null) {
