@@ -23,7 +23,7 @@ func Checkffmpeg() bool {
 		return err == nil
 	case "darwin": // macOS
 		cmd := exec.Command("which", "ffmpeg")
-		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+		cmd.SysProcAttr = nil
 		_, err := cmd.Output()
 		return err == nil
 	default:
