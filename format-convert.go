@@ -17,18 +17,29 @@ func (a *App) Checkffmpeg() bool {
 func Checkffmpeg() bool {
 	switch runtime.GOOS {
 	case "windows":
-		cmd := exec.Command("where", "ffmpeg")
-		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-		_, err := cmd.Output()
-		return err == nil
-	case "darwin": // macOS
-		cmd := exec.Command("which", "ffmpeg")
-		cmd.SysProcAttr = nil
-		_, err := cmd.Output()
-		return err == nil
+		return checkffmpegOnWindows()
+	case "darwin":
+		return checkffmpegOnMacOS()
 	default:
 		return false
 	}
+}
+
+// windows
+func checkffmpegOnWindows() bool {
+	cmd := exec.Command("where", "ffmpeg")
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow: true,
+	}
+	_, err := cmd.Output()
+	return err == nil
+}
+
+// MacOS
+func checkffmpegOnMacOS() bool {
+	cmd := exec.Command("which", "ffmpeg")
+	_, err := cmd.Output()
+	return err == nil
 }
 
 // 调用 ffmpeg 转码
