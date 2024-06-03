@@ -78,6 +78,7 @@ func (a *App) LoginBilibili() error {
 	cfg.Account.DedeUserID__ckMd5 = (*cookies)[3].Value
 	cfg.Account.Sid = (*cookies)[4].Value
 	cfg.Account.IsLogin = true
+	cfg.Account.UseAccount = true
 
 	err = cfg.Save()
 	if err != nil {
