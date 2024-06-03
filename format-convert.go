@@ -2,6 +2,7 @@ package main
 
 import (
 	"os/exec"
+	"runtime"
 	"syscall"
 
 	ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -14,16 +15,19 @@ func (a *App) Checkffmpeg() bool {
 // 检查系统中是否安装 ffmpeg
 // （临时方案）
 func Checkffmpeg() bool {
-	cmd := exec.Command("ffmpeg", "-version")
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	err := cmd.Run()
-
-	if err != nil {
-		// 未安装 ffmpeg
+	switch runtime.GOOS {
+	case "windows":
+		cmd := exec.Command("where", "ffmpeg")
+		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+		_, err := cmd.Output()
+		return err == nil
+	case "darwin": // macOS
+		cmd := exec.Command("which", "ffmpeg")
+		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+		_, err := cmd.Output()
+		return err == nil
+	default:
 		return false
-	} else {
-		// 已安装 ffmpeg
-		return true
 	}
 }
 
