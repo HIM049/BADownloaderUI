@@ -14,20 +14,20 @@
 
         <var-paper style="background-color: var(--color-primary-container); margin-bottom: 20px;" v-if="is_login">
             <h3>创建的收藏夹</h3>
-            <var-cell v-for="(collect, index) in user_collect" style="margin: 0 10px;">
+            <var-cell v-for="(collect, index) in user_collect.List" style="margin: 0 10px;">
                 {{ collect.title }}
                 <template #extra>
-                    <var-button type="primary" @click="">下载</var-button>
+                    <var-button type="primary" @click="ClipboardSetText('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=create').then(Snackbar.success('复制成功'))">复制链接</var-button>
                 </template>
             </var-cell>
         </var-paper>
 
         <var-paper style="background-color: var(--color-primary-container);" v-if="is_login">
             <h3>收藏和订阅</h3>
-            <var-cell v-for="(collect, index) in user_Favourite" style="margin: 0 10px;">
+            <var-cell v-for="(collect, index) in user_Favourite.List" style="margin: 0 10px;">
                 {{ collect.title }}
                 <template #extra>
-                    <var-button type="primary" @click="">下载</var-button>
+                    <var-button type="primary" @click="ClipboardSetText('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=11').then(Snackbar.success('复制成功'))">复制链接</var-button>
                 </template>
             </var-cell>
             <var-space style="display: flex; align-items: center;">
@@ -62,7 +62,7 @@ onMounted(() => {
     checkLogin();
     if (is_login) {
         GetUsersCollect().then(result => {
-            user_collect.value = result.List;
+            user_collect.value = result;
         })
         getFavCollect();
     }
@@ -71,8 +71,7 @@ onMounted(() => {
 // 获取订阅收藏夹列表
 function getFavCollect() {
     GetFavCollect(page_index.value).then(result => {
-        user_Favourite.value = result.List
-        fav_count.value = result.count
+        user_Favourite.value = result
     })
 }
 
