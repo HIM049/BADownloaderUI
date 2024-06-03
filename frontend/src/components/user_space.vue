@@ -72,6 +72,7 @@ onMounted(() => {
 function getFavCollect() {
     GetFavCollect(page_index.value).then(result => {
         user_Favourite.value = result
+        fav_count.value = result.count
     })
 }
 
