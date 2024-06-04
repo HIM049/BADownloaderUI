@@ -13,7 +13,7 @@ import (
 var assets embed.FS
 
 // 全局版本号
-const APP_VERSION string = "4.0.1"
+const APP_VERSION string = "4.0.2"
 
 func main() {
 	// Create an instance of the app structure
