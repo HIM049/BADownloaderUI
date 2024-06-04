@@ -27,7 +27,9 @@
             <var-cell v-for="(collect, index) in user_Favourite.List" style="margin: 0 10px;">
                 {{ collect.title }}
                 <template #extra>
-                    <var-button type="primary" @click="ClipboardSetText('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=11').then(Snackbar.success('复制成功'))">复制链接</var-button>
+                    <var-button type="primary" @click="
+                        ClipboardSetText(collect.attr == 0 ? 'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=21':'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=11').then(Snackbar.success('复制成功'))
+                    ">复制链接</var-button>
                 </template>
             </var-cell>
             <var-space style="display: flex; align-items: center;">
@@ -71,8 +73,8 @@ onMounted(() => {
 // 获取订阅收藏夹列表
 function getFavCollect() {
     GetFavCollect(page_index.value).then(result => {
-        user_Favourite.value = result
-        fav_count.value = result.count
+        user_Favourite.value = result;
+        fav_count.value = result.count;
     })
 }
 

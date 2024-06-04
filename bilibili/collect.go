@@ -133,6 +133,7 @@ func (collects *Collects) GetFavCollect(sessdata string, ps, pn int) error {
 		meta := new(meta)
 		meta.Id = int(gjson.Get(json, "data.list."+strconv.Itoa(i)+".id").Int())
 		meta.Mid = int(gjson.Get(json, "data.list."+strconv.Itoa(i)+".mid").Int())
+		meta.Attr = int(gjson.Get(json, "data.list."+strconv.Itoa(i)+".attr").Int())
 		meta.Title = gjson.Get(json, "data.list."+strconv.Itoa(i)+".title").String()
 		meta.Cover = gjson.Get(json, "data.list."+strconv.Itoa(i)+".cover").String()
 		meta.MediaCount = int(gjson.Get(json, "data.list."+strconv.Itoa(i)+".media_count").Int())
