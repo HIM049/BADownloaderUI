@@ -1,9 +1,15 @@
 <template>
-    <FramePage title="正在下载">
-        <var-space direction="column" :size="[12, 12]">
-            <var-progress type="info" :value="progress.progressPercent" :line-width="6" label :indeterminate="progress.downFinished == 0" v-show="!progress.successed" />
+    <FramePage title="开始下载">
+        <var-space justify="center">
+            <var-button type="primary" @click="startDownload" size="large" v-if="!downloading && !progress.successed"><var-icon name="download" />开始下载</var-button>
         </var-space>
         
+        
+    
+        <var-space direction="column" :size="[12, 12]" v-if="downloading">
+            <var-progress type="info" :value="progress.progressPercent" :line-width="6" label :indeterminate="progress.downFinished == 0" v-show="!progress.successed" />
+        </var-space>
+
         <var-result 
             title="下载完成"
             description="现在您可以继续使用软件了"
@@ -14,11 +20,14 @@
 
 <script setup>
 import FramePage from '../modules/frame_page.vue'
-import { reactive, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
+import { ListDownload } from '../../../wailsjs/go/main/App'
 import { EventsOn } from '../../../wailsjs/runtime'
 
-const props = defineProps(['parms'])
-const emit = defineEmits(['update:parms'])
+const downloading = ref(false)
+
+const props = defineProps(['parms', 'status'])
+const emit = defineEmits(['update:parms', 'update:status'])
 
 const parms = computed({
     get() {
@@ -28,6 +37,30 @@ const parms = computed({
         emit('update:parms', parms)
     }
 })
+
+const status = computed({
+    get() {
+        return props.status
+    },
+    set(status) {
+        emit('update:status', status)
+    }
+})
+
+function startDownload() {
+    status.value.allowBack = false;
+    downloading.value = true;
+    var opt = {
+        song_name: parms.value.options.songName,
+        song_cover: parms.value.options.songCover,
+        song_author: parms.value.options.songAuthor,
+    }
+    ListDownload("00000", parms.value.videoListPath, opt).then(result => {
+        downloading.value = false;
+        status.value.allowNext = true;
+        progress.successed = true;
+    })
+}
 
 // 进度条相关
 const progress = reactive({
@@ -39,13 +72,6 @@ const progress = reactive({
 // 下载完成事件
 EventsOn("downloadFinish", () => {
     progress.downFinished++
-    progress.progressPercent = (progress.downFinished / props.parms.options.downCount) * 100
-
-    // 判断任务是否完成
-    if (props.parms.options.downCount == progress.downFinished) {
-        progress.successed = true
-    } else {
-        progress.successed = false
-    }
+    progress.progressPercent = (progress.downFinished / parms.value.listCount) * 100
 })
 </script>

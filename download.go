@@ -16,7 +16,7 @@ var AudioType = struct {
 	mp3 string
 }{m4a: ".m4a", mp3: ".mp3"}
 
-func (a *App) StartDownload(favlistId string, opt DownloadOption) {
+func (a *App) ListDownload(favlistId, listPath string, opt DownloadOption) error {
 	// 初始化参数
 	cfg := new(Config)
 	cfg.Get()
@@ -25,17 +25,17 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
 
-	// 获取任务队列
-	var list []VideoInformationList
-	err := LoadJsonFile(cfg.VideoListPath, &list)
+	videoList := new(VideoList)
+	err := videoList.Get(listPath)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "读取视频列表时发生错误：%s", err)
+		return err
 	}
 
 	// 遍历下载队列
-	for i, video := range list {
+	for i, video := range videoList.List {
 		// 并发函数
-		go func(v VideoInformationList, num int) {
+		go func(v VideoInformation, num int) {
 			sem <- struct{}{} // 给通道中填入数据
 			wg.Add(1)         // 任务 +1
 			// 下载完成后
@@ -115,7 +115,7 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 
 		}(video, i)
 
-		go func(v VideoInformationList, num int) {
+		go func(v VideoInformation, num int) {
 			// 下载封面图片
 			err = bilibili.SaveFromURL(v.Meta.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
@@ -127,6 +127,8 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 	}
 	// 等待任务执行完成
 	wg.Wait()
+
+	return nil
 }
 
 func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, title string) {
