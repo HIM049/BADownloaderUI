@@ -7,8 +7,19 @@ import (
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+// 获取版本号
 func (a *App) GetAppVersion() string {
 	return APP_VERSION
+}
+
+// 获取列表中视频数量
+func (a *App) GetListCount(path string) int {
+	videoList := new(VideoList)
+	err := videoList.Get(path)
+	if err != nil {
+		return 0
+	}
+	return videoList.Count
 }
 
 // 查询视频信息
@@ -72,7 +83,7 @@ func (a *App) CreatVideoList() error {
 }
 
 // 添加单个视频
-func (a *App) AddVideoToList(bvid string, downloadCompilation bool) error {
+func (a *App) AddVideoToList(listPath, bvid string, downloadCompilation bool) error {
 	cfg := new(Config)
 	err := cfg.Get()
 	if err != nil {
@@ -80,7 +91,7 @@ func (a *App) AddVideoToList(bvid string, downloadCompilation bool) error {
 	}
 
 	videolist := new(VideoList)
-	err = videolist.Get()
+	err = videolist.Get(listPath)
 	if err != nil {
 		return err
 	}
@@ -95,13 +106,13 @@ func (a *App) AddVideoToList(bvid string, downloadCompilation bool) error {
 		return err
 	}
 
-	videolist.Save()
+	videolist.Save(listPath)
 
 	return nil
 }
 
 // 添加收藏夹内容
-func (a *App) AddCollectionToList(fid string, count int, downloadCompilation bool) error {
+func (a *App) AddCollectionToList(listPath, fid string, count int, downloadCompilation bool) error {
 	cfg := new(Config)
 	err := cfg.Get()
 	if err != nil {
@@ -109,7 +120,7 @@ func (a *App) AddCollectionToList(fid string, count int, downloadCompilation boo
 	}
 
 	videoList := new(VideoList)
-	err = videoList.Get()
+	err = videoList.Get(listPath)
 	if err != nil {
 		return err
 	}
@@ -124,7 +135,7 @@ func (a *App) AddCollectionToList(fid string, count int, downloadCompilation boo
 		return err
 	}
 
-	err = videoList.Save()
+	err = videoList.Save(listPath)
 	if err != nil {
 		return err
 	}
@@ -133,7 +144,7 @@ func (a *App) AddCollectionToList(fid string, count int, downloadCompilation boo
 }
 
 // 添加视频合集
-func (a *App) AddCompilationToList(mid, sid, count int, downloadCompilation bool) error {
+func (a *App) AddCompilationToList(listPath string, mid, sid, count int, downloadCompilation bool) error {
 	cfg := new(Config)
 	err := cfg.Get()
 	if err != nil {
@@ -141,7 +152,7 @@ func (a *App) AddCompilationToList(mid, sid, count int, downloadCompilation bool
 	}
 
 	videoList := new(VideoList)
-	err = videoList.Get()
+	err = videoList.Get(listPath)
 	if err != nil {
 		return nil
 	}
@@ -156,7 +167,7 @@ func (a *App) AddCompilationToList(mid, sid, count int, downloadCompilation bool
 		return err
 	}
 
-	err = videoList.Save()
+	err = videoList.Save(listPath)
 	if err != nil {
 		return err
 	}
@@ -165,9 +176,9 @@ func (a *App) AddCompilationToList(mid, sid, count int, downloadCompilation bool
 }
 
 // 加载视频列表
-func (a *App) LoadVideoList() (VideoList, error) {
+func (a *App) LoadVideoList(listPath string) (VideoList, error) {
 	videoList := new(VideoList)
-	err := videoList.Get()
+	err := videoList.Get(listPath)
 	if err != nil {
 		return VideoList{}, err
 	}

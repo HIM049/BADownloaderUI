@@ -1,8 +1,8 @@
 <template>
     <FramePage title="批量下载">
-        <var-space>                
-            <var-button type="primary" @click="creatVideoList">创建新的下载列表</var-button>
-            <var-button type="primary" @click="openFile">打开本地下载列表</var-button>
+        <var-space justify="center">                
+            <var-button type="primary" @click="creatVideoList" size="large"><var-icon name="plus" />创建新的下载列表</var-button>
+            <var-button type="primary" @click="openFile" size="large"><var-icon name="file-document-outline" />打开本地下载列表</var-button>
         </var-space>
     </FramePage>
 </template>
@@ -37,7 +37,7 @@ const status = computed({
 // 创建视频列表并保存路径
 function creatVideoList() {
     LoadConfig().then(result => {
-        parms.videoListPath = result.videolist_path;
+        parms.value.videoListPath = result.videolist_path;
         CreatVideoList();
         emit('nextpage');
     })
@@ -50,7 +50,7 @@ function openFile() {
             Snackbar.warning("未选择文件");
             return
         }
-        parms.videoListPath = result;
+        parms.value.videoListPath = result;
         emit('nextpage');
     })
 }

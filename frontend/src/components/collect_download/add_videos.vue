@@ -78,7 +78,7 @@
             </var-cell>
             <br>
             <var-space style="position: absolute; right: 20px; bottom: 20px;">
-                <var-button type="primary" @click="addItToList">确定添加</var-button>
+                <var-button type="primary" :loading="CardStatus.ConfirmBtnLoadig" loading-type="wave" @click="addItToList">确定添加</var-button>
             </var-space>
         </div>
     </var-popup>
@@ -93,19 +93,21 @@ import { QueryVideo, QueryCollection, QueryCompilation, AddVideoToList, AddColle
 import { Snackbar } from '@varlet/ui'
 
 const props = defineProps(['parms', 'status'])
-const emit = defineEmits(['update:parms', 'update:status'])
+const emit = defineEmits(['update:parms', 'update:status', 'updateBadge'])
 
 const input = ref("")
 const QueryType = ref(0)
 const addItToList = ref(null)
 
+// 本页卡片状态
 const CardStatus = reactive({
     InfoCard: false,
     InfoVCount: false,
     InfoVUpper: false,
     RightPanel: false,
     DownloadAll: true,
-    EnableDownloadAll: true
+    EnableDownloadAll: true,
+    ConfirmBtnLoadig: false
 })
 
 const parms = computed({
@@ -218,7 +220,8 @@ function openRightPanel() {
     switch (QueryType.value) {
         case 0: // Collection
             addItToList.value = () => {
-                AddCollectionToList(resp.fid, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
+                CardStatus.ConfirmBtnLoadig = true;
+                AddCollectionToList(parms.value.videoListPath, resp.fid, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
                     Snackbar.success("添加完成");
                     afterAdd();
                 });
@@ -227,7 +230,8 @@ function openRightPanel() {
     
         case 1: // Compilation
             addItToList.value = () => {
-                AddCompilationToList(Number(resp.mid), Number(resp.fid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
+                CardStatus.ConfirmBtnLoadig = true;
+                AddCompilationToList(parms.value.videoListPath, Number(resp.mid), Number(resp.fid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
                     Snackbar.success("添加完成");
                     afterAdd();
                 });
@@ -237,7 +241,8 @@ function openRightPanel() {
         case 2: // Video
             CardStatus.EnableDownloadAll = false;
             addItToList.value = () => {
-                AddVideoToList(resp.bvid, props.parms.options.downPart).then(()=>{
+                CardStatus.ConfirmBtnLoadig = true;
+                AddVideoToList(parms.value.videoListPath, resp.bvid, props.parms.options.downPart).then(()=>{
                     Snackbar.success("添加完成");
                     afterAdd();
                 });
@@ -251,6 +256,8 @@ function afterAdd() {
     CardStatus.RightPanel = false;
     input.value = "";
     props.parms.options.downCount = 0;
+    emit('updateBadge');
+    CardStatus.ConfirmBtnLoadig = false;
 }
 
 // 过滤视频分享链接

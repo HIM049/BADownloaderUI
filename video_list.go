@@ -194,7 +194,7 @@ func (VideoList *VideoList) AddCompilation(sessdata string, mid, sid, count int,
 }
 
 // 读取视频列表
-func (VideoList *VideoList) Get(fileName ...string) error {
+func (VideoList *VideoList) Get(path ...string) error {
 	cfg := new(Config)
 	err := cfg.Get()
 	if err != nil {
@@ -203,8 +203,8 @@ func (VideoList *VideoList) Get(fileName ...string) error {
 
 	// 指定路径
 	filePath := cfg.VideoListPath
-	if len(fileName) > 0 {
-		filePath = fileName[0]
+	if len(path) > 0 {
+		filePath = path[0]
 	}
 
 	err = LoadJsonFile(filePath, VideoList)
@@ -215,7 +215,7 @@ func (VideoList *VideoList) Get(fileName ...string) error {
 }
 
 // 保存视频列表
-func (VideoList *VideoList) Save(fileName ...string) error {
+func (VideoList *VideoList) Save(path ...string) error {
 	cfg := new(Config)
 	err := cfg.Get()
 	if err != nil {
@@ -224,8 +224,8 @@ func (VideoList *VideoList) Save(fileName ...string) error {
 
 	// 指定路径
 	filePath := cfg.VideoListPath
-	if len(fileName) > 0 {
-		filePath = fileName[0]
+	if len(path) > 0 {
+		filePath = path[0]
 	}
 
 	err = SaveJsonFile(filePath, VideoList)
