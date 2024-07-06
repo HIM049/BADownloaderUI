@@ -56,6 +56,32 @@ export namespace bilibili {
 	        this.message = source["message"];
 	    }
 	}
+	export class Video {
+	    bvid: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Video(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bvid = source["bvid"];
+	    }
+	}
+	export class Videos {
+	    cid: number;
+	    part: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Videos(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.cid = source["cid"];
+	        this.part = source["part"];
+	    }
+	}
 	export class meta {
 	    id: number;
 	    mid: number;
@@ -165,15 +191,16 @@ export namespace main {
 	        this.lyrics_path = source["lyrics_path"];
 	    }
 	}
-	export class VideoInformationList {
+	export class VideoInformation {
 	    bvid: string;
 	    cid: number;
 	    title: string;
 	    page_title: string;
 	    format: string;
+	    part_id: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new VideoInformationList(source);
+	        return new VideoInformation(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -183,6 +210,19 @@ export namespace main {
 	        this.title = source["title"];
 	        this.page_title = source["page_title"];
 	        this.format = source["format"];
+	        this.part_id = source["part_id"];
+	    }
+	}
+	export class VideoList {
+	    count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new VideoList(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.count = source["count"];
 	    }
 	}
 

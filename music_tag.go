@@ -9,7 +9,7 @@ import (
 )
 
 // 修改 TAG
-func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList) error {
+func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformation) error {
 
 	// 准备参数
 	fileType := AudioType.m4a
@@ -56,7 +56,7 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformationList) error 
 }
 
 // 输出文件
-func OutputFile(cfg *Config, v *VideoInformationList, favlistId, fileName string) error {
+func OutputFile(cfg *Config, v *VideoInformation, favlistId, fileName string) error {
 	fileType := AudioType.m4a
 	if cfg.ConvertFormat {
 		fileType = AudioType.mp3

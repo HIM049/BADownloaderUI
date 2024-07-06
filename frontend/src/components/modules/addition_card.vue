@@ -1,5 +1,5 @@
 <template>
-    <body class="page-body" >
+    <body class="add-body" >
         <var-paper :elevation="2" >
             <h2>{{ title }}</h2>
             <slot />
@@ -13,7 +13,7 @@ const props = defineProps(['title'])
 </script>
 
 <style>
-    .page-body {
+    .add-body {
         width: 60%;
         margin: 0px auto 20px auto;;
     }

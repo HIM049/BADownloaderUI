@@ -308,7 +308,4 @@ function extractCompilation(url) {
     bottom: 35px;
     border-radius: 8px;
 }
-.var-popup__overlay {
-    background-color: rgb(0 0 0 / 0%);
-}
 </style>

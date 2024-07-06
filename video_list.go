@@ -83,10 +83,18 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 
 		// 处理音频标题（单 P 视频）
 		var SongName string
-		SongName, err := ExtractTitle(list.PageTitle)
-		if err != nil {
-			// 如果无法判断标题
-			SongName = list.Title
+		if total <= 1 {
+			// 单集使用视频标题
+			SongName, err = ExtractTitle(list.Title)
+			if err != nil {
+				SongName = list.Title
+			}
+		} else {
+			// 多集视频使用分集标题
+			SongName, err = ExtractTitle(list.PageTitle)
+			if err != nil {
+				SongName = list.PageTitle
+			}
 		}
 		list.Meta.SongName = SongName
 		VideoList.List = append(VideoList.List, list)

@@ -185,43 +185,13 @@ func (a *App) LoadVideoList(listPath string) (VideoList, error) {
 	return *videoList, nil
 }
 
-func (a *App) SaveVideoList(newList VideoList) error {
-	err := newList.Save()
+func (a *App) SaveVideoList(newList VideoList, path string) error {
+	err := newList.Save(path)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
-// func (a *App) TestCreatVL() {
-// 	fmt.Println("Start Test")
-
-// 	VideoList := new(VideoList)
-
-// 	// 添加单个视频
-// 	fmt.Println("Start Add Video")
-// 	err := VideoList.AddVideo("", "BV1WK4y1z72p", false)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-
-// 	// 添加收藏夹
-// 	fmt.Println("Start Add Collection")
-// 	err = VideoList.AddCollection("", "742380048", 5, false)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-
-// 	// 添加合集
-// 	fmt.Println("Start Add Compilation")
-// 	err = VideoList.AddCompilation("", 449838148, 180937, 5, false)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-// 	VideoList.Save()
-
-// 	fmt.Println(VideoList)
-// }
 
 // 获取用户创建的收藏夹
 func (a *App) GetUsersCollect() bilibili.Collects {
