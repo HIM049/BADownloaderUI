@@ -23,7 +23,7 @@ export function GetListCount(arg1:string):Promise<number>;
 
 export function GetUsersCollect():Promise<bilibili.Collects>;
 
-export function ListDownload(arg1:string,arg2:string,arg3:main.DownloadOption):Promise<void>;
+export function ListDownload(arg1:string,arg2:main.DownloadOption):Promise<void>;
 
 export function LoadConfig():Promise<main.Config>;
 

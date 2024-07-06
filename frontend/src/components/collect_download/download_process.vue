@@ -55,7 +55,7 @@ function startDownload() {
         song_cover: parms.value.options.songCover,
         song_author: parms.value.options.songAuthor,
     }
-    ListDownload("00000", parms.value.videoListPath, opt).then(result => {
+    ListDownload(parms.value.videoListPath, opt).then(result => {
         downloading.value = false;
         status.value.allowNext = true;
         progress.successed = true;

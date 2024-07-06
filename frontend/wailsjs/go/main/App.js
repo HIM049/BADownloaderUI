@@ -42,8 +42,8 @@ export function GetUsersCollect() {
   return window['go']['main']['App']['GetUsersCollect']();
 }
 
-export function ListDownload(arg1, arg2, arg3) {
-  return window['go']['main']['App']['ListDownload'](arg1, arg2, arg3);
+export function ListDownload(arg1, arg2) {
+  return window['go']['main']['App']['ListDownload'](arg1, arg2);
 }
 
 export function LoadConfig() {
