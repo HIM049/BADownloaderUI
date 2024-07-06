@@ -41,8 +41,6 @@ import { LoadVideoList, SaveVideoList } from '../../../wailsjs/go/main/App'
 import { Snackbar, LoadingBar } from '@varlet/ui'
 
 const videoList = ref([])
-const showList = ref(false)
-const RightPanel = ref(false)
 
 const CardStatus = reactive({
     RightPanel: false,
@@ -85,6 +83,7 @@ watch(props, (newValue) => {
     }
 })
 
+// 打开右侧面板
 function openRightPanel(index) {
     CardStatus.ListIndex = index;
     CardStatus.Meta.song_name = videoList.value.List[index].Meta.song_name;
@@ -105,18 +104,9 @@ function saveVideoMeta() {
             Snackbar.success("保存成功");
         }
     })
-}
 
-// // 保存视频列表
-// function saveVideoList() {
-//     SaveVideoList(videoList.value, props.value.videoListPath).then(result => {
-//         if (result != null) {
-//             Snackbar.error("保存失败" + result);
-//         } else {
-//             Snackbar.success("保存成功");
-//         }
-//     })
-// }
+    CardStatus.RightPanel = false;
+}
 </script>
 
 <style>

@@ -49,21 +49,21 @@ func (a *App) LoginBilibili() error {
 			switch returnObj.Data.Code {
 			case 0:
 				// 登录成功
-				runtime.LogInfo(a.ctx, "登录成功")
+				runtime.LogDebug(a.ctx, "登录成功")
 				runtime.EventsEmit(a.ctx, "loginStatus", "登录成功")
 				return cookies, nil
 			case 86038:
 				// 二维码失效
-				runtime.LogInfo(a.ctx, "二维码已失效")
+				runtime.LogDebug(a.ctx, "二维码已失效")
 				runtime.EventsEmit(a.ctx, "loginStatus", "二维码已失效")
 				return nil, errors.New("二维码已失效")
 			case 86090:
 				// 扫描成功，待确认
-				runtime.LogInfo(a.ctx, "扫描成功，待确认")
+				runtime.LogDebug(a.ctx, "扫描成功，待确认")
 				runtime.EventsEmit(a.ctx, "loginStatus", "扫描成功，待确认")
 			case 86101:
 				// 未扫描
-				runtime.LogInfo(a.ctx, "未扫描")
+				runtime.LogDebug(a.ctx, "未扫描")
 				runtime.EventsEmit(a.ctx, "loginStatus", "请扫描二维码登录")
 			}
 		}
