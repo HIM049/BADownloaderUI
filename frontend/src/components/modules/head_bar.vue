@@ -13,7 +13,7 @@
                     <p style="font-size: 12px; display: flex; padding-left: 10px; align-items: center;">{{ APP_VERSION }}</p>
                 </div>
             </div>
-            <div id="ctl-buttons">
+            <div id="ctl-buttons" style="--wails-draggable:none;">
                 <button class="ctl-button" id="minimize" @click="WindowMinimise()"><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 -960 960 960"><path d="M200-440v-80h560v80H200Z" /></svg></button>
                 <button class="ctl-button" id="close" @click="Quit()"><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 -960 960 960"> <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg></button>
             </div>

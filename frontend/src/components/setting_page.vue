@@ -92,7 +92,6 @@ function loadConfig() {
     LoadConfig().then(result => {
         config.value = result;
         overload.value = true;
-        console.log(config.value);
     })
 }
 

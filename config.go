@@ -1,9 +1,8 @@
 package main
 
 type Config struct {
-	DownloadPath string `json:"download_path"`
-	CachePath    string `json:"cache_path"`
-	// TODO: 改为使用 ID 作为列表文件名
+	DownloadPath    string `json:"download_path"`
+	CachePath       string `json:"cache_path"`
 	VideoListPath   string `json:"videolist_path"`
 	DownloadThreads int    `json:"download_threads"`
 	RetryCount      int    `json:"retry_count"`

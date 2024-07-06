@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path"
 	"strconv"
 	"sync"
@@ -16,26 +15,40 @@ var AudioType = struct {
 	mp3 string
 }{m4a: ".m4a", mp3: ".mp3"}
 
-func (a *App) StartDownload(favlistId string, opt DownloadOption) {
+func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 	// 初始化参数
 	cfg := new(Config)
-	cfg.Get()
-	_ = os.MkdirAll(path.Join(cfg.DownloadPath, favlistId), 0755)
+	err := cfg.Get()
+	if err != nil {
+		return err
+	}
+	sessdata := ""
+	if cfg.Account.UseAccount && cfg.Account.IsLogin {
+		sessdata = cfg.Account.SESSDATA
+	}
+
+	// _ = os.MkdirAll(path.Join(cfg.DownloadPath, favlistId), 0755)
 
 	sem := make(chan struct{}, cfg.DownloadThreads+1)
 	var wg sync.WaitGroup
 
-	// 获取任务队列
-	var list []VideoInformationList
-	err := LoadJsonFile(cfg.VideoListPath, &list)
+	videoList := new(VideoList)
+	err = videoList.Get(listPath)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "读取视频列表时发生错误：%s", err)
+		return err
+	}
+
+	// 格式判断
+	audioType := AudioType.m4a
+	if cfg.ConvertFormat {
+		audioType = AudioType.mp3
 	}
 
 	// 遍历下载队列
-	for i, video := range list {
+	for i, video := range videoList.List {
 		// 并发函数
-		go func(v VideoInformationList, num int) {
+		go func(v VideoInformation, num int) {
 			sem <- struct{}{} // 给通道中填入数据
 			wg.Add(1)         // 任务 +1
 			// 下载完成后
@@ -54,9 +67,9 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 			}
 
 			//判断是否已下载
-			finalFile := path.Join(cfg.DownloadPath, favlistId, v.Title+AudioType.mp3)
+			finalFile := path.Join(cfg.DownloadPath, v.Title+audioType)
 			if IsFileExists(finalFile) {
-				runtime.LogInfof(a.ctx, "跳过已下载: %s", finalFile)
+				runtime.LogDebugf(a.ctx, "跳过已下载: %s", finalFile)
 				return
 			}
 
@@ -66,7 +79,7 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 			// 下载视频
 			for i := 0; i < cfg.RetryCount; i++ {
 
-				err := v.GetStream("")
+				err := v.GetStream(sessdata)
 				if err != nil {
 					// 获取流失败
 					runtime.LogErrorf(a.ctx, "(视频%d) 获取媒体流时出现错误：%s  (重试 %d )", num, err, i+1)
@@ -80,8 +93,9 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 					continue
 				}
 
+				runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
+				break
 			}
-			runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
 
 			// 判断文件类型并转码
 			if v.Format == AudioType.m4a && cfg.ConvertFormat {
@@ -107,7 +121,7 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 			runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
-			err = OutputFile(cfg, &v, favlistId, finalfileName)
+			err = OutputFile(cfg, &v, finalfileName)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			}
@@ -115,7 +129,7 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 
 		}(video, i)
 
-		go func(v VideoInformationList, num int) {
+		go func(v VideoInformation, num int) {
 			// 下载封面图片
 			err = bilibili.SaveFromURL(v.Meta.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
@@ -127,6 +141,8 @@ func (a *App) StartDownload(favlistId string, opt DownloadOption) {
 	}
 	// 等待任务执行完成
 	wg.Wait()
+
+	return nil
 }
 
 func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, title string) {

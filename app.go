@@ -22,7 +22,7 @@ func (a *App) startup(ctx context.Context) {
 
 	cfg := new(Config)
 	if cfg.Get() != nil {
-		runtime.LogInfo(a.ctx, "初始化文件夹失败")
+		runtime.LogError(a.ctx, "初始化文件夹失败")
 
 	}
 	_ = os.MkdirAll(cfg.DownloadPath, 0755)
