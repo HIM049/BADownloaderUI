@@ -233,7 +233,6 @@ func (a *App) GetFavCollect(pn int) bilibili.Collects {
 
 // 查询并返回歌曲信息
 func (a *App) SearchSongInformation(auid string) bilibili.AudioInf {
-	wails.LogInfo(a.ctx, auid)
 	audioInf, err := bilibili.GetAudioInfObj(auid)
 	if err != nil {
 		wails.LogErrorf(a.ctx, "获取歌曲详情时出现错误：%s", err)
