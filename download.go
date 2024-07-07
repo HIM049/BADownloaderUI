@@ -56,7 +56,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 				<-sem     // 释放一个并发槽
 				wg.Done() // 发出任务完成通知
 
-				runtime.EventsEmit(a.ctx, "downloadFinish")
+				runtime.EventsEmit(a.ctx, "downloadFinish", v.Meta.SongName)
 			}()
 
 			// 处理音频标题
