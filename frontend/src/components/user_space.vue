@@ -10,20 +10,22 @@
                 <img style="display: flex; margin: 0 auto; border-radius: 15px;" :src="qrcodeStr" alt="Image">
                 <p style="display: flex; justify-content: center;">{{ loginText }}</p>
             </var-paper>
-        </var-collapse-transition>
-
-        <var-paper style="background-color: var(--color-primary-container); margin-bottom: 20px;" v-if="is_login">
-            <h3>创建的收藏夹</h3>
+        </var-collapse-transition>   
+        <var-space v-if="is_login" justify="center">
+            <var-avatar :src="user_Information.avatar" />
+            <p>{{ user_Information.name }}</p>
+        </var-space>     
+    </FramePage>
+    <AdditionCard title="创建的收藏夹" v-if="is_login">
             <var-cell v-for="(collect, index) in user_collect.List" style="margin: 0 10px;">
                 {{ collect.title }}
                 <template #extra>
                     <var-button type="primary" @click="ClipboardSetText('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=create').then(Snackbar.success('复制成功'))">复制链接</var-button>
                 </template>
             </var-cell>
-        </var-paper>
+        </AdditionCard>
 
-        <var-paper style="background-color: var(--color-primary-container);" v-if="is_login">
-            <h3>收藏和订阅</h3>
+        <AdditionCard title="收藏和订阅" v-if="is_login">
             <var-cell v-for="(collect, index) in user_Favourite.List" style="margin: 0 10px;">
                 {{ collect.title }}
                 <template #extra>
@@ -38,15 +40,14 @@
                     <var-button @click="page_index++">下一页</var-button>
                 </var-button-group>
             </var-space>
-        </var-paper>
-        
-    </FramePage>
+        </AdditionCard>
 </template>
 
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
+import AdditionCard from './modules/addition_card.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
-import { LoginBilibili, LoadConfig, GetUsersCollect, GetFavCollect } from '../../wailsjs/go/main/App'
+import { LoginBilibili, LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf } from '../../wailsjs/go/main/App'
 import { EventsOn, ClipboardSetText } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
@@ -58,6 +59,7 @@ const page_index = ref(1) // 订阅的收藏夹的页码
 
 const user_collect = ref([]); // 用户创建的收藏夹列表
 const user_Favourite = ref([]); // 用户订阅的收藏夹列表
+const user_Information = ref(null); // 用户信息
 const fav_count = ref(0);
 
 onMounted(() => {
@@ -67,6 +69,9 @@ onMounted(() => {
             user_collect.value = result;
         })
         getFavCollect();
+        GetUserInf().then(result => {
+            user_Information.value = result;
+        })
     }
 });
 

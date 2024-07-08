@@ -1,5 +1,19 @@
 export namespace bilibili {
 	
+	export class AccountInformation {
+	    avatar: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AccountInformation(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.avatar = source["avatar"];
+	        this.name = source["name"];
+	    }
+	}
 	export class AudioInf {
 	    code: number;
 	    msg: string;

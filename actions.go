@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/myuser/bilibili"
@@ -265,6 +266,25 @@ func (a *App) OpenFileDialog() (string, error) {
 	}
 
 	return path, nil
+}
+
+// 获取已登录用户的信息
+func (a *App) GetUserInf() (bilibili.AccountInformation, error) {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return bilibili.AccountInformation{}, err
+	}
+
+	if !cfg.Account.IsLogin {
+		return bilibili.AccountInformation{}, errors.New("用户未登录")
+	}
+	sessdata := cfg.Account.SESSDATA
+
+	accountInf := new(bilibili.AccountInformation)
+	accountInf.GetUserInf(sessdata)
+
+	return *accountInf, nil
 }
 
 // 重置设置文件
