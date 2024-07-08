@@ -14,18 +14,16 @@ export namespace bilibili {
 	        this.name = source["name"];
 	    }
 	}
-	export class AudioInf {
-	    code: number;
-	    msg: string;
+	export class Audio {
+	    auid: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new AudioInf(source);
+	        return new Audio(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.code = source["code"];
-	        this.msg = source["msg"];
+	        this.auid = source["auid"];
 	    }
 	}
 	export class Collects {
@@ -212,6 +210,7 @@ export namespace main {
 	    page_title: string;
 	    format: string;
 	    part_id: number;
+	    is_audio: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new VideoInformation(source);
@@ -225,6 +224,7 @@ export namespace main {
 	        this.page_title = source["page_title"];
 	        this.format = source["format"];
 	        this.part_id = source["part_id"];
+	        this.is_audio = source["is_audio"];
 	    }
 	}
 	export class VideoList {

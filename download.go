@@ -79,6 +79,22 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			// 下载视频
 			for i := 0; i < cfg.RetryCount; i++ {
 
+				// 音频下载逻辑
+				if v.IsAudio {
+					audio := new(bilibili.Audio)
+					audio.Auid = v.Bvid
+					audio.GetStream(sessdata)
+
+					// 下载媒体流
+					err = bilibili.StreamingDownloader(audio.Stream.StreamLink, musicPathAndName+AudioType.m4a)
+					if err != nil {
+						// 下载失败
+						runtime.LogErrorf(a.ctx, "(视频%d) 下载时出现错误：%s  (重试 %d )", num, err, i+1)
+						continue
+					}
+					break
+				}
+
 				err := v.GetStream(sessdata)
 				if err != nil {
 					// 获取流失败
@@ -143,35 +159,4 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 	wg.Wait()
 
 	return nil
-}
-
-func (a *App) AudioDownload(opt DownloadOption, auid, songName, songAuthor, title string) {
-	cfg := new(Config)
-	cfg.Get()
-
-	obj, err := bilibili.GetAudioObj(auid, "2")
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "获取音频流时发生错误：%s", err)
-	}
-
-	// 下载封面图片
-	err = bilibili.SaveFromURL(obj.Data.Cover, cfg.CachePath+"/single/cover/"+auid+".jpg")
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
-	}
-	// 下载媒体流
-	err = bilibili.StreamingDownloader(obj.Data.Cdns[0], cfg.CachePath+"/single/music/"+auid+AudioType.m4a)
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "保存媒体流时发生错误：%s", err)
-	}
-	// 写入元数据
-	err = SingleChangeTag(cfg, &opt, auid, songName, songAuthor)
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "写入元数据时发生错误：%s", err)
-	}
-	// 输出文件
-	err = SingleOutputFile(cfg, auid, title)
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
-	}
 }

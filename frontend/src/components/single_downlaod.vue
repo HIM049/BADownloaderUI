@@ -57,7 +57,7 @@
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
 import { reactive, ref, watch } from 'vue'
-import { AudioDownload, SearchSongInformation } from '../../wailsjs/go/main/App'
+import {  QuerySongInformation } from '../../wailsjs/go/main/App'
 import { Snackbar } from '@varlet/ui'
 
 
@@ -86,7 +86,7 @@ const parms = reactive({
 
 // 输入的 ID 变化时查询歌曲信息
 watch(auid, (newid) => {
-    SearchSongInformation(newid).then(result => {
+    QuerySongInformation("2970534").then(result => {
         if (result.msg == "success") {
             songInf.title = result.Data.title
             songInf.cover = result.Data.cover
@@ -113,8 +113,8 @@ function audioDownload() {
         song_cover: parms.options.songCover,
         song_author: parms.options.songAuthor,
     }
-    AudioDownload(opt, auid, parms.song_name, parms.author, songInf.title).then(result => {
-        Snackbar.success("下载完成")
-    })
+    // AudioDownload(opt, auid, parms.song_name, parms.author, songInf.title).then(result => {
+    //     Snackbar.success("下载完成")
+    // })
 }
 </script>

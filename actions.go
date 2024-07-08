@@ -72,6 +72,23 @@ func (a *App) QueryCompilation(mid, sid int) bilibili.CompliationInformation {
 	return *listInf
 }
 
+// 查询音频信息
+func (a *App) QueryAudio(auid string) (bilibili.Audio, error) {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return bilibili.Audio{}, err
+	}
+
+	audio := new(bilibili.Audio)
+	err = audio.Query(auid)
+	if err != nil {
+		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+		return bilibili.Audio{}, err
+	}
+	return *audio, err
+}
+
 // 创建视频列表
 func (a *App) CreatVideoList() error {
 	videoList := new(VideoList)
@@ -176,6 +193,35 @@ func (a *App) AddCompilationToList(listPath string, mid, sid, count int, downloa
 	return nil
 }
 
+// 添加单个音频
+func (a *App) AddAudioToList(listPath, auid string) error {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return err
+	}
+
+	videolist := new(VideoList)
+	err = videolist.Get(listPath)
+	if err != nil {
+		return err
+	}
+
+	sessdata := ""
+	if cfg.Account.IsLogin && cfg.Account.UseAccount {
+		sessdata = cfg.Account.SESSDATA
+	}
+
+	err = videolist.AddAudio(sessdata, auid)
+	if err != nil {
+		return err
+	}
+
+	videolist.Save(listPath)
+
+	return nil
+}
+
 // 加载视频列表
 func (a *App) LoadVideoList(listPath string) (VideoList, error) {
 	videoList := new(VideoList)
@@ -233,14 +279,14 @@ func (a *App) GetFavCollect(pn int) bilibili.Collects {
 }
 
 // 查询并返回歌曲信息
-func (a *App) SearchSongInformation(auid string) bilibili.AudioInf {
-	audioInf, err := bilibili.GetAudioInfObj(auid)
+func (a *App) QuerySongInformation(auid string) (bilibili.Audio, error) {
+	audioInf := new(bilibili.Audio)
+	err := audioInf.Query(auid)
 	if err != nil {
-		wails.LogErrorf(a.ctx, "获取歌曲详情时出现错误：%s", err)
-		wails.EventsEmit(a.ctx, "error", "获取歌曲时出错:"+err.Error())
-		return bilibili.AudioInf{}
+		return bilibili.Audio{}, err
 	}
-	return *audioInf
+	audioInf.GetStream("")
+	return *audioInf, nil
 }
 
 // 调用 Windows 打开文件窗口
