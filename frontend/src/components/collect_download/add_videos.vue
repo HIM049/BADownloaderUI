@@ -1,5 +1,5 @@
 <template>
-    <FramePage title="批量下载">        
+    <FramePage title="添加内容">        
         <var-radio-group v-model="QueryType" @change="queryInfornation">
             <var-radio :checked-value="0">收藏夹</var-radio>
             <var-radio :checked-value="1">视频合集</var-radio>
@@ -7,7 +7,7 @@
             <var-radio :checked-value="3">AUID</var-radio>
         </var-radio-group>
 
-        <var-input placeholder="收藏夹 ID / 收藏夹 URL" v-model="input" clearable 
+        <var-input :placeholder="inputTip" v-model="input" clearable 
         style="margin-bottom: 25px;" >
             <template #prepend-icon>
                 <var-icon name="magnify" />
@@ -96,6 +96,7 @@ import { Snackbar } from '@varlet/ui'
 const props = defineProps(['parms', 'status'])
 const emit = defineEmits(['update:parms', 'update:status', 'updateBadge'])
 
+const inputTip = ref("请输入 收藏夹网页 URL")
 const input = ref("")
 const QueryType = ref(0)
 const addItToList = ref(null)
@@ -141,8 +142,29 @@ const resp = reactive({
     up_avatar: "",
 })
 
+// 输入的 ID 变化时查询歌曲信息
+watch(input, (newid) => {
+    queryInfornation();
+})
+
 // 查询信息函数
 function queryInfornation() {
+
+    switch(QueryType.value) {
+        case 0: // collect
+            inputTip.value = '请输入 收藏夹网页 URL'
+            break;
+        case 1: // comliation
+            inputTip.value = '请输入 视频合集网页 URL'
+            break;
+        case 2: // video
+            inputTip.value = '请输入 网页端视频分享链接'
+            break;
+        case 3: // audio
+            inputTip.value = '请输入 AUID'
+            break;
+    }
+
     if (input.value == "") {
         // 空输入判断
         CardStatus.InfoCard = false;
@@ -225,11 +247,6 @@ function queryInfornation() {
             break;
     }
 }
-
-// 输入的 ID 变化时查询歌曲信息
-watch(input, (newid) => {
-    queryInfornation();
-})
 
 function openRightPanel() {
     CardStatus.DownloadAll = true;
