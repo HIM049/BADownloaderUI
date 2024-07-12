@@ -13,6 +13,16 @@ func (a *App) GetAppVersion() string {
 	return APP_VERSION
 }
 
+func (a *App) GetTheme() (string, error) {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return "", err
+	}
+
+	return cfg.Thene, nil
+}
+
 // 获取列表中视频数量
 func (a *App) GetListCount(path string) int {
 	videoList := new(VideoList)

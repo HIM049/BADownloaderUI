@@ -3,6 +3,23 @@
     <FramePage title="应用设置" v-if="overload">
         <var-form>
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+                <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
+                    <var-collapse-item title="个性化选项" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                        <var-cell> 
+                            主题选择
+                            <template #extra>
+                                
+                                <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" style="width: 150px;" @change="setTheme">
+                                    <var-option label="粉色" :value="'lightPink'" />
+                                    <var-option label="蓝色" :value="'lightBlue'" />
+                                </var-select>
+                            </template>
+                        </var-cell>
+                    </var-collapse-item>
+                </var-collapse>
+            </var-paper>
+
+            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
                     <var-collapse-item title="账户相关" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <var-cell> 
@@ -96,6 +113,7 @@ const changeCfg = ref(null) // 修改设置时的响应
 const overload = ref(false) // 是否完成页面加载
 
 const CardStatus = reactive({
+    configClass0: false,
     configClass1: false,
     configClass2: false,
     configClass3: false,
@@ -135,6 +153,19 @@ function refreshConfig() {
         loadConfig();
     })
     Snackbar.success("已重置配置文件");
+}
+
+// 切换主题
+function setTheme() {
+    SaveConfig(config.value).then(result => {
+        Dialog('立即重新加载主题？').then(result => {
+            if (result == 'confirm') {
+                window.location.reload();
+            }
+            return;
+        });
+        Snackbar.success("保存成功");
+    });
 }
 
 // 登出账户

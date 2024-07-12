@@ -38,6 +38,10 @@ export function GetListCount(arg1) {
   return window['go']['main']['App']['GetListCount'](arg1);
 }
 
+export function GetTheme() {
+  return window['go']['main']['App']['GetTheme']();
+}
+
 export function GetUserInf() {
   return window['go']['main']['App']['GetUserInf']();
 }

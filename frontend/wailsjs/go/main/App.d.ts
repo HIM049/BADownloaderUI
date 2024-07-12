@@ -21,6 +21,8 @@ export function GetFavCollect(arg1:number):Promise<bilibili.Collects>;
 
 export function GetListCount(arg1:string):Promise<number>;
 
+export function GetTheme():Promise<string>;
+
 export function GetUserInf():Promise<bilibili.AccountInformation>;
 
 export function GetUsersCollect():Promise<bilibili.Collects>;

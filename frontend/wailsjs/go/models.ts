@@ -153,6 +153,7 @@ export namespace main {
 	    retry_count: number;
 	    convert_format: boolean;
 	    delete_cache: boolean;
+	    theme: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -167,6 +168,7 @@ export namespace main {
 	        this.retry_count = source["retry_count"];
 	        this.convert_format = source["convert_format"];
 	        this.delete_cache = source["delete_cache"];
+	        this.theme = source["theme"];
 	    }
 	}
 	export class DownloadOption {

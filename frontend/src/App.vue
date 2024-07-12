@@ -3,10 +3,12 @@
 </template>
 
 <script setup>
-import { StyleProvider, Themes } from '@varlet/ui'
 import MainPage from './components/main_page.vue'
+import { ref, onBeforeMount } from 'vue'
+import { StyleProvider, Themes } from '@varlet/ui'
+import { GetTheme } from '../wailsjs/go/main/App'
 
-const lightPink = {
+const ThemeLightPink = {
     '--color-primary': '#9c4146',
     '--color-on-primary': '#ffffff',
     '--color-primary-container': '#ffdad9',
@@ -56,7 +58,7 @@ const lightPink = {
 //     '--color-inverse-surface': '#ece0df'
 // }
 
-const lightBlue = {
+const ThemeLightBlue = {
     "--color-primary": "#006688",
     "--color-on-primary": "#ffffff",
     "--color-primary-container": "#c2e8ff",
@@ -106,9 +108,28 @@ const lightBlue = {
 //     "--color-inverse-surface": "#e1e2e5"
 //   }
 
-
-const mergedThemeLight = { ...Themes.md3Light, ...lightBlue };
+const mergedThemeLight = { ...Themes.md3Light, ...ThemeLightPink };
 StyleProvider(mergedThemeLight)
+
+const Theme = ref();
+
+onBeforeMount(() => {
+    GetTheme().then(result => {
+        switch (result) {
+            case 'lightBlue':
+                Theme.value = ThemeLightBlue;
+                break;
+
+            case 'lightPink':
+            default:
+                Theme.value = ThemeLightPink;
+                break;
+        }
+    const mergedThemeLight = { ...Themes.md3Light, ...Theme.value };
+    StyleProvider(mergedThemeLight)
+    });
+});
+
 
 // const mergedThemeDark = { ...Themes.md3Dark, ...darkTheme };
 // StyleProvider(mergedThemeDark)
