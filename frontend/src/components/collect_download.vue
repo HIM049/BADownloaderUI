@@ -9,7 +9,7 @@
         </var-tab-item>
 
         <var-tab-item>
-            <VideolistEditor v-model:parms="parms" v-model:status="status"  />
+            <VideolistEditor v-model:parms="parms" v-model:status="status" @refresh="updateBadge"  />
         </var-tab-item>
 
         <var-tab-item>
@@ -21,7 +21,7 @@
         <var-space justify="space-between">
             <var-button type="primary" size="large" @click="parms.pageIndex--" :disabled="!status.allowBack" v-show="status.showBack">< 上一步</var-button>
             <var-badge type="danger" position="left-top" :value="parms.listCount" :hidden="!status.showBadge">
-                <var-button type="primary" size="large" @click="parms.pageIndex++" :disabled="!status.allowNext" v-show="status.showNext">下一步 ></var-button>
+                <var-button type="primary" size="large" @click="nextButton" :disabled="!status.allowNext" v-show="status.showNext">下一步 ></var-button>
             </var-badge>
         </var-space>
     </footer>
@@ -33,14 +33,18 @@ import AddVideos from '../components/collect_download/add_videos.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
-import { GetListCount } from '../../wailsjs/go/main/App'
-import { Snackbar } from '@varlet/ui'
+import { GetListCount, TidyVideoList } from '../../wailsjs/go/main/App'
+import { Dialog, Snackbar } from '@varlet/ui'
 
 // 页面索引值
 const pageIndex = ref(0)
 
 // 底部翻页按钮距离
 const scrollTop = ref(10)
+
+const nextButton = ref(() => {
+    parms.pageIndex++
+})
 
 // 收藏夹信息
 const parms = reactive({
@@ -86,6 +90,15 @@ watch(parms, (newValue) => {
 
 // 导航按钮控制
 watch(parms, (newPageIndex) => {
+    status.showBack = true;
+    status.showNext = true;
+    status.allowBack = true;
+    status.allowNext = true;
+    status.showBadge = false;
+
+    nextButton.value = () => {
+        parms.pageIndex++
+    };
     // 列表选择或创建
     if (newPageIndex.pageIndex == 0) {
         status.showBack = false;
@@ -93,15 +106,21 @@ watch(parms, (newPageIndex) => {
     }
     // 添加视频
     if (newPageIndex.pageIndex == 1) {
-        status.showBack = true;
-        status.showNext = true;
-        status.allowBack = true;
+        status.allowNext = false;
         updateBadge();
-    } else {
-        status.showBadge = false;
     }
     // 列表编辑页面
     if (newPageIndex.pageIndex == 2) {
+        nextButton.value = () => {
+            Dialog('清理删除项并下一步？').then(result => {
+                if (result == 'confirm') {
+                    TidyVideoList(parms.videoListPath);
+                    parms.pageIndex++;
+                }
+                return;
+            });
+        };
+        updateBadge();
     }
     // 下载页面
     if (newPageIndex.pageIndex == 3) {
@@ -122,8 +141,10 @@ function updateBadge() {
         parms.listCount = result;
         if (parms.listCount <= 0) {
             status.showBadge = false;
+            status.allowNext = false;
         } else {
             status.showBadge = true;
+            status.allowNext = true;
         }
     });
 }

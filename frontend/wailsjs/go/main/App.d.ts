@@ -52,3 +52,5 @@ export function RefreshConfig():Promise<void>;
 export function SaveConfig(arg1:main.Config):Promise<void>;
 
 export function SaveVideoList(arg1:main.VideoList,arg2:string):Promise<void>;
+
+export function TidyVideoList(arg1:string):Promise<void>;

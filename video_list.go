@@ -23,6 +23,7 @@ type VideoInformation struct {
 	Format    string `json:"format"`
 	PartId    int    `json:"part_id"`
 	IsAudio   bool   `json:"is_audio"`
+	Delete    bool   `json:"delete"`
 	Audio     AudioInformation
 	Meta      MetaInformation
 }
@@ -80,6 +81,7 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		// 元数据
 		list.Meta.Cover = video.Meta.Cover
 		list.Meta.Author = video.Up.Name
+		list.Delete = false
 		// list.Meta.Lyrics_path =
 
 		list.IsAudio = false
@@ -139,6 +141,7 @@ func (VideoList *VideoList) AddAudio(sessdata, auid string) error {
 	list.Meta.SongName = audio.Meta.Title
 
 	list.IsAudio = true
+	list.Delete = false
 
 	VideoList.List = append(VideoList.List, list)
 	VideoList.Count++
@@ -304,4 +307,19 @@ func (v *VideoInformation) GetStream(sessdata string) error {
 	v.Audio.Flac.Stream = gjson.Get(json, "data.dash.flac.base_url").String()
 
 	return nil
+}
+
+func (videoList *VideoList) Tidy() {
+	if len(videoList.List) == 0 {
+		return
+	}
+
+	result := videoList.List[:0]
+	for _, video := range videoList.List {
+		if !video.Delete {
+			result = append(result, video)
+		}
+	}
+	videoList.List = result
+	videoList.Count = len(result)
 }

@@ -1,8 +1,14 @@
 <template>
-    <FramePage title="列表编辑" v-if="CardStatus.ShowList">
+    <FramePage title="列表编辑">
+        <var-space justify="center">                
+            <var-button type="primary" @click="tidyAndRefreshList" size="large"><var-icon name="refresh" />整理并刷新列表</var-button>
+            <var-button type="primary" @click="" size="large"><var-icon name="share" />导出列表文件</var-button>
+        </var-space>
+    </FramePage>
+    <AdditionCard v-if="CardStatus.ShowList">
 
         <li v-for="(video, index) in videoList.List" style="list-style-type: none;">
-            <var-card :title="video.title" :src="video.Meta.cover" layout="row" image-width="250px" outlines style="margin-bottom: 20px;">
+            <var-card :title="video.title" :src="video.Meta.cover" layout="row" image-width="250px" outlines v-if="!video.delete" style="margin-bottom: 20px;">
                 <template #description>
                     <var-divider />
                     <div style="margin: 0 10px;">
@@ -12,11 +18,30 @@
                 </template>
 
                 <template #extra>
-                    <var-button type="primary" @click="openRightPanel(index)">编辑</var-button>
+                    <div style="display: flex; align-items: center;">
+                        <var-button type="danger" size="large" round @click="setDeleteState(index)" style="margin-right: 10px;"> <var-icon name="delete" /> </var-button>
+                        <var-button type="primary" @click="openRightPanel(index)">编辑</var-button>
+                    </div>
+                </template>
+            </var-card>
+
+            
+            <var-card :title="video.title" outlines style="margin-bottom: 20px; height: 187px;" v-if="video.delete">
+                <template #description>
+                    <div style="display: flex; justify-content: center;">
+                        
+                    <h3>已设为删除</h3>
+                    </div>
+                </template>
+                <template #extra>
+                    <div style="display: flex; align-items: center;">
+                        <var-button type="success" @click="setDeleteState(index)" style="margin-right: 10px;"> <var-icon name="history" />  恢复 </var-button>
+                        <var-button type="primary" disabled>编辑</var-button>
+                    </div>
                 </template>
             </var-card>
         </li>
-    </FramePage>
+    </AdditionCard>
 
     <var-popup position="right" v-model:show="CardStatus.RightPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" style=" height: 75%; right: 35px; top: auto; bottom: 35px; border-radius: 8px;">
         <div class="popup-example-block">
@@ -37,8 +62,8 @@
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, watch, ref } from 'vue'
-import { LoadVideoList, SaveVideoList } from '../../../wailsjs/go/main/App'
-import { Snackbar, LoadingBar } from '@varlet/ui'
+import { LoadVideoList, SaveVideoList, TidyVideoList } from '../../../wailsjs/go/main/App'
+import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
 
 const videoList = ref([])
 
@@ -54,7 +79,7 @@ const CardStatus = reactive({
 })
 
 const props = defineProps(['parms', 'status'])
-const emit = defineEmits(['update:parms', 'update:status'])
+const emit = defineEmits(['update:parms', 'update:status', 'refresh'])
 const parms = computed({
     get() {
         return props.parms
@@ -76,12 +101,34 @@ const status = computed({
 // 检查是否完成列表加载
 watch(props, (newValue) => {
     if (newValue.parms.pageIndex == 2) {
-        LoadVideoList(parms.value.videoListPath).then(result => {
-            videoList.value = result;
-            CardStatus.ShowList = true;
-        })
+        loadVideoList();
     }
 })
+
+function tidyAndRefreshList() {
+    Dialog('清理删除项并刷新列表？').then(result => {
+        if (result == 'confirm') {
+            TidyVideoList(parms.value.videoListPath).then(()=>{    
+                loadVideoList();
+                emit('refresh');
+                Snackbar.success('刷新成功')
+            });
+        }
+        return;
+    });
+}
+
+// 修改视频删除状态
+function setDeleteState(index) {
+    videoList.value.List[index].delete = !videoList.value.List[index].delete;
+    SaveVideoList(videoList.value, parms.value.videoListPath).then(result => {
+        if (result != null) {
+            Snackbar.error("保存失败" + result);
+        } else {
+            Snackbar.success("保存成功");
+        }
+    })
+}
 
 // 打开右侧面板
 function openRightPanel(index) {
@@ -90,6 +137,13 @@ function openRightPanel(index) {
     CardStatus.Meta.author = videoList.value.List[index].Meta.author;
     CardStatus.RightPanel = true;
 
+}
+
+function loadVideoList() {
+    LoadVideoList(parms.value.videoListPath).then(result => {
+        videoList.value = result;
+        CardStatus.ShowList = true;
+    })
 }
 
 // 保存列表修改

@@ -213,6 +213,7 @@ export namespace main {
 	    format: string;
 	    part_id: number;
 	    is_audio: boolean;
+	    delete: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new VideoInformation(source);
@@ -227,6 +228,7 @@ export namespace main {
 	        this.format = source["format"];
 	        this.part_id = source["part_id"];
 	        this.is_audio = source["is_audio"];
+	        this.delete = source["delete"];
 	    }
 	}
 	export class VideoList {

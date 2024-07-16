@@ -13,6 +13,7 @@ func (a *App) GetAppVersion() string {
 	return APP_VERSION
 }
 
+// 获取主题字符串
 func (a *App) GetTheme() (string, error) {
 	cfg := new(Config)
 	err := cfg.Get()
@@ -242,8 +243,26 @@ func (a *App) LoadVideoList(listPath string) (VideoList, error) {
 	return *videoList, nil
 }
 
+// 保存视频列表
 func (a *App) SaveVideoList(newList VideoList, path string) error {
 	err := newList.Save(path)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// 删除列表中的废弃项
+func (a *App) TidyVideoList(listPath string) error {
+	videoList := new(VideoList)
+	err := videoList.Get(listPath)
+	if err != nil {
+		return err
+	}
+
+	videoList.Tidy()
+
+	err = videoList.Save(listPath)
 	if err != nil {
 		return err
 	}
