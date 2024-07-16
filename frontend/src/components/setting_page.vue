@@ -113,11 +113,11 @@ const changeCfg = ref(null) // 修改设置时的响应
 const overload = ref(false) // 是否完成页面加载
 
 const CardStatus = reactive({
-    configClass0: false,
-    configClass1: false,
-    configClass2: false,
-    configClass3: false,
-    configClass4: false,
+    configClass0: [],
+    configClass1: [],
+    configClass2: [],
+    configClass3: [],
+    configClass4: [],
 })
 
 onMounted(() => {
