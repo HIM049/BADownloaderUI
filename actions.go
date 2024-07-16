@@ -318,7 +318,7 @@ func (a *App) QuerySongInformation(auid string) (bilibili.Audio, error) {
 	return *audioInf, nil
 }
 
-// 调用 Windows 打开文件窗口
+// 调用打开文件窗口
 func (a *App) OpenFileDialog() (string, error) {
 	var FileFilter []wails.FileFilter
 
@@ -334,6 +334,7 @@ func (a *App) OpenFileDialog() (string, error) {
 		Title:            "打开本地列表文件",
 		Filters:          FileFilter,
 	}
+	// 弹出对话框
 	path, err := wails.OpenFileDialog(a.ctx, option)
 	if err != nil {
 		wails.LogErrorf(a.ctx, err.Error())
@@ -341,6 +342,43 @@ func (a *App) OpenFileDialog() (string, error) {
 	}
 
 	return path, nil
+}
+
+// 调用保存窗口
+func (a *App) SaveVideoListTo(videolist VideoList) error {
+	var FileFilter []wails.FileFilter
+
+	fileFilter := wails.FileFilter{
+		DisplayName: "视频下载列表 (*.json)",
+		Pattern:     "*.json",
+	}
+	FileFilter = append(FileFilter, fileFilter)
+
+	option := wails.SaveDialogOptions{
+		DefaultDirectory: "./",
+		DefaultFilename:  "BAD_VideoList",
+		Title:            "另存视频列表",
+		Filters:          FileFilter,
+	}
+
+	// 弹出对话框
+	path, err := wails.SaveFileDialog(a.ctx, option)
+	if err != nil {
+		return err
+	}
+
+	// 用户取消操作
+	if path == "" {
+		wails.EventsEmit(a.ctx, "error", "未选择保存路径")
+		return nil
+	}
+
+	// 保存列表
+	err = videolist.Save(path)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // 获取已登录用户的信息

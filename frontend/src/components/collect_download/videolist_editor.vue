@@ -2,7 +2,7 @@
     <FramePage title="列表编辑">
         <var-space justify="center">                
             <var-button type="primary" @click="tidyAndRefreshList" size="large"><var-icon name="refresh" />整理并刷新列表</var-button>
-            <var-button type="primary" @click="" size="large"><var-icon name="share" />导出列表文件</var-button>
+            <var-button type="primary" @click="saveListTo" size="large"><var-icon name="share" />导出列表文件</var-button>
         </var-space>
     </FramePage>
     <AdditionCard v-if="CardStatus.ShowList">
@@ -62,7 +62,7 @@
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, watch, ref } from 'vue'
-import { LoadVideoList, SaveVideoList, TidyVideoList } from '../../../wailsjs/go/main/App'
+import { LoadVideoList, SaveVideoList, TidyVideoList, SaveVideoListTo } from '../../../wailsjs/go/main/App'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
 
 const videoList = ref([])
@@ -105,16 +105,38 @@ watch(props, (newValue) => {
     }
 })
 
-function tidyAndRefreshList() {
-    Dialog('清理删除项并刷新列表？').then(result => {
+// 另存列表
+function saveListTo() {
+    Dialog('清理删除项并导出列表？').then(result => {
         if (result == 'confirm') {
-            TidyVideoList(parms.value.videoListPath).then(()=>{    
-                loadVideoList();
-                emit('refresh');
-                Snackbar.success('刷新成功')
+            tidyAndRefresh(() => {
+                SaveVideoListTo(videoList.value).then(() => {
+                    Snackbar.success('导出成功');
+                });
             });
         }
         return;
+    });
+}
+
+// 清理并刷新列表
+function tidyAndRefreshList() {
+    Dialog('清理删除项并刷新列表？').then(result => {
+        if (result == 'confirm') {
+            tidyAndRefresh(() => {
+                Snackbar.success('刷新成功');
+            });
+        }
+        return;
+    });
+}
+
+// 清理并刷新列表
+function tidyAndRefresh(callback) {
+    TidyVideoList(parms.value.videoListPath).then(()=>{    
+        loadVideoList();
+        emit('refresh');
+        callback();
     });
 }
 

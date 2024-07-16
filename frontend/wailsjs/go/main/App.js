@@ -102,6 +102,10 @@ export function SaveVideoList(arg1, arg2) {
   return window['go']['main']['App']['SaveVideoList'](arg1, arg2);
 }
 
+export function SaveVideoListTo(arg1) {
+  return window['go']['main']['App']['SaveVideoListTo'](arg1);
+}
+
 export function TidyVideoList(arg1) {
   return window['go']['main']['App']['TidyVideoList'](arg1);
 }
