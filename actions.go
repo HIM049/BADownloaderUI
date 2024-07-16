@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/myuser/bilibili"
@@ -10,6 +11,17 @@ import (
 // 获取版本号
 func (a *App) GetAppVersion() string {
 	return APP_VERSION
+}
+
+// 获取主题字符串
+func (a *App) GetTheme() (string, error) {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return "", err
+	}
+
+	return cfg.Thene, nil
 }
 
 // 获取列表中视频数量
@@ -69,6 +81,23 @@ func (a *App) QueryCompilation(mid, sid int) bilibili.CompliationInformation {
 		return bilibili.CompliationInformation{}
 	}
 	return *listInf
+}
+
+// 查询音频信息
+func (a *App) QueryAudio(auid string) (bilibili.Audio, error) {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return bilibili.Audio{}, err
+	}
+
+	audio := new(bilibili.Audio)
+	err = audio.Query(auid)
+	if err != nil {
+		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+		return bilibili.Audio{}, err
+	}
+	return *audio, err
 }
 
 // 创建视频列表
@@ -175,6 +204,35 @@ func (a *App) AddCompilationToList(listPath string, mid, sid, count int, downloa
 	return nil
 }
 
+// 添加单个音频
+func (a *App) AddAudioToList(listPath, auid string) error {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return err
+	}
+
+	videolist := new(VideoList)
+	err = videolist.Get(listPath)
+	if err != nil {
+		return err
+	}
+
+	sessdata := ""
+	if cfg.Account.IsLogin && cfg.Account.UseAccount {
+		sessdata = cfg.Account.SESSDATA
+	}
+
+	err = videolist.AddAudio(sessdata, auid)
+	if err != nil {
+		return err
+	}
+
+	videolist.Save(listPath)
+
+	return nil
+}
+
 // 加载视频列表
 func (a *App) LoadVideoList(listPath string) (VideoList, error) {
 	videoList := new(VideoList)
@@ -185,8 +243,26 @@ func (a *App) LoadVideoList(listPath string) (VideoList, error) {
 	return *videoList, nil
 }
 
+// 保存视频列表
 func (a *App) SaveVideoList(newList VideoList, path string) error {
 	err := newList.Save(path)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// 删除列表中的废弃项
+func (a *App) TidyVideoList(listPath string) error {
+	videoList := new(VideoList)
+	err := videoList.Get(listPath)
+	if err != nil {
+		return err
+	}
+
+	videoList.Tidy()
+
+	err = videoList.Save(listPath)
 	if err != nil {
 		return err
 	}
@@ -232,17 +308,17 @@ func (a *App) GetFavCollect(pn int) bilibili.Collects {
 }
 
 // 查询并返回歌曲信息
-func (a *App) SearchSongInformation(auid string) bilibili.AudioInf {
-	audioInf, err := bilibili.GetAudioInfObj(auid)
+func (a *App) QuerySongInformation(auid string) (bilibili.Audio, error) {
+	audioInf := new(bilibili.Audio)
+	err := audioInf.Query(auid)
 	if err != nil {
-		wails.LogErrorf(a.ctx, "获取歌曲详情时出现错误：%s", err)
-		wails.EventsEmit(a.ctx, "error", "获取歌曲时出错:"+err.Error())
-		return bilibili.AudioInf{}
+		return bilibili.Audio{}, err
 	}
-	return *audioInf
+	audioInf.GetStream("")
+	return *audioInf, nil
 }
 
-// 调用 Windows 打开文件窗口
+// 调用打开文件窗口
 func (a *App) OpenFileDialog() (string, error) {
 	var FileFilter []wails.FileFilter
 
@@ -258,6 +334,7 @@ func (a *App) OpenFileDialog() (string, error) {
 		Title:            "打开本地列表文件",
 		Filters:          FileFilter,
 	}
+	// 弹出对话框
 	path, err := wails.OpenFileDialog(a.ctx, option)
 	if err != nil {
 		wails.LogErrorf(a.ctx, err.Error())
@@ -265,6 +342,62 @@ func (a *App) OpenFileDialog() (string, error) {
 	}
 
 	return path, nil
+}
+
+// 调用保存窗口
+func (a *App) SaveVideoListTo(videolist VideoList) error {
+	var FileFilter []wails.FileFilter
+
+	fileFilter := wails.FileFilter{
+		DisplayName: "视频下载列表 (*.json)",
+		Pattern:     "*.json",
+	}
+	FileFilter = append(FileFilter, fileFilter)
+
+	option := wails.SaveDialogOptions{
+		DefaultDirectory: "./",
+		DefaultFilename:  "BAD_VideoList",
+		Title:            "另存视频列表",
+		Filters:          FileFilter,
+	}
+
+	// 弹出对话框
+	path, err := wails.SaveFileDialog(a.ctx, option)
+	if err != nil {
+		return err
+	}
+
+	// 用户取消操作
+	if path == "" {
+		wails.EventsEmit(a.ctx, "error", "未选择保存路径")
+		return nil
+	}
+
+	// 保存列表
+	err = videolist.Save(path)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// 获取已登录用户的信息
+func (a *App) GetUserInf() (bilibili.AccountInformation, error) {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return bilibili.AccountInformation{}, err
+	}
+
+	if !cfg.Account.IsLogin {
+		return bilibili.AccountInformation{}, errors.New("用户未登录")
+	}
+	sessdata := cfg.Account.SESSDATA
+
+	accountInf := new(bilibili.AccountInformation)
+	accountInf.GetUserInf(sessdata)
+
+	return *accountInf, nil
 }
 
 // 重置设置文件

@@ -22,6 +22,8 @@ type VideoInformation struct {
 	PageTitle string `json:"page_title"`
 	Format    string `json:"format"`
 	PartId    int    `json:"part_id"`
+	IsAudio   bool   `json:"is_audio"`
+	Delete    bool   `json:"delete"`
 	Audio     AudioInformation
 	Meta      MetaInformation
 }
@@ -79,7 +81,10 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		// 元数据
 		list.Meta.Cover = video.Meta.Cover
 		list.Meta.Author = video.Up.Name
+		list.Delete = false
 		// list.Meta.Lyrics_path =
+
+		list.IsAudio = false
 
 		// 处理音频标题（单 P 视频）
 		var SongName string
@@ -100,6 +105,47 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		VideoList.List = append(VideoList.List, list)
 		VideoList.Count++
 	}
+	return nil
+}
+
+// 向列表中添加一个音频项目
+func (VideoList *VideoList) AddAudio(sessdata, auid string) error {
+	// 查询视频信息
+	audio := new(bilibili.Audio)
+	err := audio.Query(auid)
+	if err != nil {
+		return err
+	}
+
+	aucid, err := strconv.Atoi(auid)
+	if err != nil {
+		return err
+	}
+
+	// 保存信息
+	var list VideoInformation
+	list.Bvid = auid
+	list.Cid = aucid
+	list.Title = CheckFileName(audio.Meta.Title)
+	list.PageTitle = CheckFileName(audio.Meta.Title)
+	list.Format = AudioType.m4a
+	// 音频流
+	list.Audio.Audio.Quality = audio.Stream.Type
+	list.Audio.Audio.Stream = audio.Stream.StreamLink
+	// list.Audio.Flac.Quality = video.Videos[i].Stream.Flac.Id
+	// list.Audio.Flac.Stream = video.Videos[i].Stream.Flac.BaseUrl
+	// 元数据
+	list.Meta.Cover = audio.Meta.Cover
+	list.Meta.Author = audio.Up.Author
+	list.Meta.Lyrics_path = audio.Meta.Lyric
+	list.Meta.SongName = audio.Meta.Title
+
+	list.IsAudio = true
+	list.Delete = false
+
+	VideoList.List = append(VideoList.List, list)
+	VideoList.Count++
+
 	return nil
 }
 
@@ -261,4 +307,19 @@ func (v *VideoInformation) GetStream(sessdata string) error {
 	v.Audio.Flac.Stream = gjson.Get(json, "data.dash.flac.base_url").String()
 
 	return nil
+}
+
+func (videoList *VideoList) Tidy() {
+	if len(videoList.List) == 0 {
+		return
+	}
+
+	result := videoList.List[:0]
+	for _, video := range videoList.List {
+		if !video.Delete {
+			result = append(result, video)
+		}
+	}
+	videoList.List = result
+	videoList.Count = len(result)
 }

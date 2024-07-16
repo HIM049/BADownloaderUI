@@ -8,6 +8,7 @@ type Config struct {
 	RetryCount      int    `json:"retry_count"`
 	ConvertFormat   bool   `json:"convert_format"`
 	DeleteCache     bool   `json:"delete_cache"`
+	Thene           string `json:"theme"`
 	Account         Account
 }
 
@@ -31,6 +32,7 @@ func (cfg *Config) init() {
 		RetryCount:      10,
 		ConvertFormat:   Checkffmpeg(),
 		DeleteCache:     true,
+		Thene:           "lightPink",
 		Account: Account{
 			IsLogin:           false,
 			UseAccount:        false,

@@ -6,9 +6,16 @@
         
         
     
-        <var-space direction="column" :size="[12, 12]" v-if="downloading">
-            <var-progress type="info" :value="progress.progressPercent" :line-width="6" label :indeterminate="progress.downFinished == 0" v-show="!progress.successed" />
-        </var-space>
+        <div v-if="downloading">
+            <var-space direction="column" :size="[12, 12]">
+                <var-progress type="info" :value="progress.progressPercent" :line-width="6" label :indeterminate="progress.downFinished == 0" v-show="!progress.successed" />
+            </var-space>
+
+            <var-space justify="center">
+                <var-chip type="info" style="margin-top: 10px;">正在下载：{{ progress.downloadingTitle }} ( {{ progress.downFinished }} / {{ parms.listCount }} )</var-chip>
+                
+            </var-space>
+        </div>
 
         <var-result 
             title="下载完成"
@@ -25,6 +32,14 @@ import { ListDownload } from '../../../wailsjs/go/main/App'
 import { EventsOn } from '../../../wailsjs/runtime'
 
 const downloading = ref(false)
+
+// 进度条相关
+const progress = reactive({
+    downFinished: 0,    // 任务完成数量
+    progressPercent: 0, // 任务完成百分比
+    successed: false,   // 任务完成状态
+    downloadingTitle: "", // 下载中标题
+})
 
 const props = defineProps(['parms', 'status'])
 const emit = defineEmits(['update:parms', 'update:status'])
@@ -62,16 +77,11 @@ function startDownload() {
     })
 }
 
-// 进度条相关
-const progress = reactive({
-    downFinished: 0,    // 任务完成数量
-    progressPercent: 0, // 任务完成百分比
-    successed: false,   // 任务完成状态
-})
 
 // 下载完成事件
-EventsOn("downloadFinish", () => {
-    progress.downFinished++
-    progress.progressPercent = (progress.downFinished / parms.value.listCount) * 100
+EventsOn("downloadFinish", (title) => {
+    progress.downFinished++;
+    progress.downloadingTitle = title;
+    progress.progressPercent = (progress.downFinished / parms.value.listCount) * 100;
 })
 </script>
