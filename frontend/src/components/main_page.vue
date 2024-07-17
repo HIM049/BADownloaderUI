@@ -42,6 +42,11 @@ const activePage = ref(1)
 EventsOn("error", (err) => {
     Snackbar.warning(err)
 })
+
+// 页面跳转 
+EventsOn('turnToPage', (i) => {
+    activePage.value = i;
+})
 </script>
 
 <style>
