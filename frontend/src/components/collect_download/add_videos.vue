@@ -91,7 +91,7 @@ import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
 // import { ClipboardGetText } from '../../../wailsjs/runtime'
 import { QueryVideo, QueryCollection, QueryCompilation, QueryAudio, AddVideoToList, AddCollectionToList, AddCompilationToList, AddAudioToList } from '../../../wailsjs/go/main/App'
-import { EventsOn } from '../../../wailsjs/runtime'
+import { EventsOn, EventsEmit } from '../../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
 const props = defineProps(['parms', 'status'])
@@ -151,6 +151,7 @@ watch(input, () => {
 // 一键添加事件
 EventsOn('addToList', (url, type) => {
     if (parms.value.videoListPath == "") {
+        EventsEmit('turnToPage', 1);
         Snackbar.warning('请先选择视频列表');
         return;
     }

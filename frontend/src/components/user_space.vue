@@ -93,7 +93,6 @@ onMounted(() => {
 // 一键添加至列表
 function addToList(url, type) {
     EventsEmit('addToList', url, type);
-    // EventsEmit('turnToPage', 1);
 }
 
 // 获取订阅收藏夹列表
