@@ -17,23 +17,30 @@
         </var-space>     
     </FramePage>
     <AdditionCard title="创建的收藏夹" v-if="is_login && CardStatus.LoadUsersCollect">
-        <var-cell v-for="(collect, index) in user_collect.List" style="margin: 0 10px;">
-            {{ collect.title }}
-            <template #extra>
-                <var-button type="primary" @click="ClipboardSetText('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=create').then(Snackbar.success('复制成功'))">复制链接</var-button>
-            </template>
-        </var-cell>
+        <var-paper style="background-color: var(--color-primary-container);">
+            <div v-for="(collect, index) in user_collect.List" style="margin: 5px 20px;">
+                <var-space justify="space-between" align="center">
+                    <text style="font-size: 15px; font-weight: 600;">{{ collect.title }}</text> 
+                    <var-button type="primary" @click="addToList('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=create', 11)"><var-icon name="plus" />添加至列表</var-button>
+                </var-space>
+            </div>
+        </var-paper>
     </AdditionCard>
 
     <AdditionCard title="收藏和订阅" v-if="is_login && CardStatus.LoadFavCollect">
-        <var-cell v-for="(collect, index) in user_Favourite.List" style="margin: 0 10px;">
-            {{ collect.title }}
-            <template #extra>
-                <var-button type="primary" @click="
-                    ClipboardSetText(collect.attr == 0 ? 'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=21':'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=11').then(Snackbar.success('复制成功'))
-                ">复制链接</var-button>
-            </template>
-        </var-cell>
+        
+        <var-paper style="background-color: var(--color-primary-container);">
+            <div v-for="(collect, index) in user_Favourite.List" style="margin: 5px 20px;">
+                <var-space justify="space-between" align="center">
+                    <text style="font-size: 15px; font-weight: 600;">{{ collect.title }}</text> 
+                    
+                    <var-button type="primary" @click="
+                        addToList(collect.attr == 0 ? 'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=21':'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=11', collect.attr)
+                    "><var-icon name="plus" />添加至列表</var-button>
+                </var-space>
+            </div>
+        </var-paper>
+
         <var-space style="display: flex; align-items: center;">
             <var-button-group type="primary" size="normal" outline >
                 <var-button @click="page_index--">上一页</var-button>
@@ -48,7 +55,7 @@ import FramePage from '../components/modules/frame_page.vue'
 import AdditionCard from './modules/addition_card.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
 import { LoginBilibili, LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf } from '../../wailsjs/go/main/App'
-import { EventsOn, ClipboardSetText } from '../../wailsjs/runtime'
+import { EventsOn, EventsEmit, ClipboardSetText } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
 const loginText = ref("请扫描二维码登录") // 登录时的提示字符
@@ -82,6 +89,12 @@ onMounted(() => {
         })
     }
 });
+
+// 一键添加至列表
+function addToList(url, type) {
+    EventsEmit('addToList', url, type);
+    // EventsEmit('turnToPage', 1);
+}
 
 // 获取订阅收藏夹列表
 function getFavCollect() {

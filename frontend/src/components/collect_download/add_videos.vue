@@ -91,6 +91,7 @@ import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
 // import { ClipboardGetText } from '../../../wailsjs/runtime'
 import { QueryVideo, QueryCollection, QueryCompilation, QueryAudio, AddVideoToList, AddCollectionToList, AddCompilationToList, AddAudioToList } from '../../../wailsjs/go/main/App'
+import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
 const props = defineProps(['parms', 'status'])
@@ -143,8 +144,21 @@ const resp = reactive({
 })
 
 // 输入的 ID 变化时查询歌曲信息
-watch(input, (newid) => {
+watch(input, () => {
     queryInfornation();
+})
+
+// 一键添加事件
+EventsOn('addToList', (url, type) => {
+    if (parms.value.videoListPath == "") {
+        Snackbar.warning('请先选择视频列表');
+        return;
+    }
+
+    QueryType.value = type == 0 ? 1 : 0;
+    input.value = url;
+    parms.value.pageIndex = 1;
+    openRightPanel();
 })
 
 // 查询信息函数

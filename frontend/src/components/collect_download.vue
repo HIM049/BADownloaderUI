@@ -1,19 +1,19 @@
 <template>
     <var-tabs-items v-model:active="parms.pageIndex">
         <var-tab-item>
-            <CreatVideolist v-model:parms="parms" v-model:status="status" @nextpage="parms.pageIndex++" />
+            <CreatVideolist v-model:parms="parms" v-model:status="status" @nextpage="parms.pageIndex++"/>
         </var-tab-item>
 
         <var-tab-item>
-            <AddVideos v-model:parms="parms" v-model:status="status" @updateBadge="updateBadge"  />
+            <AddVideos v-model:parms="parms" v-model:status="status" @updateBadge="updateBadge" />
         </var-tab-item>
 
         <var-tab-item>
-            <VideolistEditor v-model:parms="parms" v-model:status="status" @refresh="updateBadge"  />
+            <VideolistEditor v-model:parms="parms" v-model:status="status" @refresh="updateBadge" />
         </var-tab-item>
 
         <var-tab-item>
-            <DownloadProcess v-model:parms="parms" v-model:status="status"  />
+            <DownloadProcess v-model:parms="parms" v-model:status="status" />
         </var-tab-item>
     </var-tabs-items>
 
