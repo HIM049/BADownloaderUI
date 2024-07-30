@@ -187,10 +187,18 @@ func (VideoList *VideoList) AddCollection(sessdata, favlistId string, count int,
 		}
 		// 遍历分页
 		for j := 0; j < pageSize; j++ {
-			// 添加视频到列表
-			err := VideoList.AddVideo(sessdata, favlist.Data.Medias[j].Bvid, downloadCompilation)
-			if err != nil {
-				continue
+			if favlist.Data.Medias[j].Type == 2 {
+				// 添加视频到列表
+				err := VideoList.AddVideo(sessdata, favlist.Data.Medias[j].Bvid, downloadCompilation)
+				if err != nil {
+					continue
+				}
+			} else {
+				// 添加收藏夹中的音频
+				err := VideoList.AddAudio(sessdata, strconv.Itoa(favlist.Data.Medias[j].Id))
+				if err != nil {
+					continue
+				}
 			}
 		}
 	}
