@@ -122,8 +122,9 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
 				if err != nil {
 					runtime.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
+				} else {
+					runtime.LogDebugf(a.ctx, "(视频%d) 转码文件成功", num)
 				}
-				runtime.LogDebugf(a.ctx, "(视频%d) 转码文件成功", num)
 			} else {
 				runtime.LogDebugf(a.ctx, "(视频%d) 不转码", num)
 				finalfileName = finalfileName + AudioType.m4a
