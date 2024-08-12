@@ -12,11 +12,7 @@ import (
 func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformation) error {
 
 	// 准备参数
-	fileType := AudioType.m4a
-	if cfg.ConvertFormat {
-		fileType = AudioType.mp3
-	}
-	file := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + fileType
+	file := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid) + v.Format
 	songCover := cfg.CachePath + "/cover/" + strconv.Itoa(v.Cid) + ".jpg"
 	songName := v.Meta.SongName
 	songAuthor := v.Meta.Author
@@ -57,11 +53,7 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformation) error {
 
 // 输出文件
 func OutputFile(cfg *Config, v *VideoInformation, fileName string) error {
-	fileType := AudioType.m4a
-	if cfg.ConvertFormat {
-		fileType = AudioType.mp3
-	}
-	sourcePath := path.Join(cfg.CachePath, "music", strconv.Itoa(v.Cid)+fileType)
+	sourcePath := path.Join(cfg.CachePath, "music", strconv.Itoa(v.Cid)+v.Format)
 	destPath := path.Join(cfg.DownloadPath, fileName)
 
 	// 重命名歌曲文件并移动位置

@@ -145,7 +145,22 @@ export namespace main {
 	        this.sid = source["sid"];
 	    }
 	}
+	export class AudioInformation {
+	    quality: number;
+	    stream: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AudioInformation(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.quality = source["quality"];
+	        this.stream = source["stream"];
+	    }
+	}
 	export class Config {
+	    config_version: number;
 	    download_path: string;
 	    cache_path: string;
 	    videolist_path: string;
@@ -161,6 +176,7 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.config_version = source["config_version"];
 	        this.download_path = source["download_path"];
 	        this.cache_path = source["cache_path"];
 	        this.videolist_path = source["videolist_path"];

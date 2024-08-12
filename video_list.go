@@ -28,14 +28,8 @@ type VideoInformation struct {
 	Meta      MetaInformation
 }
 type AudioInformation struct {
-	Audio struct {
-		Quality int    `json:"quality"`
-		Stream  string `json:"stream"`
-	}
-	Flac struct {
-		Quality int    `json:"quality"`
-		Stream  string `json:"stream"`
-	}
+	Quality int    `json:"quality"`
+	Stream  string `json:"stream"`
 }
 type MetaInformation struct {
 	SongName    string `json:"song_name"`
@@ -73,11 +67,6 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		list.Title = CheckFileName(video.Meta.Title)
 		list.PageTitle = CheckFileName(video.Videos[i].Part)
 		list.Format = AudioType.m4a
-		// 音频流
-		list.Audio.Audio.Quality = video.Videos[i].Stream.Audio.Id
-		list.Audio.Audio.Stream = video.Videos[i].Stream.Audio.BaseUrl
-		list.Audio.Flac.Quality = video.Videos[i].Stream.Flac.Id
-		list.Audio.Flac.Stream = video.Videos[i].Stream.Flac.BaseUrl
 		// 元数据
 		list.Meta.Cover = video.Meta.Cover
 		list.Meta.Author = video.Up.Name
@@ -129,11 +118,6 @@ func (VideoList *VideoList) AddAudio(sessdata, auid string) error {
 	list.Title = CheckFileName(audio.Meta.Title)
 	list.PageTitle = CheckFileName(audio.Meta.Title)
 	list.Format = AudioType.m4a
-	// 音频流
-	list.Audio.Audio.Quality = audio.Stream.Type
-	list.Audio.Audio.Stream = audio.Stream.StreamLink
-	// list.Audio.Flac.Quality = video.Videos[i].Stream.Flac.Id
-	// list.Audio.Flac.Stream = video.Videos[i].Stream.Flac.BaseUrl
 	// 元数据
 	list.Meta.Cover = audio.Meta.Cover
 	list.Meta.Author = audio.Up.Author
@@ -309,10 +293,17 @@ func (v *VideoInformation) GetStream(sessdata string) error {
 	if CheckObj(int(gjson.Get(json, "code").Int())) {
 		return errors.New(gjson.Get(json, "message").String())
 	}
-	v.Audio.Audio.Quality = int(gjson.Get(json, "data.dash.audio.0.id").Int())
-	v.Audio.Audio.Stream = gjson.Get(json, "data.dash.audio.0.base_url").String()
-	v.Audio.Flac.Quality = int(gjson.Get(json, "data.dash.flac.id").Int())
-	v.Audio.Flac.Stream = gjson.Get(json, "data.dash.flac.base_url").String()
+
+	// 选择音频流
+	if gjson.Get(json, "data.dash.flac.audio").String() != "" {
+		v.Audio.Quality = int(gjson.Get(json, "data.dash.audio.id").Int())
+		v.Audio.Stream = gjson.Get(json, "data.dash.flac.audio.base_url").String()
+		v.Format = AudioType.flac
+
+		return nil
+	}
+	v.Audio.Quality = int(gjson.Get(json, "data.dash.audio.0.id").Int())
+	v.Audio.Stream = gjson.Get(json, "data.dash.audio.0.base_url").String()
 
 	return nil
 }

@@ -30,16 +30,6 @@ type Videos struct {
 	Meta struct {
 		SongName string `json:"song_name"` // 歌名
 	}
-	Stream struct {
-		Audio struct {
-			Id      int    `json:"id"`       // 音质代码
-			BaseUrl string `json:"base_url"` // 音频流
-		}
-		Flac struct {
-			Id      int    `json:"id"`       // 音质代码
-			BaseUrl string `json:"base_url"` // 音频流
-		}
-	}
 }
 
 // 以 BVID 为单位请求视频详细信息
@@ -143,24 +133,30 @@ func GetVideoPageInformation(bvid, sessdata string) (string, error) {
 // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md#%E8%8E%B7%E5%8F%96%E8%A7%86%E9%A2%91%E6%B5%81%E5%9C%B0%E5%9D%80_web%E7%AB%AF
 func GetVideoStream(bvid, cid, sessdata string) (string, error) {
 	// 创建请求
-	req, err := http.NewRequest("GET", "https://api.bilibili.com/x/player/wbi/playurl", nil)
+	request, err := http.NewRequest("GET", "https://api.bilibili.com/x/player/wbi/playurl", nil)
 	if err != nil {
 		return "", err
 	}
 
 	// 设置 URL 参数
-	q := req.URL.Query()
+	q := request.URL.Query()
 	q.Add("bvid", bvid)
 	q.Add("cid", cid)
 	q.Add("fnval", "16")
-	req.URL.RawQuery = q.Encode()
+	request.URL.RawQuery = q.Encode()
 
-	signedUrl, err := WbiSignURLParams(req.URL.String())
+	signedUrl, err := WbiSignURLParams(request.URL.String())
 	if err != nil {
 		return "", errors.New("Wbi Sign Error: " + err.Error())
 	}
 
 	signedRequest, err := http.NewRequest("GET", signedUrl, nil)
+	if err != nil {
+		return "", errors.New("New Signed Request Error: " + err.Error())
+	}
+
+	signedRequest.Header.Set("referer", "https://www.bilibili.com")
+	signedRequest.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0")
 
 	// 添加 Cookie 到请求头
 	if sessdata != "" {
