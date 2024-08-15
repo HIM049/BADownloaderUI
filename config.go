@@ -1,6 +1,7 @@
 package main
 
 type Config struct {
+	ConfigVersion   int    `json:"config_version"`
 	DownloadPath    string `json:"download_path"`
 	CachePath       string `json:"cache_path"`
 	VideoListPath   string `json:"videolist_path"`
@@ -25,6 +26,7 @@ type Account struct {
 // 初始化设置
 func (cfg *Config) init() {
 	*cfg = Config{
+		ConfigVersion:   1,
 		DownloadPath:    "./Download",
 		CachePath:       "./Cache",
 		VideoListPath:   "./Cache/video_list.json",
@@ -67,6 +69,13 @@ func (cfg *Config) Get() error {
 			*cfg = file
 			return nil
 		}
+	}
+}
+
+func (cfg *Config) Check() {
+	if cfg.ConfigVersion != CONFIG_VERSION {
+		cfg.ConfigVersion = CONFIG_VERSION
+		cfg.Save()
 	}
 }
 

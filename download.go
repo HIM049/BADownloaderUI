@@ -11,9 +11,10 @@ import (
 )
 
 var AudioType = struct {
-	m4a string
-	mp3 string
-}{m4a: ".m4a", mp3: ".mp3"}
+	m4a  string
+	mp3  string
+	flac string
+}{m4a: ".m4a", mp3: ".mp3", flac: ".flac"}
 
 func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 	// 初始化参数
@@ -102,46 +103,53 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 					continue
 				}
 				// 下载媒体流
-				err = bilibili.StreamingDownloader(v.Audio.Audio.Stream, musicPathAndName+AudioType.m4a)
+				err = bilibili.StreamingDownloader(v.Audio.Stream, musicPathAndName+v.Format)
 				if err != nil {
 					// 下载失败
 					runtime.LogErrorf(a.ctx, "(视频%d) 下载时出现错误：%s  (重试 %d )", num, err, i+1)
 					continue
+				} else {
+					runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
 				}
 
-				runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
 				break
 			}
 
 			// 判断文件类型并转码
 			if v.Format == AudioType.m4a && cfg.ConvertFormat {
 				runtime.LogDebugf(a.ctx, "(视频%d) 转码为 MP3", num)
+				v.Format = AudioType.mp3
 				finalfileName = finalfileName + AudioType.mp3
 
 				// 转码文件
 				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
 				if err != nil {
 					runtime.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
+				} else {
+					runtime.LogDebugf(a.ctx, "(视频%d) 转码文件成功", num)
 				}
-				runtime.LogDebugf(a.ctx, "(视频%d) 转码文件成功", num)
 			} else {
 				runtime.LogDebugf(a.ctx, "(视频%d) 不转码", num)
-				finalfileName = finalfileName + AudioType.m4a
+				finalfileName = finalfileName + v.Format
 			}
 
 			// 写入元数据
-			err = ChangeTag(cfg, &opt, &v)
-			if err != nil {
-				runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
+			if v.Format != AudioType.flac {
+				err = ChangeTag(cfg, &opt, &v)
+				if err != nil {
+					runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
+				} else {
+					runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
+				}
 			}
-			runtime.LogDebugf(a.ctx, "(视频%d) 写入元数据成功", num)
 
 			// 输出文件
 			err = OutputFile(cfg, &v, finalfileName)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
+			} else {
+				runtime.LogDebugf(a.ctx, "(视频%d) 输出文件成功", num)
 			}
-			runtime.LogDebugf(a.ctx, "(视频%d) 输出文件成功", num)
 
 		}(video, i)
 
@@ -150,8 +158,9 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			err = bilibili.SaveFromURL(v.Meta.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
+			} else {
+				runtime.LogDebugf(a.ctx, "(视频%d) 下载封面成功", num)
 			}
-			runtime.LogDebugf(a.ctx, "(视频%d) 下载封面成功", num)
 		}(video, i)
 		time.Sleep(10 * time.Millisecond)
 	}
