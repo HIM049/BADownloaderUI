@@ -91,8 +91,7 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 			}
 		}
 		list.Meta.SongName = SongName
-		VideoList.List = append(VideoList.List, list)
-		VideoList.Count++
+		VideoList.Add(&list)
 	}
 	return nil
 }
@@ -127,9 +126,7 @@ func (VideoList *VideoList) AddAudio(sessdata, auid string) error {
 	list.IsAudio = true
 	list.Delete = false
 
-	VideoList.List = append(VideoList.List, list)
-	VideoList.Count++
-
+	VideoList.Add(&list)
 	return nil
 }
 
@@ -230,6 +227,55 @@ func (VideoList *VideoList) AddCompilation(sessdata string, mid, sid, count int,
 		for j := 0; j < pageSize; j++ {
 			// 添加视频到列表
 			err := VideoList.AddVideo(sessdata, favlist.Data.Archives[j].Bvid, downloadCompilation)
+			if err != nil {
+				continue
+			}
+		}
+	}
+
+	return nil
+}
+
+// 向列表中添加个人主页视频
+func (VideoList *VideoList) AddProfileVideo(sessdata string, mid, count int, downloadCompilation bool) error {
+	respJson, err := bilibili.GetProfileVideo(strconv.Itoa(mid), "1", "1", sessdata)
+	if err != nil {
+		return err
+	}
+
+	// 计算下载页数
+	var pageCount int
+	if count == 0 {
+		// 如果下载数量为 0 （全部下载）
+		count = int(gjson.Get(respJson, "data.page.count").Int())
+		pageCount = count / 20
+	} else {
+		// 计算下载页数
+		pageCount = count / 20
+	}
+	// 非完整页面
+	if count%20 != 0 {
+		pageCount++
+	}
+
+	// 主循环
+	for i := 0; i < pageCount; i++ {
+		pageSize := 20
+
+		// 处理非完整尾页
+		if i+1 == pageCount && count%20 != 0 {
+			pageSize = count % 20
+		}
+
+		// 获取当前分页信息
+		respJson, err := bilibili.GetProfileVideo(strconv.Itoa(mid), strconv.Itoa(i+1), "20", sessdata)
+		if err != nil {
+			return err
+		}
+		// 遍历分页
+		for j := 0; j < pageSize; j++ {
+			// 添加视频到列表
+			err := VideoList.AddVideo(sessdata, gjson.Get(respJson, "data.list.vlist."+strconv.Itoa(j)+".bvid").String(), downloadCompilation)
 			if err != nil {
 				continue
 			}

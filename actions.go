@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/myuser/bilibili"
+	"github.com/tidwall/gjson"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -98,6 +99,27 @@ func (a *App) QueryAudio(auid string) (bilibili.Audio, error) {
 		return bilibili.Audio{}, err
 	}
 	return *audio, err
+}
+
+// 查询音频信息
+func (a *App) QueryProfileVideo(mid string) (int, error) {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return 0, err
+	}
+
+	sessdata := ""
+	if cfg.Account.UseAccount && cfg.Account.IsLogin {
+		sessdata = cfg.Account.SESSDATA
+	}
+
+	respJson, err := bilibili.GetProfileVideo(mid, "1", "1", sessdata)
+	if err != nil {
+		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+		return 0, err
+	}
+	return int(gjson.Get(respJson, "data.page.count").Int()), err
 }
 
 // 创建视频列表
@@ -229,6 +251,38 @@ func (a *App) AddAudioToList(listPath, auid string) error {
 	}
 
 	videolist.Save(listPath)
+
+	return nil
+}
+
+// 添加个人主页视频
+func (a *App) AddProfileVideoToList(listPath string, mid, count int, downloadCompilation bool) error {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return err
+	}
+
+	videoList := new(VideoList)
+	err = videoList.Get(listPath)
+	if err != nil {
+		return nil
+	}
+
+	sessdata := ""
+	if cfg.Account.IsLogin && cfg.Account.UseAccount {
+		sessdata = cfg.Account.SESSDATA
+	}
+
+	err = videoList.AddProfileVideo(sessdata, mid, count, downloadCompilation)
+	if err != nil {
+		return err
+	}
+
+	err = videoList.Save(listPath)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

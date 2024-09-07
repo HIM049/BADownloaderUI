@@ -14,6 +14,10 @@ export function AddCompilationToList(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['AddCompilationToList'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function AddProfileVideoToList(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['App']['AddProfileVideoToList'](arg1, arg2, arg3, arg4);
+}
+
 export function AddVideoToList(arg1, arg2, arg3) {
   return window['go']['main']['App']['AddVideoToList'](arg1, arg2, arg3);
 }
@@ -80,6 +84,10 @@ export function QueryCollection(arg1) {
 
 export function QueryCompilation(arg1, arg2) {
   return window['go']['main']['App']['QueryCompilation'](arg1, arg2);
+}
+
+export function QueryProfileVideo(arg1) {
+  return window['go']['main']['App']['QueryProfileVideo'](arg1);
 }
 
 export function QuerySongInformation(arg1) {

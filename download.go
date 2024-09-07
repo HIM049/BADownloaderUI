@@ -92,6 +92,8 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 						// 下载失败
 						runtime.LogErrorf(a.ctx, "(视频%d) 下载时出现错误：%s  (重试 %d )", num, err, i+1)
 						continue
+					} else {
+						runtime.LogDebugf(a.ctx, "(视频%d) 下载视频成功", num)
 					}
 					break
 				}
@@ -166,6 +168,12 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 	}
 	// 等待任务执行完成
 	wg.Wait()
+
+	// 下载完成后保存列表
+	err = videoList.Save(listPath)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

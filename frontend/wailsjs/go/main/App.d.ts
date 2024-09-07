@@ -9,6 +9,8 @@ export function AddCollectionToList(arg1:string,arg2:string,arg3:number,arg4:boo
 
 export function AddCompilationToList(arg1:string,arg2:number,arg3:number,arg4:number,arg5:boolean):Promise<void>;
 
+export function AddProfileVideoToList(arg1:string,arg2:number,arg3:number,arg4:boolean):Promise<void>;
+
 export function AddVideoToList(arg1:string,arg2:string,arg3:boolean):Promise<void>;
 
 export function Checkffmpeg():Promise<boolean>;
@@ -42,6 +44,8 @@ export function QueryAudio(arg1:string):Promise<bilibili.Audio>;
 export function QueryCollection(arg1:string):Promise<bilibili.FavList>;
 
 export function QueryCompilation(arg1:number,arg2:number):Promise<bilibili.CompliationInformation>;
+
+export function QueryProfileVideo(arg1:string):Promise<number>;
 
 export function QuerySongInformation(arg1:string):Promise<bilibili.Audio>;
 

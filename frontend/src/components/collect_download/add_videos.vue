@@ -5,6 +5,7 @@
             <var-radio :checked-value="1">视频合集</var-radio>
             <var-radio :checked-value="2">视频链接</var-radio>
             <var-radio :checked-value="3">AUID</var-radio>
+            <var-radio :checked-value="4">用户空间</var-radio>
         </var-radio-group>
 
         <var-input :placeholder="inputTip" v-model="input" clearable 
@@ -90,7 +91,7 @@ import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
 // import { ClipboardGetText } from '../../../wailsjs/runtime'
-import { QueryVideo, QueryCollection, QueryCompilation, QueryAudio, AddVideoToList, AddCollectionToList, AddCompilationToList, AddAudioToList } from '../../../wailsjs/go/main/App'
+import { QueryVideo, QueryCollection, QueryCompilation, QueryAudio, QueryProfileVideo, AddVideoToList, AddCollectionToList, AddCompilationToList, AddAudioToList, AddProfileVideoToList } from '../../../wailsjs/go/main/App'
 import { EventsOn, EventsEmit } from '../../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
@@ -178,6 +179,9 @@ function queryInfornation() {
         case 3: // audio
             inputTip.value = '请输入 AUID'
             break;
+        case 4: // profile
+            inputTip.value = '请输入 用户空间 URL'
+        break;
     }
 
     if (input.value == "") {
@@ -260,6 +264,24 @@ function queryInfornation() {
                 CardStatus.InfoCard = true;
             });
             break;
+        
+        case 4:
+            const mid = extractMid(input.value);
+            if (mid == null) {
+                CardStatus.InfoCard = false;
+                Snackbar.warning("链接匹配失败");
+                return;
+            }
+            QueryProfileVideo(mid).then(result => {
+                resp.title = "用户个人空间";
+                resp.cover = "";
+                resp.up_name = "";
+                resp.count = result;
+
+                resp.bvid = mid;
+                CardStatus.InfoCard = true;
+            });
+            break;
     }
 }
 
@@ -305,6 +327,16 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddAudioToList(parms.value.videoListPath, resp.bvid).then(()=>{
+                    Snackbar.success("添加完成");
+                    afterAdd();
+                });
+            }
+            break;
+
+        case 4: //Profile
+            addItToList.value = () => {
+                CardStatus.ConfirmBtnLoadig = true;
+                AddProfileVideoToList(parms.value.videoListPath, Number(resp.bvid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
                     Snackbar.success("添加完成");
                     afterAdd();
                 });
@@ -361,10 +393,22 @@ function extractCompilation(url) {
     }
 }
 
+// 过滤AUID
 function extractAuid(auid) {
     const match = auid.match(/^au(\d+)$/);
     return match ? match[1] : null;
 }
+
+// 过滤用户空间 MID
+function extractMid(url) {
+    const regex = /space\.bilibili\.com\/(\d+)/;
+    const match = url.match(regex);
+    if (match) {
+        return match[1]; // 返回匹配到的数字部分
+    }
+    return null; // 如果没有匹配到，返回 null
+}
+
 </script>
 
 <style>
