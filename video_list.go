@@ -91,8 +91,7 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 			}
 		}
 		list.Meta.SongName = SongName
-		VideoList.List = append(VideoList.List, list)
-		VideoList.Count++
+		VideoList.Add(&list)
 	}
 	return nil
 }
@@ -127,9 +126,7 @@ func (VideoList *VideoList) AddAudio(sessdata, auid string) error {
 	list.IsAudio = true
 	list.Delete = false
 
-	VideoList.List = append(VideoList.List, list)
-	VideoList.Count++
-
+	VideoList.Add(&list)
 	return nil
 }
 
