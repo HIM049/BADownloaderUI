@@ -4,7 +4,7 @@
         <var-form>
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
-                    <var-collapse-item title="软件设置" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件行为与外观" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <var-cell> 
                             主题颜色
                             <template #extra>
@@ -27,7 +27,7 @@
 
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
-                    <var-collapse-item title="账户相关" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="账号使用" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <var-cell> 
                             获取内容时使用账号
                             <template #extra>
@@ -46,7 +46,7 @@
 
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass2" :offset="true" elevation="0">
-                    <var-collapse-item title="下载相关" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件下载行为" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <var-cell> 
                             最大下载线程数
                             <template #extra>
@@ -66,7 +66,7 @@
 
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass3" :offset="true" elevation="0">
-                    <var-collapse-item title="文件设置" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="文件与路径" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
 
                     <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%;">
                         <var-cell> 使用 ffmpeg 转码音频
