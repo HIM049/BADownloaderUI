@@ -50,14 +50,14 @@
                         <var-cell> 
                             最大下载线程数
                             <template #extra>
-                                <var-counter v-model="config.download_threads" @change="changeCfg" />
+                                <var-counter v-model="config.download_config.download_threads" @change="changeCfg" />
                             </template>
                         </var-cell>        
 
                         <var-cell> 
                             下载重试次数
                             <template #extra>
-                                <var-counter v-model="config.retry_count" @change="changeCfg" />
+                                <var-counter v-model="config.download_config.retry_count" @change="changeCfg" />
                             </template>
                         </var-cell>
                     </var-collapse-item>
@@ -71,18 +71,18 @@
                     <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%;">
                         <var-cell> 使用 ffmpeg 转码音频
                             <template #extra>
-                                <var-switch v-model="config.convert_format" variant @change="setConvertFormat" />
+                                <var-switch v-model="config.file_config.convert_format" variant @change="setConvertFormat" />
                             </template>
                         </var-cell>
                     </var-tooltip>
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="音频保存路径" size="small" v-model="config.download_path"
+                    <var-input style="margin: 10px" variant="outlined" placeholder="音频保存路径" size="small" v-model="config.file_config.download_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="下载缓存路径" size="small" v-model="config.cache_path"
+                    <var-input style="margin: 10px" variant="outlined" placeholder="下载缓存路径" size="small" v-model="config.file_config.cache_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.videolist_path"
+                    <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
                     </var-collapse-item>
                 </var-collapse>
@@ -204,7 +204,7 @@ function setConvertFormat() {
         if (result) {
             saveConfig();
         } else {
-            config.convert_format = false;
+            config.file_config.convert_format = false;
             Snackbar.warning("未检测到 ffmpeg 安装");
         }
     })

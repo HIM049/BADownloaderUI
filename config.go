@@ -1,16 +1,24 @@
 package main
 
 type Config struct {
-	ConfigVersion   int    `json:"config_version"`
-	DownloadPath    string `json:"download_path"`
-	CachePath       string `json:"cache_path"`
-	VideoListPath   string `json:"videolist_path"`
-	DownloadThreads int    `json:"download_threads"`
-	RetryCount      int    `json:"retry_count"`
-	ConvertFormat   bool   `json:"convert_format"`
-	DeleteCache     bool   `json:"delete_cache"`
-	Thene           string `json:"theme"`
-	Account         Account
+	ConfigVersion  int            `json:"config_version"`
+	DeleteCache    bool           `json:"delete_cache"`
+	Theme          string         `json:"theme"`
+	DownloadConfig DownloadConfig `json:"download_config"`
+	FileConfig     FileConfig     `json:"file_config"`
+	Account        Account
+}
+
+type DownloadConfig struct {
+	DownloadThreads int `json:"download_threads"`
+	RetryCount      int `json:"retry_count"`
+}
+
+type FileConfig struct {
+	ConvertFormat bool   `json:"convert_format"`
+	DownloadPath  string `json:"download_path"`
+	CachePath     string `json:"cache_path"`
+	VideoListPath string `json:"videolist_path"`
 }
 
 type Account struct {
@@ -26,15 +34,19 @@ type Account struct {
 // 初始化设置
 func (cfg *Config) init() {
 	*cfg = Config{
-		ConfigVersion:   1,
-		DownloadPath:    "./Download",
-		CachePath:       "./Cache",
-		VideoListPath:   "./Cache/video_list.json",
-		DownloadThreads: 5,
-		RetryCount:      10,
-		ConvertFormat:   Checkffmpeg(),
-		DeleteCache:     true,
-		Thene:           "lightPink",
+		ConfigVersion: 1,
+		DeleteCache:   true,
+		Theme:         "lightPink",
+		DownloadConfig: DownloadConfig{
+			DownloadThreads: 5,
+			RetryCount:      10,
+		},
+		FileConfig: FileConfig{
+			ConvertFormat: Checkffmpeg(),
+			DownloadPath:  "./Download",
+			CachePath:     "./Cache",
+			VideoListPath: "./Cache/video_list.json",
+		},
 		Account: Account{
 			IsLogin:           false,
 			UseAccount:        false,

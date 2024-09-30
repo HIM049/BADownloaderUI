@@ -30,7 +30,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 
 	// _ = os.MkdirAll(path.Join(cfg.DownloadPath, favlistId), 0755)
 
-	sem := make(chan struct{}, cfg.DownloadThreads+1)
+	sem := make(chan struct{}, cfg.DownloadConfig.DownloadThreads+1)
 	var wg sync.WaitGroup
 
 	videoList := new(VideoList)
@@ -42,7 +42,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 
 	// 格式判断
 	audioType := AudioType.m4a
-	if cfg.ConvertFormat {
+	if cfg.FileConfig.ConvertFormat {
 		audioType = AudioType.mp3
 	}
 
@@ -68,17 +68,17 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			}
 
 			//判断是否已下载
-			finalFile := path.Join(cfg.DownloadPath, v.Title+audioType)
+			finalFile := path.Join(cfg.FileConfig.DownloadPath, v.Title+audioType)
 			if IsFileExists(finalFile) {
 				runtime.LogDebugf(a.ctx, "跳过已下载: %s", finalFile)
 				return
 			}
 
 			runtime.LogDebugf(a.ctx, "开始下载视频%d", num)
-			musicPathAndName := cfg.CachePath + "/music/" + strconv.Itoa(v.Cid)
+			musicPathAndName := cfg.FileConfig.CachePath + "/music/" + strconv.Itoa(v.Cid)
 
 			// 下载视频
-			for i := 0; i < cfg.RetryCount; i++ {
+			for i := 0; i < cfg.DownloadConfig.RetryCount; i++ {
 
 				// 音频下载逻辑
 				if v.IsAudio {
@@ -118,7 +118,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			}
 
 			// 判断文件类型并转码
-			if v.Format == AudioType.m4a && cfg.ConvertFormat {
+			if v.Format == AudioType.m4a && cfg.FileConfig.ConvertFormat {
 				runtime.LogDebugf(a.ctx, "(视频%d) 转码为 MP3", num)
 				v.Format = AudioType.mp3
 				finalfileName = finalfileName + AudioType.mp3
@@ -157,7 +157,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 
 		go func(v VideoInformation, num int) {
 			// 下载封面图片
-			err = bilibili.SaveFromURL(v.Meta.Cover, cfg.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
+			err = bilibili.SaveFromURL(v.Meta.Cover, cfg.FileConfig.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 			} else {

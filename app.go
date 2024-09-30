@@ -25,12 +25,15 @@ func (a *App) startup(ctx context.Context) {
 		runtime.LogError(a.ctx, "初始化文件夹失败")
 
 	}
-	_ = os.MkdirAll(cfg.DownloadPath, 0755)
-	_ = os.MkdirAll(cfg.CachePath, 0755)
-	_ = os.MkdirAll(cfg.CachePath+"/music", 0755)
-	_ = os.MkdirAll(cfg.CachePath+"/cover", 0755)
-	_ = os.MkdirAll(cfg.CachePath+"/single/cover", 0755)
-	_ = os.MkdirAll(cfg.CachePath+"/single/music", 0755)
+
+	downloadPath := cfg.FileConfig.DownloadPath
+	cachePath := cfg.FileConfig.CachePath
+	_ = os.MkdirAll(downloadPath, 0755)
+	_ = os.MkdirAll(cachePath, 0755)
+	_ = os.MkdirAll(cachePath+"/music", 0755)
+	_ = os.MkdirAll(cachePath+"/cover", 0755)
+	_ = os.MkdirAll(cachePath+"/single/cover", 0755)
+	_ = os.MkdirAll(cachePath+"/single/music", 0755)
 }
 
 // 程序关闭时
@@ -39,7 +42,7 @@ func (a *App) shutdown(ctx context.Context) {
 	cfg := new(Config)
 	cfg.Get()
 	if cfg.DeleteCache {
-		os.RemoveAll(cfg.CachePath)
+		os.RemoveAll(cfg.FileConfig.CachePath)
 	}
 }
 
