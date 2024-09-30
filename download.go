@@ -60,12 +60,12 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 				runtime.EventsEmit(a.ctx, "downloadFinish", v.Meta.SongName)
 			}()
 
-			// 处理音频标题
-			finalfileName := v.Title
-			// 如果是分 P （以分 P 命名为主）
-			if true {
-				finalfileName += "(" + v.PageTitle + ")"
-			}
+			// 处理文件名结构体
+			fileName := new(FileName)
+			fileName.Title = v.Title
+			fileName.Subtitle = v.PageTitle
+			fileName.ID = num
+			fileName.Quality = "hires"
 
 			//判断是否已下载
 			finalFile := path.Join(cfg.FileConfig.DownloadPath, v.Title+audioType)
@@ -121,7 +121,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			if v.Format == AudioType.m4a && cfg.FileConfig.ConvertFormat {
 				runtime.LogDebugf(a.ctx, "(视频%d) 转码为 MP3", num)
 				v.Format = AudioType.mp3
-				finalfileName = finalfileName + AudioType.mp3
+				fileName.Format = AudioType.mp3
 
 				// 转码文件
 				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
@@ -132,11 +132,12 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 				}
 			} else {
 				runtime.LogDebugf(a.ctx, "(视频%d) 不转码", num)
-				finalfileName = finalfileName + v.Format
+				fileName.Format = v.Format
 			}
 
 			// 写入元数据
 			if v.Format != AudioType.flac {
+				fileName.Quality = "normal"
 				err = ChangeTag(cfg, &opt, &v)
 				if err != nil {
 					runtime.LogErrorf(a.ctx, "(视频%d) 写入元数据时发生错误：%s", num, err)
@@ -146,7 +147,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			}
 
 			// 输出文件
-			err = OutputFile(cfg, &v, finalfileName)
+			err = OutputFile(cfg, &v, *fileName)
 			if err != nil {
 				runtime.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			} else {

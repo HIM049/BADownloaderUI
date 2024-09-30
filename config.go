@@ -15,10 +15,11 @@ type DownloadConfig struct {
 }
 
 type FileConfig struct {
-	ConvertFormat bool   `json:"convert_format"`
-	DownloadPath  string `json:"download_path"`
-	CachePath     string `json:"cache_path"`
-	VideoListPath string `json:"videolist_path"`
+	ConvertFormat    bool   `json:"convert_format"`
+	FileNameTemplate string `json:"file_name_template"`
+	DownloadPath     string `json:"download_path"`
+	CachePath        string `json:"cache_path"`
+	VideoListPath    string `json:"videolist_path"`
 }
 
 type Account struct {
@@ -34,7 +35,7 @@ type Account struct {
 // 初始化设置
 func (cfg *Config) init() {
 	*cfg = Config{
-		ConfigVersion: 1,
+		ConfigVersion: 2,
 		DeleteCache:   true,
 		Theme:         "lightPink",
 		DownloadConfig: DownloadConfig{
@@ -42,10 +43,11 @@ func (cfg *Config) init() {
 			RetryCount:      10,
 		},
 		FileConfig: FileConfig{
-			ConvertFormat: Checkffmpeg(),
-			DownloadPath:  "./Download",
-			CachePath:     "./Cache",
-			VideoListPath: "./Cache/video_list.json",
+			ConvertFormat:    Checkffmpeg(),
+			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}",
+			DownloadPath:     "./Download",
+			CachePath:        "./Cache",
+			VideoListPath:    "./Cache/video_list.json",
 		},
 		Account: Account{
 			IsLogin:           false,

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"html/template"
 	"os"
 	"path"
 	"strconv"
@@ -51,13 +53,34 @@ func ChangeTag(cfg *Config, opt *DownloadOption, v *VideoInformation) error {
 	return nil
 }
 
+type FileName struct {
+	Title    string
+	Subtitle string
+	Quality  string
+	ID       int
+	Format   string
+}
+
 // 输出文件
-func OutputFile(cfg *Config, v *VideoInformation, fileName string) error {
+func OutputFile(cfg *Config, v *VideoInformation, fileName FileName) error {
+	// 处理模板和生成文件名
+	tmpl, err := template.New("filename").Parse(cfg.FileConfig.FileNameTemplate)
+	if err != nil {
+		return err
+	}
+
+	var output bytes.Buffer
+	err = tmpl.Execute(&output, fileName)
+	if err != nil {
+		return err
+	}
+
+	// 添加路径
 	sourcePath := path.Join(cfg.FileConfig.CachePath, "music", strconv.Itoa(v.Cid)+v.Format)
-	destPath := path.Join(cfg.FileConfig.DownloadPath, fileName)
+	destPath := path.Join(cfg.FileConfig.DownloadPath, output.String())
 
 	// 重命名歌曲文件并移动位置
-	err := RenameAndMoveFile(sourcePath, destPath)
+	err = os.Rename(sourcePath, destPath)
 	if err != nil {
 		return err
 	}
@@ -109,15 +132,6 @@ func SingleOutputFile(cfg *Config, uuid, Title string) error {
 	destPath := path.Join(cfg.FileConfig.DownloadPath, Title+AudioType.mp3)
 
 	// 重命名歌曲文件并移动位置
-	err := RenameAndMoveFile(sourcePath, destPath)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// 重命名和移动
-func RenameAndMoveFile(sourcePath, destPath string) error {
 	err := os.Rename(sourcePath, destPath)
 	if err != nil {
 		return err

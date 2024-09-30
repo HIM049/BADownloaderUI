@@ -161,6 +161,7 @@ export namespace main {
 	}
 	export class FileConfig {
 	    convert_format: boolean;
+	    file_name_template: string;
 	    download_path: string;
 	    cache_path: string;
 	    videolist_path: string;
@@ -172,6 +173,7 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.convert_format = source["convert_format"];
+	        this.file_name_template = source["file_name_template"];
 	        this.download_path = source["download_path"];
 	        this.cache_path = source["cache_path"];
 	        this.videolist_path = source["videolist_path"];
