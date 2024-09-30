@@ -4,9 +4,9 @@
         <var-form>
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
-                    <var-collapse-item title="个性化选项" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件行为与外观" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <var-cell> 
-                            主题选择
+                            主题颜色
                             <template #extra>
                                 
                                 <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" style="width: 150px;" @change="setTheme">
@@ -15,15 +15,21 @@
                                 </var-select>
                             </template>
                         </var-cell>
+
+                        <var-cell> 关闭软件后清除缓存
+                            <template #extra>
+                                <var-switch v-model="config.delete_cache" variant @change="changeCfg" />
+                            </template>
+                        </var-cell>
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
 
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
-                    <var-collapse-item title="账户相关" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="账号使用" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <var-cell> 
-                            使用账号获取内容
+                            获取内容时使用账号
                             <template #extra>
                                 <var-switch v-model="config.Account.use_account" variant @change="setUseAccount"/>
                             </template>
@@ -40,18 +46,18 @@
 
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass2" :offset="true" elevation="0">
-                    <var-collapse-item title="下载相关" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件下载行为" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <var-cell> 
                             最大下载线程数
                             <template #extra>
-                                <var-counter v-model="config.download_threads" @change="changeCfg" />
+                                <var-counter v-model="config.download_config.download_threads" @change="changeCfg" />
                             </template>
                         </var-cell>        
 
                         <var-cell> 
                             下载重试次数
                             <template #extra>
-                                <var-counter v-model="config.retry_count" @change="changeCfg" />
+                                <var-counter v-model="config.download_config.retry_count" @change="changeCfg" />
                             </template>
                         </var-cell>
                     </var-collapse-item>
@@ -60,34 +66,34 @@
 
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass3" :offset="true" elevation="0">
-                    <var-collapse-item title="其他选项" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
-                        <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%;">
-                            <var-cell> 使用 ffmpeg 转码音频
-                                <template #extra>
-                                    <var-switch v-model="config.convert_format" variant @change="setConvertFormat" />
-                                </template>
-                            </var-cell>
-                        </var-tooltip>
-                        
-                        <var-cell> 关闭软件后清除缓存
+                    <var-collapse-item title="文件与路径" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+
+                    <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%; margin-bottom: 10px;">
+                        <var-cell> 使用 ffmpeg 转码音频
                             <template #extra>
-                                <var-switch v-model="config.delete_cache" variant @change="changeCfg" />
+                                <var-switch v-model="config.file_config.convert_format" variant @change="setConvertFormat" />
                             </template>
                         </var-cell>
-                    </var-collapse-item>
-                </var-collapse>
-            </var-paper>
+                    </var-tooltip>
 
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
-                <var-collapse v-model="CardStatus.configClass4" :offset="true" elevation="0">
-                    <var-collapse-item title="路径设置" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
-                    <var-input style="margin: 10px" variant="outlined" placeholder="音频保存路径" size="small" v-model="config.download_path"
+                    <var-tooltip content="双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名" style="width: 100%; margin-bottom: 10px;" trigger="click">
+                        <template #content>
+                            
+                            <p v-pre>双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名</p>
+                            <p v-pre>列表编号{{.ID}} 视频标题{{.Title}} 单集标题{{.Subtitle}} 音频质量{{.Quality}} 格式后缀名{{.Format}}</p>
+                        </template>
+                        <var-input style="margin: 10px;" variant="outlined" placeholder="文件命名方式" size="small" v-model="config.file_config.file_name_template"
+                            :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
+                    </var-tooltip>
+                    
+
+                    <var-input style="margin: 10px" variant="outlined" placeholder="音频保存路径" size="small" v-model="config.file_config.download_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="下载缓存路径" size="small" v-model="config.cache_path"
+                    <var-input style="margin: 10px" variant="outlined" placeholder="下载缓存路径" size="small" v-model="config.file_config.cache_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.videolist_path"
+                    <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
                     </var-collapse-item>
                 </var-collapse>
@@ -117,7 +123,6 @@ const CardStatus = reactive({
     configClass1: [],
     configClass2: [],
     configClass3: [],
-    configClass4: [],
 })
 
 onMounted(() => {
@@ -210,10 +215,16 @@ function setConvertFormat() {
         if (result) {
             saveConfig();
         } else {
-            config.convert_format = false;
+            config.file_config.convert_format = false;
             Snackbar.warning("未检测到 ffmpeg 安装");
         }
     })
 }
 
 </script>
+
+<style>
+.var-swipe-item::-webkit-scrollbar {
+    display: none;
+}
+</style>

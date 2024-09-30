@@ -37,7 +37,7 @@ const status = computed({
 // 创建视频列表并保存路径
 function creatVideoList() {
     LoadConfig().then(result => {
-        parms.value.videoListPath = result.videolist_path;
+        parms.value.videoListPath = result.file_config.videolist_path;
         CreatVideoList();
         emit('nextpage');
     })

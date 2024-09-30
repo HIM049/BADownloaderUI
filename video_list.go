@@ -294,7 +294,7 @@ func (VideoList *VideoList) Get(path ...string) error {
 	}
 
 	// 指定路径
-	filePath := cfg.VideoListPath
+	filePath := cfg.FileConfig.VideoListPath
 	if len(path) > 0 {
 		filePath = path[0]
 	}
@@ -315,7 +315,7 @@ func (VideoList *VideoList) Save(path ...string) error {
 	}
 
 	// 指定路径
-	filePath := cfg.VideoListPath
+	filePath := cfg.FileConfig.VideoListPath
 	if len(path) > 0 {
 		filePath = path[0]
 	}

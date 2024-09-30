@@ -159,16 +159,46 @@ export namespace main {
 	        this.stream = source["stream"];
 	    }
 	}
-	export class Config {
-	    config_version: number;
+	export class FileConfig {
+	    convert_format: boolean;
+	    file_name_template: string;
 	    download_path: string;
 	    cache_path: string;
 	    videolist_path: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FileConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.convert_format = source["convert_format"];
+	        this.file_name_template = source["file_name_template"];
+	        this.download_path = source["download_path"];
+	        this.cache_path = source["cache_path"];
+	        this.videolist_path = source["videolist_path"];
+	    }
+	}
+	export class DownloadConfig {
 	    download_threads: number;
 	    retry_count: number;
-	    convert_format: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new DownloadConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.download_threads = source["download_threads"];
+	        this.retry_count = source["retry_count"];
+	    }
+	}
+	export class Config {
+	    config_version: number;
 	    delete_cache: boolean;
 	    theme: string;
+	    download_config: DownloadConfig;
+	    file_config: FileConfig;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -177,16 +207,31 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.config_version = source["config_version"];
-	        this.download_path = source["download_path"];
-	        this.cache_path = source["cache_path"];
-	        this.videolist_path = source["videolist_path"];
-	        this.download_threads = source["download_threads"];
-	        this.retry_count = source["retry_count"];
-	        this.convert_format = source["convert_format"];
 	        this.delete_cache = source["delete_cache"];
 	        this.theme = source["theme"];
+	        this.download_config = this.convertValues(source["download_config"], DownloadConfig);
+	        this.file_config = this.convertValues(source["file_config"], FileConfig);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
+	
 	export class DownloadOption {
 	    song_name: boolean;
 	    song_cover: boolean;
@@ -203,6 +248,7 @@ export namespace main {
 	        this.song_author = source["song_author"];
 	    }
 	}
+	
 	export class MetaInformation {
 	    song_name: string;
 	    cover: string;

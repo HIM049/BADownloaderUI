@@ -22,7 +22,7 @@ func (a *App) GetTheme() (string, error) {
 		return "", err
 	}
 
-	return cfg.Thene, nil
+	return cfg.Theme, nil
 }
 
 // 获取列表中视频数量
