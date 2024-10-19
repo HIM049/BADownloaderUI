@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"path/filepath"
 	"strconv"
 
 	"github.com/myuser/bilibili"
@@ -480,4 +481,26 @@ func (a *App) SaveConfig(cfg Config) {
 		wails.LogErrorf(a.ctx, "写入设置文件失败：%s", err)
 		wails.EventsEmit(a.ctx, "error", "写入设置时出错:"+err.Error())
 	}
+}
+
+// 打开下载文件夹
+func (a *App) OpenDownloadFolader() error {
+	cfg := new(Config)
+	err := cfg.Get()
+	if err != nil {
+		return err
+	}
+
+	absPath, err := filepath.Abs(cfg.FileConfig.DownloadPath)
+	if err != nil {
+		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+		return err
+	}
+
+	err = OpenFolder(absPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

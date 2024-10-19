@@ -70,6 +70,10 @@ export function LoginBilibili() {
   return window['go']['main']['App']['LoginBilibili']();
 }
 
+export function OpenDownloadFolader() {
+  return window['go']['main']['App']['OpenDownloadFolader']();
+}
+
 export function OpenFileDialog() {
   return window['go']['main']['App']['OpenFileDialog']();
 }
