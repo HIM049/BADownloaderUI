@@ -483,6 +483,7 @@ func (a *App) SaveConfig(cfg Config) {
 	}
 }
 
+// 打开下载文件夹
 func (a *App) OpenDownloadFolader() error {
 	cfg := new(Config)
 	err := cfg.Get()
@@ -491,6 +492,10 @@ func (a *App) OpenDownloadFolader() error {
 	}
 
 	absPath, err := filepath.Abs(cfg.FileConfig.DownloadPath)
+	if err != nil {
+		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+		return err
+	}
 
 	err = OpenFolder(absPath)
 	if err != nil {
