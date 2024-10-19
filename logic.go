@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"os/exec"
 	"regexp"
 	"time"
 
@@ -157,4 +158,10 @@ func CheckObj(code int) bool {
 	} else {
 		return true
 	}
+}
+
+// 打开文件夹
+func OpenFolder(path string) error {
+	cmd := exec.Command("explorer", path)
+	return cmd.Start()
 }

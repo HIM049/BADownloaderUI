@@ -19,16 +19,20 @@
 
         <var-result 
             title="下载完成"
-            description="现在您可以继续使用软件了"
+            description="请点击下一步回到主页"
             v-show="progress.successed"
-        />
+        >
+            <template #footer>
+                <var-button @click="OpenDownloadFolader" type="primary">打开下载文件夹</var-button>
+            </template>
+        </var-result>
     </FramePage>
 </template>
 
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { ref, reactive, computed } from 'vue'
-import { ListDownload } from '../../../wailsjs/go/main/App'
+import { ListDownload, OpenDownloadFolader } from '../../../wailsjs/go/main/App'
 import { EventsOn } from '../../../wailsjs/runtime'
 
 const downloading = ref(false)
