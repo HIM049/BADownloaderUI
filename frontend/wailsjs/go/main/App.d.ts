@@ -37,6 +37,8 @@ export function LoadVideoList(arg1:string):Promise<main.VideoList>;
 
 export function LoginBilibili():Promise<void>;
 
+export function OpenDownloadFolader():Promise<void>;
+
 export function OpenFileDialog():Promise<string>;
 
 export function QueryAudio(arg1:string):Promise<bilibili.Audio>;
