@@ -63,6 +63,7 @@ import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, watch, ref } from 'vue'
 import { LoadVideoList, SaveVideoList, TidyVideoList, SaveVideoListTo } from '../../../wailsjs/go/main/App'
+import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
 
 const videoList = ref([])
@@ -98,11 +99,8 @@ const status = computed({
     }
 })
 
-// 检查是否完成列表加载
-watch(props, (newValue) => {
-    if (newValue.parms.pageIndex == 2) {
-        loadVideoList();
-    }
+EventsOn('refreshVideoList', () => {
+    loadVideoList();
 })
 
 // 另存列表
