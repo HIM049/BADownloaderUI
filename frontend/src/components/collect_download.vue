@@ -35,7 +35,7 @@ import DownloadProcess from '../components/collect_download/download_process.vue
 import { ref, reactive, watch, onMounted } from 'vue'
 import { GetListCount, TidyVideoList } from '../../wailsjs/go/main/App'
 import { Dialog, Snackbar } from '@varlet/ui'
-
+import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
 // 页面索引值
 const pageIndex = ref(0)
 
@@ -120,6 +120,7 @@ watch(parms, (newPageIndex) => {
                 return;
             });
         };
+        EventsEmit('refreshVideoList');
         updateBadge();
     }
     // 下载页面
