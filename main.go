@@ -13,7 +13,7 @@ import (
 var assets embed.FS
 
 // 全局版本号
-const APP_VERSION string = "4.8.1"
+const APP_VERSION string = "4.8.2"
 const CONFIG_VERSION int = 2
 
 func main() {
