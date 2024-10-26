@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"syscall"
 	"time"
 
 	"github.com/myuser/bilibili"
@@ -162,6 +163,7 @@ func CheckObj(code int) bool {
 
 // 打开文件夹
 func OpenFolder(path string) error {
-	cmd := exec.Command("explorer", path)
+	cmd := exec.Command("cmd", "/c", "start", "", path)
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	return cmd.Start()
 }
