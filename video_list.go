@@ -154,20 +154,15 @@ func (VideoList *VideoList) AddCollection(sessdata, favlistId string, count int,
 
 	// 主循环
 	for i := 0; i < pageCount; i++ {
-		pageSize := 20
-
-		// 处理非完整尾页
-		if i+1 == pageCount && count%20 != 0 {
-			pageSize = count % 20
-		}
-
 		// 获取当前分页信息
 		favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 20, i+1)
 		if err != nil {
 			return err
 		}
+
 		// 遍历分页
-		for j := 0; j < pageSize; j++ {
+		for j := 0; j < len(favlist.Data.Medias); j++ {
+
 			if favlist.Data.Medias[j].Type == 2 {
 				// 添加视频到列表
 				err := VideoList.AddVideo(sessdata, favlist.Data.Medias[j].Bvid, downloadCompilation)
@@ -211,20 +206,13 @@ func (VideoList *VideoList) AddCompilation(sessdata string, mid, sid, count int,
 
 	// 主循环
 	for i := 0; i < pageCount; i++ {
-		pageSize := 20
-
-		// 处理非完整尾页
-		if i+1 == pageCount && count%20 != 0 {
-			pageSize = count % 20
-		}
-
 		// 获取当前分页信息
 		favlist, err := bilibili.GetCompliationObj(mid, sid, 20, i+1)
 		if err != nil {
 			return err
 		}
 		// 遍历分页
-		for j := 0; j < pageSize; j++ {
+		for j := 0; j < len(favlist.Data.Archives); j++ {
 			// 添加视频到列表
 			err := VideoList.AddVideo(sessdata, favlist.Data.Archives[j].Bvid, downloadCompilation)
 			if err != nil {
