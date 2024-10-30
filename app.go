@@ -56,7 +56,7 @@ func (a *App) startup(ctx context.Context) {
 
 		result, err := wails.MessageDialog(a.ctx, wails.MessageDialogOptions{
 			Type:          wails.QuestionDialog,
-			Title:         "找到新版本",
+			Title:         "找到新版本：" + version,
 			Message:       "软件有新版本发布了，是否前往下载？",
 			DefaultButton: "Yes",
 		})
