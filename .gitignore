@@ -6,3 +6,4 @@ config.json
 Download/*
 Cache/*
 package-lock.json
+*.log
