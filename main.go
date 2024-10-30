@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bili-audio-downloader/services"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
@@ -22,7 +23,7 @@ func main() {
 	app := &App{}
 
 	// Init logger
-	customLogger, err := NewCustomLogger()
+	customLogger, err := services.NewCustomLogger()
 	if err != nil {
 		println("Error:", err.Error())
 		return

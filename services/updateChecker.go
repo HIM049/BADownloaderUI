@@ -1,4 +1,4 @@
-package main
+package services
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 
 // 通过 GitHub 检查程序更新
 // string 为 "0" 代表没有更新，有更新时该位为最新版本号
-func CheckUpdate() (string, error) {
+func CheckUpdate(currentVersion string) (string, error) {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", "HIM049/BADownloaderUI")
 	resp, err := http.Get(url)
 	if err != nil {
@@ -32,7 +32,7 @@ func CheckUpdate() (string, error) {
 	latestVersion := gjson.Get(string(bodyString), "tag_name").String()
 
 	// 比较版本号
-	if latestVersion > APP_VERSION {
+	if latestVersion > currentVersion {
 		return latestVersion, nil
 	}
 	return "0", nil

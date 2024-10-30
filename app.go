@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bili-audio-downloader/services"
 	"context"
 	"os"
 
@@ -44,7 +45,7 @@ func (a *App) startup(ctx context.Context) {
 		wails.LogInfo(a.ctx, "Initialize Folder Successful")
 	}
 
-	version, err := CheckUpdate()
+	version, err := services.CheckUpdate(APP_VERSION)
 	if err != nil {
 		wails.LogErrorf(a.ctx, "Check for update Faild: %s", err)
 	} else if version == "0" {
