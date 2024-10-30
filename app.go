@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -13,27 +13,36 @@ type App struct {
 }
 
 // startup is called when the app starts. The context is saved
-// so we can call the runtime methods
+// so we can call the wails methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 
 	// 程序初始化
-	runtime.LogInfo(a.ctx, "正在初始化文件夹")
-
 	cfg := new(Config)
 	if cfg.Get() != nil {
-		runtime.LogError(a.ctx, "初始化文件夹失败")
-
+		wails.LogFatal(a.ctx, "Initialize Config Faild")
+	} else {
+		wails.LogInfo(a.ctx, "Initialize Config Successful")
 	}
 
 	downloadPath := cfg.FileConfig.DownloadPath
 	cachePath := cfg.FileConfig.CachePath
-	_ = os.MkdirAll(downloadPath, 0755)
-	_ = os.MkdirAll(cachePath, 0755)
-	_ = os.MkdirAll(cachePath+"/music", 0755)
-	_ = os.MkdirAll(cachePath+"/cover", 0755)
-	_ = os.MkdirAll(cachePath+"/single/cover", 0755)
-	_ = os.MkdirAll(cachePath+"/single/music", 0755)
+	err2 := os.MkdirAll(downloadPath, 0755)
+	err3 := os.MkdirAll(cachePath, 0755)
+	err4 := os.MkdirAll(cachePath+"/music", 0755)
+	err5 := os.MkdirAll(cachePath+"/cover", 0755)
+	err6 := os.MkdirAll(cachePath+"/single/cover", 0755)
+	err7 := os.MkdirAll(cachePath+"/single/music", 0755)
+	if err2 != nil ||
+		err3 != nil ||
+		err4 != nil ||
+		err5 != nil ||
+		err6 != nil ||
+		err7 != nil {
+		wails.LogFatal(a.ctx, "Initialize Folder Faild")
+	} else {
+		wails.LogInfo(a.ctx, "Initialize Folder Successful")
+	}
 }
 
 // 程序关闭时
