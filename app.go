@@ -45,13 +45,31 @@ func (a *App) startup(ctx context.Context) {
 		wails.LogInfo(a.ctx, "Initialize Folder Successful")
 	}
 
+	// 检查版本更新
 	version, err := services.CheckUpdate(APP_VERSION)
 	if err != nil {
 		wails.LogErrorf(a.ctx, "Check for update Faild: %s", err)
 	} else if version == "0" {
-		wails.LogInfo(a.ctx, "Can not find update")
+		wails.LogInfo(a.ctx, "No software update")
 	} else {
 		wails.LogInfof(a.ctx, "Found new version: %s", version)
+
+		result, err := wails.MessageDialog(a.ctx, wails.MessageDialogOptions{
+			Type:          wails.QuestionDialog,
+			Title:         "找到新版本",
+			Message:       "软件有新版本发布了，是否前往下载？",
+			DefaultButton: "Yes",
+		})
+
+		if err != nil {
+			wails.LogError(a.ctx, "弹出更新提示失败")
+		}
+
+		wails.LogDebugf(a.ctx, "选择结果：%s", result)
+
+		if result == "Yes" {
+			wails.BrowserOpenURL(a.ctx, "https://github.com/HIM049/BADownloaderUI/releases/tag/"+version)
+		}
 
 	}
 }
