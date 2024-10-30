@@ -1,11 +1,11 @@
 package main
 
 import (
+	"bili-audio-downloader/bilibili"
 	"errors"
 	"path/filepath"
 	"strconv"
 
-	"github.com/myuser/bilibili"
 	"github.com/tidwall/gjson"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )

@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bili-audio-downloader/bilibili"
 	"errors"
 	"strconv"
 
-	"github.com/myuser/bilibili"
 	"github.com/tidwall/gjson"
 )
 
