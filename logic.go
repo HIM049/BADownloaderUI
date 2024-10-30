@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bili-audio-downloader/bilibili"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/myuser/bilibili"
 	qrcode "github.com/skip2/go-qrcode"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

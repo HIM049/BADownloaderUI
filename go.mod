@@ -1,17 +1,14 @@
-module BiliAudioDownloader
+module bili-audio-downloader
 
 go 1.21.4
 
 require (
 	github.com/gcottom/audiometa v1.2.5
-	github.com/myuser/bilibili v0.0.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/tidwall/gjson v1.17.1
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/wailsapp/wails/v2 v2.8.2
 )
-
-replace github.com/myuser/bilibili => ./bilibili
 
 require (
 	github.com/Sorrow446/go-mp4tag v0.0.0-20220705231847-a6f24ef004f0 // indirect

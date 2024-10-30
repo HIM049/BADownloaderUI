@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bili-audio-downloader/bilibili"
 	"path"
 	"strconv"
 	"sync"
 	"time"
 
-	"github.com/myuser/bilibili"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
