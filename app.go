@@ -43,6 +43,16 @@ func (a *App) startup(ctx context.Context) {
 	} else {
 		wails.LogInfo(a.ctx, "Initialize Folder Successful")
 	}
+
+	version, err := CheckUpdate()
+	if err != nil {
+		wails.LogErrorf(a.ctx, "Check for update Faild: %s", err)
+	} else if version == "0" {
+		wails.LogInfo(a.ctx, "Can not find update")
+	} else {
+		wails.LogInfof(a.ctx, "Found new version: %s", version)
+
+	}
 }
 
 // 程序关闭时
