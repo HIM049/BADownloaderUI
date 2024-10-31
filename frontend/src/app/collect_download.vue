@@ -28,10 +28,10 @@
 </template>
 
 <script setup>
-import CreatVideolist from '../components/collect_download/creat_videolist.vue'
-import AddVideos from '../components/collect_download/add_videos.vue'
-import VideolistEditor from '../components/collect_download/videolist_editor.vue'
-import DownloadProcess from '../components/collect_download/download_process.vue'
+import CreatVideolist from '../app/collect_download/creat_videolist.vue'
+import AddVideos from '../app/collect_download/add_videos.vue'
+import VideolistEditor from '../app/collect_download/videolist_editor.vue'
+import DownloadProcess from '../app/collect_download/download_process.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
 import { GetListCount, TidyVideoList } from '../../wailsjs/go/main/App'
 import { Dialog, Snackbar } from '@varlet/ui'

@@ -52,7 +52,7 @@
 
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
-import AdditionCard from './modules/addition_card.vue'
+import AdditionCard from '../components/modules/addition_card.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
 import { LoginBilibili, LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf } from '../../wailsjs/go/main/App'
 import { EventsOn, EventsEmit, ClipboardSetText } from '../../wailsjs/runtime'

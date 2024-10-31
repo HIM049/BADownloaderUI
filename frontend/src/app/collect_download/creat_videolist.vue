@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import FramePage from '../modules/frame_page.vue'
+import FramePage from '../../components/modules/frame_page.vue'
 import { reactive, computed, ref, watch } from 'vue'
 import { LoadConfig, CreatVideoList, OpenFileDialog } from '../../../wailsjs/go/main/App'
 import { Snackbar } from '@varlet/ui'

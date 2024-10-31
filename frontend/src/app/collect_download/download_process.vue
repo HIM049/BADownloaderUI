@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import FramePage from '../modules/frame_page.vue'
+import FramePage from '../../components/modules/frame_page.vue'
 import { ref, reactive, computed } from 'vue'
 import { ListDownload, OpenDownloadFolader } from '../../../wailsjs/go/main/App'
 import { EventsOn } from '../../../wailsjs/runtime'

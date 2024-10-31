@@ -28,9 +28,9 @@
 
 <script setup>
 import HeadBar from '../components/modules/head_bar.vue'
-import UserSpace from '../components/user_space.vue'
-import CollectDownload from '../components/collect_download.vue'
-import SettingPage from '../components/setting_page.vue'
+import UserSpace from '../app/user_space.vue'
+import CollectDownload from '../app/collect_download.vue'
+import SettingPage from '../app/setting_page.vue'
 import { ref } from 'vue'
 import { EventsOn } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'

@@ -59,8 +59,8 @@
 </template>
 
 <script setup>
-import FramePage from '../modules/frame_page.vue'
-import AdditionCard from '../modules/addition_card.vue'
+import FramePage from '../../components/modules/frame_page.vue'
+import AdditionCard from '../../components/modules/addition_card.vue'
 import { reactive, computed, watch, ref } from 'vue'
 import { LoadVideoList, SaveVideoList, TidyVideoList, SaveVideoListTo } from '../../../wailsjs/go/main/App'
 import { EventsOn } from '../../../wailsjs/runtime'

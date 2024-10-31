@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import MainPage from './components/main_page.vue'
+import MainPage from './app/main_page.vue'
 import { ref, onBeforeMount } from 'vue'
 import { StyleProvider, Themes } from '@varlet/ui'
 import { GetTheme } from '../wailsjs/go/main/App'

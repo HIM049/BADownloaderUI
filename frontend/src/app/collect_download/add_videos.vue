@@ -87,8 +87,8 @@
 </template>
 
 <script setup>
-import FramePage from '../modules/frame_page.vue'
-import AdditionCard from '../modules/addition_card.vue'
+import FramePage from '../../components/modules/frame_page.vue'
+import AdditionCard from '../../components/modules/addition_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
 // import { ClipboardGetText } from '../../../wailsjs/runtime'
 import { QueryVideo, QueryCollection, QueryCompilation, QueryAudio, QueryProfileVideo, AddVideoToList, AddCollectionToList, AddCompilationToList, AddAudioToList, AddProfileVideoToList } from '../../../wailsjs/go/main/App'
