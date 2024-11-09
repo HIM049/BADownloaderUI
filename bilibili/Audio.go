@@ -122,7 +122,7 @@ func (audio *Audio) GetStream(sessdata string) error {
 	bodyJson := string(body)
 
 	// 错误检查
-	if CheckObj(int(gjson.Get(bodyJson, "code").Int())) {
+	if int(gjson.Get(bodyJson, "code").Int()) == 0 {
 		return errors.New(gjson.Get(bodyJson, "message").String())
 	}
 

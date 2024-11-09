@@ -37,13 +37,3 @@ func decodeJson(jsonFile string, object any) error {
 	}
 	return nil
 }
-
-// 工具函数
-// 检查结构体中的状态码
-func CheckObj(code int) bool {
-	if code == 0 {
-		return false
-	} else {
-		return true
-	}
-}

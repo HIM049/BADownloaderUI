@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bili-audio-downloader/services"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -166,7 +167,7 @@ func (cfg *Config) init() {
 func (cfg *Config) Get() error {
 	for {
 		// 判断设置文件是否已经存在
-		if !IsFileExists("./config.json") {
+		if !services.IsFileExists("./config.json") {
 			// 文件不存在
 			file := new(Config)
 			file.init()
@@ -177,7 +178,7 @@ func (cfg *Config) Get() error {
 		} else {
 			// 文件已存在
 			var file Config
-			err := LoadJsonFile("./config.json", &file)
+			err := services.LoadJsonFile("./config.json", &file)
 			if err != nil {
 				return err
 			}
@@ -213,7 +214,7 @@ func (cfg *Config) Check() {
 
 // 保存设置到文件
 func (cfg *Config) Save() error {
-	err := SaveJsonFile("./config.json", cfg)
+	err := services.SaveJsonFile("./config.json", cfg)
 	if err != nil {
 		return err
 	}

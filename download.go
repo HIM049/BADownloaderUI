@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/bilibili"
+	"bili-audio-downloader/services"
 	"path"
 	"strconv"
 	"sync"
@@ -67,7 +68,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 
 			//判断是否已下载
 			finalFile := path.Join(cfg.FileConfig.DownloadPath, v.Title+audioType)
-			if IsFileExists(finalFile) {
+			if services.IsFileExists(finalFile) {
 				wails.LogInfof(a.ctx, "跳过已存在的视频: %s", finalFile)
 				return
 			}
