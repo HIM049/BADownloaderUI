@@ -126,7 +126,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 				fileName.Format = AudioType.mp3
 
 				// 转码文件
-				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
+				err = services.ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
 				if err != nil {
 					wails.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
 				} else {

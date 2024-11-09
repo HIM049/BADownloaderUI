@@ -145,7 +145,7 @@ func (cfg *Config) init() {
 			RetryCount:      10,
 		},
 		FileConfig: FileConfig{
-			ConvertFormat:    Checkffmpeg(),
+			ConvertFormat:    services.Checkffmpeg(),
 			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}.{{.Format}}",
 			DownloadPath:     "./Download",
 			CachePath:        "./Cache",
