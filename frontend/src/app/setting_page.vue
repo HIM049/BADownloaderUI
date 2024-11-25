@@ -79,8 +79,8 @@
                     <var-tooltip content="双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名" style="width: 100%; margin-bottom: 10px;" trigger="click">
                         <template #content>
                             
-                            <p v-pre>双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名</p>
-                            <p v-pre>列表编号{{.ID}} 视频标题{{.Title}} 单集标题{{.Subtitle}} 音频质量{{.Quality}} 格式后缀名{{.Format}}</p>
+                            <p v-pre>双大括号中的为文件名通配符，可以通过自行组合自定义文件名风格</p>
+                            <p v-pre>列表编号{{.ID}} 视频标题{{.Title}} 单集标题{{.Subtitle}} 音频质量{{.Quality}} 格式后缀名{{.Format}} 歌曲名{{.SongName}} 歌曲作者{{.Author}}</p>
                         </template>
                         <var-input style="margin: 10px;" variant="outlined" placeholder="文件命名方式" size="small" v-model="config.file_config.file_name_template"
                             :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />

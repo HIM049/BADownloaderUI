@@ -146,7 +146,7 @@ func (cfg *Config) init() {
 		},
 		FileConfig: FileConfig{
 			ConvertFormat:    services.Checkffmpeg(),
-			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}.{{.Format}}",
+			FileNameTemplate: "{{.ID}}_{{.SongName}}-{{.Author}} {{.Title}}({{.Subtitle}})_{{.Quality}}.{{.Format}}",
 			DownloadPath:     "./Download",
 			CachePath:        "./Cache",
 			VideoListPath:    "./Cache/video_list.json",

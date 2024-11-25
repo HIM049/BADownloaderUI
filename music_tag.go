@@ -59,10 +59,12 @@ type FileName struct {
 	Quality  string
 	ID       int
 	Format   string
+	SongName string
+	Author   string
 }
 
 // 输出文件
-func OutputFile(cfg *Config, v *VideoInformation, fileName FileName) error {
+func OutputFile(cfg *Config, v *VideoInformation, fileName *FileName) error {
 	// 处理模板和生成文件名
 	tmpl, err := template.New("filename").Parse(cfg.FileConfig.FileNameTemplate)
 	if err != nil {

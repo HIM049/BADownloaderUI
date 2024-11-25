@@ -65,6 +65,8 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			fileName.Subtitle = v.PageTitle
 			fileName.ID = num
 			fileName.Quality = "hires"
+			fileName.SongName = v.Meta.SongName
+			fileName.SongName = v.Meta.Author
 
 			//判断是否已下载
 			finalFile := path.Join(cfg.FileConfig.DownloadPath, v.Title+audioType)
@@ -149,7 +151,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			}
 
 			// 输出文件
-			err = OutputFile(cfg, &v, *fileName)
+			err = OutputFile(cfg, &v, fileName)
 			if err != nil {
 				wails.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			} else {
