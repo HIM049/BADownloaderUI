@@ -80,13 +80,13 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		var SongName string
 		if total <= 1 {
 			// 单集使用视频标题
-			SongName, err = ExtractTitle(list.Title)
+			SongName, err = services.ExtractTitle(list.Title)
 			if err != nil {
 				SongName = list.Title
 			}
 		} else {
 			// 多集视频使用分集标题
-			SongName, err = ExtractTitle(list.PageTitle)
+			SongName, err = services.ExtractTitle(list.PageTitle)
 			if err != nil {
 				SongName = list.PageTitle
 			}
