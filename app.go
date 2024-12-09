@@ -4,6 +4,7 @@ import (
 	"bili-audio-downloader/services"
 	"context"
 	"os"
+	"path/filepath"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -21,29 +22,36 @@ func (a *App) startup(ctx context.Context) {
 	// 程序初始化
 	cfg := new(Config)
 	if cfg.Get() != nil {
-		wails.LogFatal(a.ctx, "Initialize Config Faild")
+		wails.LogFatal(a.ctx, "Initialize Config Failed")
 	} else {
 		wails.LogInfo(a.ctx, "Initialize Config Successful")
 	}
 
+	// 创建文件夹
 	downloadPath := cfg.FileConfig.DownloadPath
 	cachePath := cfg.FileConfig.CachePath
-	err2 := os.MkdirAll(downloadPath, 0755)
-	err3 := os.MkdirAll(cachePath, 0755)
-	err4 := os.MkdirAll(cachePath+"/music", 0755)
-	err5 := os.MkdirAll(cachePath+"/cover", 0755)
-	err6 := os.MkdirAll(cachePath+"/single/cover", 0755)
-	err7 := os.MkdirAll(cachePath+"/single/music", 0755)
-	if err2 != nil ||
-		err3 != nil ||
-		err4 != nil ||
-		err5 != nil ||
-		err6 != nil ||
-		err7 != nil {
-		wails.LogFatal(a.ctx, "Initialize Folder Faild")
-	} else {
-		wails.LogInfo(a.ctx, "Initialize Folder Successful")
+	var paths []string
+	paths = append(paths, downloadPath)
+	paths = append(paths, cachePath)
+	paths = append(paths, filepath.Join(cachePath, "/music"))
+	paths = append(paths, filepath.Join(cachePath, "/cover"))
+	paths = append(paths, filepath.Join(cachePath, "/single/cover"))
+	paths = append(paths, filepath.Join(cachePath, "/single/music"))
+
+	for _, path := range paths {
+		pathString, err := filepath.Abs(path)
+		if err != nil {
+			wails.LogFatal(a.ctx, "Initialize Folder Failed")
+			return
+		}
+
+		err = os.MkdirAll(pathString, 0755)
+		if err != nil {
+			wails.LogFatal(a.ctx, "Initialize Folder Failed")
+			return
+		}
 	}
+	wails.LogInfo(a.ctx, "Initialize Folder Successful")
 
 	// 检查版本更新
 	version, err := services.CheckUpdate(APP_VERSION)
