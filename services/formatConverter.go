@@ -1,4 +1,4 @@
-package main
+package services
 
 import (
 	"os/exec"
@@ -7,10 +7,6 @@ import (
 
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
-
-func (a *App) Checkffmpeg() bool {
-	return Checkffmpeg()
-}
 
 // 检查系统中是否安装 ffmpeg
 // （临时方案）

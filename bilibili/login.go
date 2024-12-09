@@ -31,7 +31,7 @@ func GetLoginKey() (string, string, error) {
 		return "", "", err
 	}
 	// 错误检查
-	if CheckObj(obj.Code) {
+	if obj.Code == 0 {
 		return "", "", errors.New(obj.Message)
 	}
 	return obj.Data.Url, obj.Data.Qrcode_key, nil
@@ -112,7 +112,7 @@ func CheckLoginStatus(qrcode_key string) (*checkLoginReturn, *[]*http.Cookie, er
 		return nil, nil, err
 	}
 	// 错误检查
-	if CheckObj(obj.Code) {
+	if obj.Code == 0 {
 		return nil, nil, errors.New(obj.Message)
 	}
 
@@ -158,7 +158,7 @@ func (accountInf *AccountInformation) GetUserInf(sessdata string) error {
 	bodyJson := string(body)
 
 	// 错误检查
-	if CheckObj(int(gjson.Get(bodyJson, "code").Int())) {
+	if int(gjson.Get(bodyJson, "code").Int()) == 0 {
 		return errors.New(gjson.Get(bodyJson, "message").String())
 	}
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/bilibili"
+	"bili-audio-downloader/services"
 	"errors"
 	"strconv"
 
@@ -79,13 +80,13 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		var SongName string
 		if total <= 1 {
 			// 单集使用视频标题
-			SongName, err = ExtractTitle(list.Title)
+			SongName, err = services.ExtractTitle(list.Title)
 			if err != nil {
 				SongName = list.Title
 			}
 		} else {
 			// 多集视频使用分集标题
-			SongName, err = ExtractTitle(list.PageTitle)
+			SongName, err = services.ExtractTitle(list.PageTitle)
 			if err != nil {
 				SongName = list.PageTitle
 			}
@@ -287,7 +288,7 @@ func (VideoList *VideoList) Get(path ...string) error {
 		filePath = path[0]
 	}
 
-	err = LoadJsonFile(filePath, VideoList)
+	err = services.LoadJsonFile(filePath, VideoList)
 	if err != nil {
 		return err
 	}
@@ -308,7 +309,7 @@ func (VideoList *VideoList) Save(path ...string) error {
 		filePath = path[0]
 	}
 
-	err = SaveJsonFile(filePath, VideoList)
+	err = services.SaveJsonFile(filePath, VideoList)
 	if err != nil {
 		return err
 	}
@@ -324,7 +325,7 @@ func (v *VideoInformation) GetStream(sessdata string) error {
 		return err
 	}
 	// 错误检查
-	if CheckObj(int(gjson.Get(json, "code").Int())) {
+	if int(gjson.Get(json, "code").Int()) == 0 {
 		return errors.New(gjson.Get(json, "message").String())
 	}
 

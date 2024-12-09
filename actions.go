@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/bilibili"
+	"bili-audio-downloader/services"
 	"errors"
 	"path/filepath"
 	"strconv"
@@ -24,6 +25,11 @@ func (a *App) GetTheme() (string, error) {
 	}
 
 	return cfg.Theme, nil
+}
+
+// 检查 ffmpeg
+func (a *App) Checkffmpeg() bool {
+	return services.Checkffmpeg()
 }
 
 // 获取列表中视频数量

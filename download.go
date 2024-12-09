@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/bilibili"
+	"bili-audio-downloader/services"
 	"path"
 	"strconv"
 	"sync"
@@ -64,10 +65,12 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			fileName.Subtitle = v.PageTitle
 			fileName.ID = num
 			fileName.Quality = "hires"
+			fileName.SongName = v.Meta.SongName
+			fileName.SongName = v.Meta.Author
 
 			//判断是否已下载
 			finalFile := path.Join(cfg.FileConfig.DownloadPath, v.Title+audioType)
-			if IsFileExists(finalFile) {
+			if services.IsFileExists(finalFile) {
 				wails.LogInfof(a.ctx, "跳过已存在的视频: %s", finalFile)
 				return
 			}
@@ -125,7 +128,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 				fileName.Format = AudioType.mp3
 
 				// 转码文件
-				err = ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
+				err = services.ConventFile(musicPathAndName+AudioType.m4a, musicPathAndName+AudioType.mp3)
 				if err != nil {
 					wails.LogErrorf(a.ctx, "转码文件时发生错误：%s", err)
 				} else {
@@ -148,7 +151,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			}
 
 			// 输出文件
-			err = OutputFile(cfg, &v, *fileName)
+			err = OutputFile(cfg, &v, fileName)
 			if err != nil {
 				wails.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			} else {

@@ -87,7 +87,7 @@ func GetFavListObj(id, sessdata string, ps, pn int) (*FavList, error) {
 		return nil, err
 	}
 	// 错误检查
-	if CheckObj(obj.Code) {
+	if obj.Code == 0 {
 		return nil, errors.New(obj.Message)
 	}
 	return &obj, nil
@@ -116,7 +116,7 @@ func (collects *Collects) GetFavCollect(sessdata string, ps, pn int) error {
 	}
 
 	// 错误检查
-	if CheckObj(int(gjson.Get(json, "code").Int())) {
+	if int(gjson.Get(json, "code").Int()) == 0 {
 		return errors.New(gjson.Get(json, "message").String())
 	}
 
@@ -191,7 +191,7 @@ func (collects *Collects) GetUsersCollect(sessdata string) error {
 	}
 
 	// 错误检查
-	if CheckObj(int(gjson.Get(json, "code").Int())) {
+	if int(gjson.Get(json, "code").Int()) == 0 {
 		return errors.New(gjson.Get(json, "message").String())
 	}
 
