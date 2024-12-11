@@ -15,8 +15,8 @@ import (
 var assets embed.FS
 
 // 全局版本号
-const APP_VERSION string = "4.9.0"
-const CONFIG_VERSION int = 2
+const APP_VERSION string = "4.10.0-Debug"
+const CONFIG_VERSION int = 3
 
 func main() {
 	// Create an instance of the app structure
@@ -27,6 +27,18 @@ func main() {
 	if err != nil {
 		println("Error:", err.Error())
 		return
+	}
+
+	// 设定 DEBUG
+	cfg := new(Config)
+	err = cfg.Get()
+	if err != nil {
+		return
+	}
+
+	debugStatus := logger.INFO
+	if cfg.Debug {
+		debugStatus = logger.DEBUG
 	}
 
 	// Create application with options
@@ -45,7 +57,7 @@ func main() {
 		BackgroundColour:   &options.RGBA{R: 255, G: 255, B: 255, A: 1},
 		OnStartup:          app.startup,
 		OnShutdown:         app.shutdown,
-		LogLevelProduction: logger.INFO,
+		LogLevelProduction: debugStatus,
 		Logger:             customLogger,
 		Bind: []interface{}{
 			app,

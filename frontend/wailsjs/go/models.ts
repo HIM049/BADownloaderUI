@@ -197,6 +197,7 @@ export namespace main {
 	    config_version: number;
 	    delete_cache: boolean;
 	    theme: string;
+	    debug: boolean;
 	    download_config: DownloadConfig;
 	    file_config: FileConfig;
 	
@@ -209,6 +210,7 @@ export namespace main {
 	        this.config_version = source["config_version"];
 	        this.delete_cache = source["delete_cache"];
 	        this.theme = source["theme"];
+	        this.debug = source["debug"];
 	        this.download_config = this.convertValues(source["download_config"], DownloadConfig);
 	        this.file_config = this.convertValues(source["file_config"], FileConfig);
 	    }

@@ -12,6 +12,7 @@ type Config struct {
 	ConfigVersion  int            `json:"config_version"`
 	DeleteCache    bool           `json:"delete_cache"`
 	Theme          string         `json:"theme"`
+	Debug          bool           `json:"debug"`
 	DownloadConfig DownloadConfig `json:"download_config"`
 	FileConfig     FileConfig     `json:"file_config"`
 	Account        Account
@@ -140,6 +141,7 @@ func (cfg *Config) init() {
 		ConfigVersion: CONFIG_VERSION,
 		DeleteCache:   true,
 		Theme:         "lightPink",
+		Debug:         false,
 		DownloadConfig: DownloadConfig{
 			DownloadThreads: 5,
 			RetryCount:      10,

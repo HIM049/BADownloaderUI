@@ -21,6 +21,12 @@
                                 <var-switch v-model="config.delete_cache" variant @change="changeCfg" />
                             </template>
                         </var-cell>
+
+                        <var-cell> DEBUG 日志
+                          <template #extra>
+                            <var-switch v-model="config.debug" variant @change="changeCfg" />
+                          </template>
+                        </var-cell>
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
