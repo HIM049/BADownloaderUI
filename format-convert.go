@@ -1,11 +1,9 @@
 package main
 
 import (
+	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"os/exec"
 	"runtime"
-	"syscall"
-
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
 func (a *App) Checkffmpeg() bool {
@@ -28,9 +26,7 @@ func Checkffmpeg() bool {
 // windows
 func checkffmpegOnWindows() bool {
 	cmd := exec.Command("where", "ffmpeg")
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		HideWindow: true,
-	}
+	setHideWindow(cmd)
 	_, err := cmd.Output()
 	return err == nil
 }
@@ -46,7 +42,7 @@ func checkffmpegOnMacOS() bool {
 func ConventFile(inputFile, outputFile string) error {
 	stream := ffmpeg.Input(inputFile).Output(outputFile, ffmpeg.KwArgs{"qscale": "0"})
 	cmd := stream.Compile()
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	setHideWindow(cmd)
 	err := cmd.Run()
 
 	if err != nil {

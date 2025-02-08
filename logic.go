@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
-	"syscall"
 	"time"
 
 	qrcode "github.com/skip2/go-qrcode"
@@ -18,7 +17,10 @@ import (
 // 登录 bilibili
 func (a *App) LoginBilibili() error {
 	cfg := new(Config)
-	cfg.Get()
+	err := cfg.Get()
+	if err != nil {
+		return err
+	}
 
 	// 获取二维码和请求密钥
 	url, key, err := bilibili.GetLoginKey()
@@ -131,7 +133,7 @@ func IsFileExists(path string) bool {
 
 // 剔除文件名中的奇怪字符
 func CheckFileName(SFileN string) string {
-	re := regexp.MustCompile(`[/\$<>?:*|]`)
+	re := regexp.MustCompile(`[/$<>?:*|]`)
 	newName := re.ReplaceAllString(SFileN, "")
 	return newName
 }
@@ -164,6 +166,6 @@ func CheckObj(code int) bool {
 // 打开文件夹
 func OpenFolder(path string) error {
 	cmd := exec.Command("cmd", "/c", "start", "", path)
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	setHideWindow(cmd)
 	return cmd.Start()
 }
