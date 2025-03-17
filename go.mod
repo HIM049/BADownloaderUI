@@ -1,9 +1,11 @@
 module bili-audio-downloader
 
-go 1.21.4
+go 1.23.0
+
+toolchain go1.23.6
 
 require (
-	github.com/gcottom/audiometa v1.2.5
+	github.com/gcottom/audiometa v1.3.1
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/tidwall/gjson v1.17.1
 	github.com/u2takey/ffmpeg-go v0.5.0
@@ -12,10 +14,12 @@ require (
 
 require (
 	github.com/Sorrow446/go-mp4tag v0.0.0-20220705231847-a6f24ef004f0 // indirect
-	github.com/abema/go-mp4 v0.7.2 // indirect
+	github.com/abema/go-mp4 v1.4.1 // indirect
+	github.com/aler9/writerseeker v1.1.0 // indirect
 	github.com/aws/aws-sdk-go v1.38.20 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/bogem/id3v2 v1.2.0 // indirect
+	github.com/bogem/id3v2/v2 v2.1.4 // indirect
 	github.com/go-flac/flacpicture v0.3.0 // indirect
 	github.com/go-flac/flacvorbis v0.2.0 // indirect
 	github.com/go-flac/go-flac v1.0.0 // indirect
@@ -49,5 +53,5 @@ require (
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 )
