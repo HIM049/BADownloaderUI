@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/bilibili"
+	"bili-audio-downloader/config"
 	"path"
 	"strconv"
 	"sync"
@@ -18,21 +19,16 @@ var AudioType = struct {
 
 func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 	// 初始化参数
-	cfg := new(Config)
-	err := cfg.Get()
-	if err != nil {
-		return err
-	}
 	sessdata := ""
-	if cfg.Account.UseAccount && cfg.Account.IsLogin {
-		sessdata = cfg.Account.SESSDATA
+	if config.Cfg.Account.UseAccount && config.Cfg.Account.IsLogin {
+		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	sem := make(chan struct{}, cfg.DownloadConfig.DownloadThreads+1)
+	sem := make(chan struct{}, config.Cfg.DownloadConfig.DownloadThreads+1)
 	var wg sync.WaitGroup
 
 	videoList := new(VideoList)
-	err = videoList.Get(listPath)
+	err := videoList.Get(listPath)
 	if err != nil {
 		wails.LogErrorf(a.ctx, "读取视频列表时发生错误：%s", err)
 		return err
@@ -40,7 +36,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 
 	// 格式判断
 	audioType := AudioType.m4a
-	if cfg.FileConfig.ConvertFormat {
+	if config.Cfg.FileConfig.ConvertFormat {
 		audioType = AudioType.mp3
 	}
 
@@ -66,16 +62,16 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			fileName.Quality = "hires"
 
 			//判断是否已下载
-			finalFile := path.Join(cfg.FileConfig.DownloadPath, v.Title+audioType)
+			finalFile := path.Join(config.Cfg.FileConfig.DownloadPath, v.Title+audioType)
 			if IsFileExists(finalFile) {
 				wails.LogInfof(a.ctx, "跳过已存在的视频: %s", finalFile)
 				return
 			}
 
-			musicPathAndName := cfg.FileConfig.CachePath + "/music/" + strconv.Itoa(v.Cid)
+			musicPathAndName := config.Cfg.FileConfig.CachePath + "/music/" + strconv.Itoa(v.Cid)
 
 			// 下载视频
-			for i := 0; i < cfg.DownloadConfig.RetryCount; i++ {
+			for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 
 				// 音频下载逻辑
 				if v.IsAudio {
@@ -119,7 +115,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			}
 
 			// 判断文件类型并转码
-			if v.Format == AudioType.m4a && cfg.FileConfig.ConvertFormat {
+			if v.Format == AudioType.m4a && config.Cfg.FileConfig.ConvertFormat {
 				wails.LogInfof(a.ctx, "(队列%d) 转码为 MP3", num)
 				v.Format = AudioType.mp3
 				fileName.Format = AudioType.mp3
@@ -139,7 +135,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			// 写入元数据
 			if v.Format != AudioType.flac {
 				fileName.Quality = "normal"
-				err = ChangeTag(cfg, &opt, &v)
+				err = ChangeTag(&config.Cfg, &opt, &v)
 				if err != nil {
 					wails.LogErrorf(a.ctx, "(队列%d) 写入元数据时发生错误：%s", num, err)
 				} else {
@@ -148,7 +144,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			}
 
 			// 输出文件
-			err = OutputFile(cfg, &v, *fileName)
+			err = OutputFile(&config.Cfg, &v, *fileName)
 			if err != nil {
 				wails.LogErrorf(a.ctx, "输出文件时发生错误：%s", err)
 			} else {
@@ -159,7 +155,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 
 		go func(v VideoInformation, num int) {
 			// 下载封面图片
-			err = bilibili.SaveFromURL(v.Meta.Cover, cfg.FileConfig.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
+			err = bilibili.SaveFromURL(v.Meta.Cover, config.Cfg.FileConfig.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
 				wails.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 			} else {

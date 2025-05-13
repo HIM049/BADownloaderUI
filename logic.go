@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/bilibili"
+	"bili-audio-downloader/config"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -16,12 +17,6 @@ import (
 
 // 登录 bilibili
 func (a *App) LoginBilibili() error {
-	cfg := new(Config)
-	err := cfg.Get()
-	if err != nil {
-		return err
-	}
-
 	// 获取二维码和请求密钥
 	url, key, err := bilibili.GetLoginKey()
 	if err != nil {
@@ -29,7 +24,7 @@ func (a *App) LoginBilibili() error {
 	}
 
 	// 生成二维码
-	qrcodePath := cfg.FileConfig.CachePath + "/qr.png"
+	qrcodePath := config.Cfg.FileConfig.CachePath + "/qr.png"
 	err = qrcode.WriteFile(url, qrcode.Medium, 256, qrcodePath)
 	if err != nil {
 		return err
@@ -76,15 +71,15 @@ func (a *App) LoginBilibili() error {
 		return err
 	}
 
-	cfg.Account.SESSDATA = (*cookies)[0].Value
-	cfg.Account.Bili_jct = (*cookies)[1].Value
-	cfg.Account.DedeUserID = (*cookies)[2].Value
-	cfg.Account.DedeUserID__ckMd5 = (*cookies)[3].Value
-	cfg.Account.Sid = (*cookies)[4].Value
-	cfg.Account.IsLogin = true
-	cfg.Account.UseAccount = true
+	config.Cfg.Account.SESSDATA = (*cookies)[0].Value
+	config.Cfg.Account.Bili_jct = (*cookies)[1].Value
+	config.Cfg.Account.DedeUserID = (*cookies)[2].Value
+	config.Cfg.Account.DedeUserID__ckMd5 = (*cookies)[3].Value
+	config.Cfg.Account.Sid = (*cookies)[4].Value
+	config.Cfg.Account.IsLogin = true
+	config.Cfg.Account.UseAccount = true
 
-	err = cfg.Save()
+	err = config.Cfg.UpdateAndSave()
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/bilibili"
+	"bili-audio-downloader/config"
 	"errors"
 	"strconv"
 
@@ -275,19 +276,13 @@ func (VideoList *VideoList) AddProfileVideo(sessdata string, mid, count int, dow
 
 // 读取视频列表
 func (VideoList *VideoList) Get(path ...string) error {
-	cfg := new(Config)
-	err := cfg.Get()
-	if err != nil {
-		return err
-	}
-
 	// 指定路径
-	filePath := cfg.FileConfig.VideoListPath
+	filePath := config.Cfg.FileConfig.VideoListPath
 	if len(path) > 0 {
 		filePath = path[0]
 	}
 
-	err = LoadJsonFile(filePath, VideoList)
+	err := LoadJsonFile(filePath, VideoList)
 	if err != nil {
 		return err
 	}
@@ -296,19 +291,13 @@ func (VideoList *VideoList) Get(path ...string) error {
 
 // 保存视频列表
 func (VideoList *VideoList) Save(path ...string) error {
-	cfg := new(Config)
-	err := cfg.Get()
-	if err != nil {
-		return err
-	}
-
 	// 指定路径
-	filePath := cfg.FileConfig.VideoListPath
+	filePath := config.Cfg.FileConfig.VideoListPath
 	if len(path) > 0 {
 		filePath = path[0]
 	}
 
-	err = SaveJsonFile(filePath, VideoList)
+	err := SaveJsonFile(filePath, VideoList)
 	if err != nil {
 		return err
 	}

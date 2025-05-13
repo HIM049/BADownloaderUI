@@ -101,7 +101,7 @@
 
             <var-space direction="column" size="large">
                 <var-space justify="flex-end">
-                    <var-button type="danger" @click="refreshConfig">重置设置</var-button>
+                    <var-button type="danger" @click="resetConfig">重置设置</var-button>
                     <var-button type="success" @click="changeCfg">保存更改</var-button>
                 </var-space>
             </var-space>
@@ -112,7 +112,7 @@
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
 import { reactive, ref, onMounted } from 'vue'
-import { LoadConfig, SaveConfig, RefreshConfig, Checkffmpeg } from '../../wailsjs/go/main/App'
+import { LoadConfig, SaveConfig, ResetConfig, Checkffmpeg } from '../../wailsjs/go/main/App'
 import { Dialog, Snackbar } from '@varlet/ui'
 
 const changeCfg = ref(null) // 修改设置时的响应
@@ -153,8 +153,8 @@ function saveConfig() {
 }
 
 // 重置配置文件
-function refreshConfig() {
-    RefreshConfig().then(result => {
+function resetConfig() {
+    ResetConfig().then(result => {
         loadConfig();
     })
     Snackbar.success("已重置配置文件");
