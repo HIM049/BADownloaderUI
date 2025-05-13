@@ -7,6 +7,7 @@ toolchain go1.23.6
 require (
 	github.com/gcottom/audiometa v1.3.1
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	github.com/spf13/viper v1.20.1
 	github.com/tidwall/gjson v1.18.0
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/wailsapp/wails/v2 v2.10.1
@@ -46,7 +47,6 @@ require (
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
-	github.com/spf13/viper v1.20.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/sunfish-shogi/bufseekio v0.1.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

@@ -102,8 +102,8 @@ export function QueryVideo(arg1) {
   return window['go']['main']['App']['QueryVideo'](arg1);
 }
 
-export function RefreshConfig() {
-  return window['go']['main']['App']['RefreshConfig']();
+export function ResetConfig() {
+  return window['go']['main']['App']['ResetConfig']();
 }
 
 export function SaveConfig(arg1) {

@@ -256,7 +256,7 @@ export namespace bilibili {
 
 }
 
-export namespace main {
+export namespace config {
 	
 	export class Account {
 	    is_login: boolean;
@@ -280,20 +280,6 @@ export namespace main {
 	        this.dede_user_id = source["dede_user_id"];
 	        this.dede_user_id__ck_md5 = source["dede_user_id__ck_md5"];
 	        this.sid = source["sid"];
-	    }
-	}
-	export class AudioInformation {
-	    quality: number;
-	    stream: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new AudioInformation(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.quality = source["quality"];
-	        this.stream = source["stream"];
 	    }
 	}
 	export class FileConfig {
@@ -371,6 +357,25 @@ export namespace main {
 		}
 	}
 	
+
+}
+
+export namespace main {
+	
+	export class AudioInformation {
+	    quality: number;
+	    stream: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AudioInformation(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.quality = source["quality"];
+	        this.stream = source["stream"];
+	    }
+	}
 	export class DownloadOption {
 	    song_name: boolean;
 	    song_cover: boolean;
@@ -387,7 +392,6 @@ export namespace main {
 	        this.song_author = source["song_author"];
 	    }
 	}
-	
 	export class MetaInformation {
 	    song_name: string;
 	    cover: string;
