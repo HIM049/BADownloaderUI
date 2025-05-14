@@ -62,13 +62,13 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 			fileName.Quality = "hires"
 
 			//判断是否已下载
-			finalFile := path.Join(config.Cfg.FileConfig.DownloadPath, v.Title+audioType)
+			finalFile := path.Join(config.Cfg.GetDownloadPath(), v.Title+audioType)
 			if IsFileExists(finalFile) {
 				wails.LogInfof(a.ctx, "跳过已存在的视频: %s", finalFile)
 				return
 			}
 
-			musicPathAndName := config.Cfg.FileConfig.CachePath + "/music/" + strconv.Itoa(v.Cid)
+			musicPathAndName := config.Cfg.GetCachePath() + "/music/" + strconv.Itoa(v.Cid)
 
 			// 下载视频
 			for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
@@ -155,7 +155,7 @@ func (a *App) ListDownload(listPath string, opt DownloadOption) error {
 
 		go func(v VideoInformation, num int) {
 			// 下载封面图片
-			err = bilibili.SaveFromURL(v.Meta.Cover, config.Cfg.FileConfig.CachePath+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
+			err = bilibili.SaveFromURL(v.Meta.Cover, config.Cfg.GetCachePath()+"/cover/"+strconv.Itoa(v.Cid)+".jpg")
 			if err != nil {
 				wails.LogErrorf(a.ctx, "保存封面时发生错误：%s", err)
 			} else {

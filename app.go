@@ -22,8 +22,8 @@ func (a *App) startup(ctx context.Context) {
 	// 程序初始化
 	config.InitConfig()
 
-	downloadPath := config.Cfg.FileConfig.DownloadPath
-	cachePath := config.Cfg.FileConfig.CachePath
+	downloadPath := config.Cfg.GetDownloadPath()
+	cachePath := config.Cfg.GetCachePath()
 	err2 := os.MkdirAll(downloadPath, 0755)
 	err3 := os.MkdirAll(cachePath, 0755)
 	err4 := os.MkdirAll(cachePath+"/music", 0755)
@@ -74,7 +74,7 @@ func (a *App) startup(ctx context.Context) {
 func (a *App) shutdown(ctx context.Context) {
 	// 清理缓存
 	if config.Cfg.DeleteCache {
-		os.RemoveAll(config.Cfg.FileConfig.CachePath)
+		os.RemoveAll(config.Cfg.GetCachePath())
 	}
 }
 

@@ -277,7 +277,7 @@ func (VideoList *VideoList) AddProfileVideo(sessdata string, mid, count int, dow
 // 读取视频列表
 func (VideoList *VideoList) Get(path ...string) error {
 	// 指定路径
-	filePath := config.Cfg.FileConfig.VideoListPath
+	filePath := config.Cfg.GetVideolistPath()
 	if len(path) > 0 {
 		filePath = path[0]
 	}
@@ -292,7 +292,7 @@ func (VideoList *VideoList) Get(path ...string) error {
 // 保存视频列表
 func (VideoList *VideoList) Save(path ...string) error {
 	// 指定路径
-	filePath := config.Cfg.FileConfig.VideoListPath
+	filePath := config.Cfg.GetVideolistPath()
 	if len(path) > 0 {
 		filePath = path[0]
 	}

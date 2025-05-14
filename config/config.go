@@ -4,6 +4,7 @@ import (
 	"bili-audio-downloader/constants"
 	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
@@ -163,4 +164,28 @@ func DefaultConfig() *Config {
 		},
 	}
 	return &cfg
+}
+
+func (cfg *Config) GetDownloadPath() string {
+	path, err := filepath.Abs(cfg.FileConfig.DownloadPath)
+	if err != nil {
+		log.Fatalln("Failed to get abs path: ", err)
+	}
+	return path
+}
+
+func (cfg *Config) GetCachePath() string {
+	path, err := filepath.Abs(cfg.FileConfig.CachePath)
+	if err != nil {
+		log.Fatalln("Failed to get abs path: ", err)
+	}
+	return path
+}
+
+func (cfg *Config) GetVideolistPath() string {
+	path, err := filepath.Abs(cfg.FileConfig.VideoListPath)
+	if err != nil {
+		log.Fatalln("Failed to get abs path: ", err)
+	}
+	return path
 }

@@ -4,7 +4,6 @@ import (
 	"bili-audio-downloader/bilibili"
 	"bili-audio-downloader/config"
 	"errors"
-	"path/filepath"
 	"strconv"
 
 	"github.com/spf13/viper"
@@ -444,13 +443,8 @@ func (a *App) RefreshConfig() error {
 
 // 打开下载文件夹
 func (a *App) OpenDownloadFolader() error {
-	absPath, err := filepath.Abs(config.Cfg.FileConfig.DownloadPath)
-	if err != nil {
-		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
-		return err
-	}
 
-	err = OpenFolder(absPath)
+	err := OpenFolder(config.Cfg.GetDownloadPath())
 	if err != nil {
 		return err
 	}

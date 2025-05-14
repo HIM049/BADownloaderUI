@@ -24,7 +24,7 @@ func (a *App) LoginBilibili() error {
 	}
 
 	// 生成二维码
-	qrcodePath := config.Cfg.FileConfig.CachePath + "/qr.png"
+	qrcodePath := config.Cfg.GetCachePath() + "/qr.png"
 	err = qrcode.WriteFile(url, qrcode.Medium, 256, qrcodePath)
 	if err != nil {
 		return err
