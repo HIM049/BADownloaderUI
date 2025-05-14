@@ -87,11 +87,15 @@
                     </var-tooltip>
                     
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="音频保存路径" size="small" v-model="config.file_config.download_path"
-                        :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
+                    <div style="display: flex; align-items: center;">
+                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="音频保存路径" size="small" readonly v-model="config.file_config.download_path" />
+                        <var-button type="primary" @click="setDownloadPathDialog">更改</var-button>
+                    </div>
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="下载缓存路径" size="small" v-model="config.file_config.cache_path"
-                        :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
+                    <div style="display: flex; align-items: center;">    
+                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="下载缓存路径" size="small" readonly  v-model="config.file_config.cache_path" />
+                        <var-button type="primary" @click="" disabled>更改</var-button>
+                    </div>
 
                     <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
@@ -101,7 +105,7 @@
 
             <var-space direction="column" size="large">
                 <var-space justify="flex-end">
-                    <var-button type="danger" @click="refreshConfig">重置设置</var-button>
+                    <var-button type="danger" @click="resetConfig">重置设置</var-button>
                     <var-button type="success" @click="changeCfg">保存更改</var-button>
                 </var-space>
             </var-space>
@@ -112,7 +116,7 @@
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
 import { reactive, ref, onMounted } from 'vue'
-import { LoadConfig, SaveConfig, RefreshConfig, Checkffmpeg } from '../../wailsjs/go/main/App'
+import { LoadConfig, SaveConfig, ResetConfig, Checkffmpeg, RefreshConfig, SetDownloadPathDialog } from '../../wailsjs/go/main/App'
 import { Dialog, Snackbar } from '@varlet/ui'
 
 const changeCfg = ref(null) // 修改设置时的响应
@@ -126,8 +130,8 @@ const CardStatus = reactive({
 })
 
 onMounted(() => {
-    loadConfig();
     setTimeout(() => {
+        loadConfig();
         changeCfg.value = saveConfig
     }, 100)
 })
@@ -135,8 +139,15 @@ onMounted(() => {
 // 设置内容
 const config = ref([])
 
+function setDownloadPathDialog() {
+    SetDownloadPathDialog().then(() => {    
+        loadConfig();
+    })
+}
+
 // 读取配置文件
 function loadConfig() {
+    RefreshConfig();
     LoadConfig().then(result => {
         config.value = result;
         overload.value = true;
@@ -153,8 +164,8 @@ function saveConfig() {
 }
 
 // 重置配置文件
-function refreshConfig() {
-    RefreshConfig().then(result => {
+function resetConfig() {
+    ResetConfig().then(result => {
         loadConfig();
     })
     Snackbar.success("已重置配置文件");

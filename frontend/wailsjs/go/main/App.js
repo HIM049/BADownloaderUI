@@ -106,6 +106,10 @@ export function RefreshConfig() {
   return window['go']['main']['App']['RefreshConfig']();
 }
 
+export function ResetConfig() {
+  return window['go']['main']['App']['ResetConfig']();
+}
+
 export function SaveConfig(arg1) {
   return window['go']['main']['App']['SaveConfig'](arg1);
 }
@@ -116,6 +120,10 @@ export function SaveVideoList(arg1, arg2) {
 
 export function SaveVideoListTo(arg1) {
   return window['go']['main']['App']['SaveVideoListTo'](arg1);
+}
+
+export function SetDownloadPathDialog() {
+  return window['go']['main']['App']['SetDownloadPathDialog']();
 }
 
 export function TidyVideoList(arg1) {

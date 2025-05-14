@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bili-audio-downloader/config"
 	"bili-audio-downloader/services"
 	"context"
 	"os"
@@ -19,15 +20,10 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 
 	// 程序初始化
-	cfg := new(Config)
-	if cfg.Get() != nil {
-		wails.LogFatal(a.ctx, "Initialize Config Faild")
-	} else {
-		wails.LogInfo(a.ctx, "Initialize Config Successful")
-	}
+	config.InitConfig()
 
-	downloadPath := cfg.FileConfig.DownloadPath
-	cachePath := cfg.FileConfig.CachePath
+	downloadPath := config.Cfg.GetDownloadPath()
+	cachePath := config.Cfg.GetCachePath()
 	err2 := os.MkdirAll(downloadPath, 0755)
 	err3 := os.MkdirAll(cachePath, 0755)
 	err4 := os.MkdirAll(cachePath+"/music", 0755)
@@ -77,10 +73,8 @@ func (a *App) startup(ctx context.Context) {
 // 程序关闭时
 func (a *App) shutdown(ctx context.Context) {
 	// 清理缓存
-	cfg := new(Config)
-	cfg.Get()
-	if cfg.DeleteCache {
-		os.RemoveAll(cfg.FileConfig.CachePath)
+	if config.Cfg.DeleteCache {
+		os.RemoveAll(config.Cfg.GetCachePath())
 	}
 }
 
