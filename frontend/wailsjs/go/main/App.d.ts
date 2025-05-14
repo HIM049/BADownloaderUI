@@ -54,6 +54,8 @@ export function QuerySongInformation(arg1:string):Promise<bilibili.Audio>;
 
 export function QueryVideo(arg1:string):Promise<bilibili.Video>;
 
+export function RefreshConfig():Promise<void>;
+
 export function ResetConfig():Promise<void>;
 
 export function SaveConfig(arg1:config.Config):Promise<void>;
@@ -61,5 +63,7 @@ export function SaveConfig(arg1:config.Config):Promise<void>;
 export function SaveVideoList(arg1:main.VideoList,arg2:string):Promise<void>;
 
 export function SaveVideoListTo(arg1:main.VideoList):Promise<void>;
+
+export function SetDownloadPathDialog():Promise<void>;
 
 export function TidyVideoList(arg1:string):Promise<void>;

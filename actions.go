@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/spf13/viper"
 	"github.com/tidwall/gjson"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -337,26 +338,26 @@ func (a *App) OpenFileDialog() (string, error) {
 	return path, nil
 }
 
-// func (a *App) SetDownloadPathDialog() {
+func (a *App) SetDownloadPathDialog() {
 
-// 	option := wails.OpenDialogOptions{
-// 		DefaultDirectory: "./",
-// 		DefaultFilename:  "",
-// 		Title:            "选择下载路径",
-// 	}
+	option := wails.OpenDialogOptions{
+		DefaultDirectory: "./",
+		DefaultFilename:  "",
+		Title:            "选择下载路径",
+	}
 
-// 	path, err := wails.OpenDirectoryDialog(a.ctx, option)
-// 	if err != nil {
-// 		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
-// 	}
+	path, err := wails.OpenDirectoryDialog(a.ctx, option)
+	if err != nil {
+		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+	}
 
-// 	config.Cfg.FileConfig.DownloadPath = path
-// 	err = config.Cfg.UpdateAndSave()
-// 	if err != nil {
-// 		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
-// 	}
+	config.Cfg.FileConfig.DownloadPath = path
+	err = config.Cfg.UpdateAndSave()
+	if err != nil {
+		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+	}
 
-// }
+}
 
 // 调用保存窗口
 func (a *App) SaveVideoListTo(videolist VideoList) error {
@@ -433,9 +434,13 @@ func (a *App) SaveConfig(cfg config.Config) {
 	}
 }
 
-// func (a *App) RefreshConfig() {
-// 	config.InitConfig()
-// }
+func (a *App) RefreshConfig() error {
+	err := viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 // 打开下载文件夹
 func (a *App) OpenDownloadFolader() error {
