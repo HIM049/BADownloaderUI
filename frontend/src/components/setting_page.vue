@@ -87,11 +87,15 @@
                     </var-tooltip>
                     
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="音频保存路径" size="small" v-model="config.file_config.download_path"
-                        :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
+                    <div style="display: flex; align-items: center;">
+                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="音频保存路径" size="small" readonly v-model="config.file_config.download_path" />
+                        <var-button type="primary" @click="">更改</var-button>
+                    </div>
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="下载缓存路径" size="small" v-model="config.file_config.cache_path"
-                        :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
+                    <div style="display: flex; align-items: center;">    
+                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="下载缓存路径" size="small" readonly  v-model="config.file_config.cache_path" />
+                        <var-button type="primary" @click="">更改</var-button>
+                    </div>
 
                     <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
@@ -135,8 +139,19 @@ onMounted(() => {
 // 设置内容
 const config = ref([])
 
+// function setDownloadPathDialog() {
+//     SetDownloadPathDialog();
+//     loadConfig();
+// }
+
+// function setCachePathDialog() {
+//     SetCachePathDialog();
+//     loadConfig();
+// }
+
 // 读取配置文件
 function loadConfig() {
+    // RefreshConfig();
     LoadConfig().then(result => {
         config.value = result;
         overload.value = true;

@@ -337,6 +337,27 @@ func (a *App) OpenFileDialog() (string, error) {
 	return path, nil
 }
 
+// func (a *App) SetDownloadPathDialog() {
+
+// 	option := wails.OpenDialogOptions{
+// 		DefaultDirectory: "./",
+// 		DefaultFilename:  "",
+// 		Title:            "选择下载路径",
+// 	}
+
+// 	path, err := wails.OpenDirectoryDialog(a.ctx, option)
+// 	if err != nil {
+// 		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+// 	}
+
+// 	config.Cfg.FileConfig.DownloadPath = path
+// 	err = config.Cfg.UpdateAndSave()
+// 	if err != nil {
+// 		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
+// 	}
+
+// }
+
 // 调用保存窗口
 func (a *App) SaveVideoListTo(videolist VideoList) error {
 	var FileFilter []wails.FileFilter
@@ -411,6 +432,10 @@ func (a *App) SaveConfig(cfg config.Config) {
 		wails.EventsEmit(a.ctx, "error", "写入设置时出错:"+err.Error())
 	}
 }
+
+// func (a *App) RefreshConfig() {
+// 	config.InitConfig()
+// }
 
 // 打开下载文件夹
 func (a *App) OpenDownloadFolader() error {
