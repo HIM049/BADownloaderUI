@@ -10,7 +10,8 @@
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { reactive, computed, ref, watch } from 'vue'
-import { LoadConfig, CreatVideoList, OpenFileDialog } from '../../../wailsjs/go/main/App'
+import { LoadConfig, OpenFileDialog } from '../../../wailsjs/go/main/App'
+import { CreatVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { Snackbar } from '@varlet/ui'
 
 const props = defineProps(['parms', 'status'])

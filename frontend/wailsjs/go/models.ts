@@ -362,20 +362,6 @@ export namespace config {
 
 export namespace main {
 	
-	export class AudioInformation {
-	    quality: number;
-	    stream: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new AudioInformation(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.quality = source["quality"];
-	        this.stream = source["stream"];
-	    }
-	}
 	export class DownloadOption {
 	    song_name: boolean;
 	    song_cover: boolean;
@@ -390,6 +376,25 @@ export namespace main {
 	        this.song_name = source["song_name"];
 	        this.song_cover = source["song_cover"];
 	        this.song_author = source["song_author"];
+	    }
+	}
+
+}
+
+export namespace services {
+	
+	export class AudioInformation {
+	    quality: number;
+	    stream: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AudioInformation(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.quality = source["quality"];
+	        this.stream = source["stream"];
 	    }
 	}
 	export class MetaInformation {

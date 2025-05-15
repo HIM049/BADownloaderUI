@@ -2,6 +2,8 @@ package main
 
 import (
 	"bili-audio-downloader/config"
+	"bili-audio-downloader/constants"
+	"bili-audio-downloader/services"
 	"bytes"
 	"html/template"
 	"os"
@@ -12,7 +14,7 @@ import (
 )
 
 // 修改 TAG
-func ChangeTag(cfg *config.Config, opt *DownloadOption, v *VideoInformation) error {
+func ChangeTag(cfg *config.Config, opt *DownloadOption, v *services.VideoInformation) error {
 
 	// 准备参数
 	file := cfg.FileConfig.CachePath + "/music/" + strconv.Itoa(v.Cid) + v.Format
@@ -63,7 +65,7 @@ type FileName struct {
 }
 
 // 输出文件
-func OutputFile(cfg *config.Config, v *VideoInformation, fileName FileName) error {
+func OutputFile(cfg *config.Config, v *services.VideoInformation, fileName FileName) error {
 	// 处理模板和生成文件名
 	tmpl, err := template.New("filename").Parse(cfg.FileConfig.FileNameTemplate)
 	if err != nil {
@@ -92,7 +94,7 @@ func OutputFile(cfg *config.Config, v *VideoInformation, fileName FileName) erro
 func SingleChangeTag(cfg *config.Config, opt *DownloadOption, auid, songName, songAuthor string) error {
 
 	// 准备参数
-	file := cfg.FileConfig.CachePath + "/single/music/" + auid + AudioType.m4a
+	file := cfg.FileConfig.CachePath + "/single/music/" + auid + constants.AudioType.M4a
 	songCover := cfg.FileConfig.CachePath + "/single/cover/" + auid + ".jpg"
 
 	// 打开歌曲元数据
@@ -129,8 +131,8 @@ func SingleChangeTag(cfg *config.Config, opt *DownloadOption, auid, songName, so
 // 输出文件
 func SingleOutputFile(cfg *config.Config, uuid, Title string) error {
 
-	sourcePath := path.Join(cfg.FileConfig.CachePath, "single/music", uuid+AudioType.m4a)
-	destPath := path.Join(cfg.FileConfig.DownloadPath, Title+AudioType.mp3)
+	sourcePath := path.Join(cfg.FileConfig.CachePath, "single/music", uuid+constants.AudioType.M4a)
+	destPath := path.Join(cfg.FileConfig.DownloadPath, Title+constants.AudioType.Mp3)
 
 	// 重命名歌曲文件并移动位置
 	err := os.Rename(sourcePath, destPath)

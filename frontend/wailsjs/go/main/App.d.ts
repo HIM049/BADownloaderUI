@@ -3,28 +3,11 @@
 import {bilibili} from '../models';
 import {main} from '../models';
 import {config} from '../models';
-
-export function AddAudioToList(arg1:string,arg2:string):Promise<void>;
-
-export function AddCollectionToList(arg1:string,arg2:string,arg3:number,arg4:boolean):Promise<void>;
-
-export function AddCompilationToList(arg1:string,arg2:number,arg3:number,arg4:number,arg5:boolean):Promise<void>;
-
-export function AddProfileVideoToList(arg1:string,arg2:number,arg3:number,arg4:boolean):Promise<void>;
-
-export function AddVideoToList(arg1:string,arg2:string,arg3:boolean):Promise<void>;
+import {services} from '../models';
 
 export function Checkffmpeg():Promise<boolean>;
 
-export function CreatVideoList():Promise<void>;
-
-export function GetAppVersion():Promise<string>;
-
 export function GetFavCollect(arg1:number):Promise<bilibili.Collects>;
-
-export function GetListCount(arg1:string):Promise<number>;
-
-export function GetTheme():Promise<string>;
 
 export function GetUserInf():Promise<bilibili.AccountInformation>;
 
@@ -34,25 +17,11 @@ export function ListDownload(arg1:string,arg2:main.DownloadOption):Promise<void>
 
 export function LoadConfig():Promise<config.Config>;
 
-export function LoadVideoList(arg1:string):Promise<main.VideoList>;
-
 export function LoginBilibili():Promise<void>;
 
 export function OpenDownloadFolader():Promise<void>;
 
 export function OpenFileDialog():Promise<string>;
-
-export function QueryAudio(arg1:string):Promise<bilibili.Audio>;
-
-export function QueryCollection(arg1:string):Promise<bilibili.FavList>;
-
-export function QueryCompilation(arg1:number,arg2:number):Promise<bilibili.CompliationInformation>;
-
-export function QueryProfileVideo(arg1:string):Promise<number>;
-
-export function QuerySongInformation(arg1:string):Promise<bilibili.Audio>;
-
-export function QueryVideo(arg1:string):Promise<bilibili.Video>;
 
 export function RefreshConfig():Promise<void>;
 
@@ -60,10 +29,6 @@ export function ResetConfig():Promise<void>;
 
 export function SaveConfig(arg1:config.Config):Promise<void>;
 
-export function SaveVideoList(arg1:main.VideoList,arg2:string):Promise<void>;
-
-export function SaveVideoListTo(arg1:main.VideoList):Promise<void>;
+export function SaveVideoListTo(arg1:services.VideoList):Promise<void>;
 
 export function SetDownloadPathDialog():Promise<void>;
-
-export function TidyVideoList(arg1:string):Promise<void>;

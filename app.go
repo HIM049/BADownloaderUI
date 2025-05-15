@@ -2,6 +2,7 @@ package main
 
 import (
 	"bili-audio-downloader/config"
+	"bili-audio-downloader/constants"
 	"bili-audio-downloader/services"
 	"context"
 	"os"
@@ -36,13 +37,13 @@ func (a *App) startup(ctx context.Context) {
 		err5 != nil ||
 		err6 != nil ||
 		err7 != nil {
-		wails.LogFatal(a.ctx, "Initialize Folder Faild")
+		wails.LogFatal(a.ctx, "Initialize Folder Failed")
 	} else {
 		wails.LogInfo(a.ctx, "Initialize Folder Successful")
 	}
 
 	// 检查版本更新
-	version, err := services.CheckUpdate(APP_VERSION)
+	version, err := services.CheckUpdate(constants.APP_VERSION)
 	if err != nil {
 		wails.LogErrorf(a.ctx, "Check for update Faild: %s", err)
 	} else if version == "0" {

@@ -33,7 +33,7 @@ import AddVideos from '../components/collect_download/add_videos.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
-import { GetListCount, TidyVideoList } from '../../wailsjs/go/main/App'
+import { GetListCount, TidyVideoList } from '../../wailsjs/go/wails_api/WailsApi'
 import { Dialog, Snackbar } from '@varlet/ui'
 import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
 // 页面索引值

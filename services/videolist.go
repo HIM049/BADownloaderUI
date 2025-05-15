@@ -1,8 +1,10 @@
-package main
+package services
 
 import (
 	"bili-audio-downloader/bilibili"
 	"bili-audio-downloader/config"
+	"bili-audio-downloader/constants"
+	"bili-audio-downloader/utils"
 	"errors"
 	"strconv"
 
@@ -65,9 +67,9 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		var list VideoInformation
 		list.Bvid = video.Bvid
 		list.Cid = video.Videos[i].Cid
-		list.Title = CheckFileName(video.Meta.Title)
-		list.PageTitle = CheckFileName(video.Videos[i].Part)
-		list.Format = AudioType.m4a
+		list.Title = utils.CheckFileName(video.Meta.Title)
+		list.PageTitle = utils.CheckFileName(video.Videos[i].Part)
+		list.Format = constants.AudioType.M4a
 		// 元数据
 		list.Meta.Cover = video.Meta.Cover
 		list.Meta.Author = video.Up.Name
@@ -80,13 +82,13 @@ func (VideoList *VideoList) AddVideo(sessdata, bvid string, downloadCompilation 
 		var SongName string
 		if total <= 1 {
 			// 单集使用视频标题
-			SongName, err = ExtractTitle(list.Title)
+			SongName, err = utils.ExtractTitle(list.Title)
 			if err != nil {
 				SongName = list.Title
 			}
 		} else {
 			// 多集视频使用分集标题
-			SongName, err = ExtractTitle(list.PageTitle)
+			SongName, err = utils.ExtractTitle(list.PageTitle)
 			if err != nil {
 				SongName = list.PageTitle
 			}
@@ -115,9 +117,9 @@ func (VideoList *VideoList) AddAudio(sessdata, auid string) error {
 	var list VideoInformation
 	list.Bvid = auid
 	list.Cid = aucid
-	list.Title = CheckFileName(audio.Meta.Title)
-	list.PageTitle = CheckFileName(audio.Meta.Title)
-	list.Format = AudioType.m4a
+	list.Title = utils.CheckFileName(audio.Meta.Title)
+	list.PageTitle = utils.CheckFileName(audio.Meta.Title)
+	list.Format = constants.AudioType.M4a
 	// 元数据
 	list.Meta.Cover = audio.Meta.Cover
 	list.Meta.Author = audio.Up.Author
@@ -282,7 +284,7 @@ func (VideoList *VideoList) Get(path ...string) error {
 		filePath = path[0]
 	}
 
-	err := LoadJsonFile(filePath, VideoList)
+	err := utils.LoadJsonFile(filePath, VideoList)
 	if err != nil {
 		return err
 	}
@@ -297,7 +299,7 @@ func (VideoList *VideoList) Save(path ...string) error {
 		filePath = path[0]
 	}
 
-	err := SaveJsonFile(filePath, VideoList)
+	err := utils.SaveJsonFile(filePath, VideoList)
 	if err != nil {
 		return err
 	}
@@ -313,7 +315,7 @@ func (v *VideoInformation) GetStream(sessdata string) error {
 		return err
 	}
 	// 错误检查
-	if CheckObj(int(gjson.Get(json, "code").Int())) {
+	if gjson.Get(json, "code").Int() != 0 {
 		return errors.New(gjson.Get(json, "message").String())
 	}
 
@@ -321,7 +323,7 @@ func (v *VideoInformation) GetStream(sessdata string) error {
 	if gjson.Get(json, "data.dash.flac.audio").String() != "" {
 		v.Audio.Quality = int(gjson.Get(json, "data.dash.audio.id").Int())
 		v.Audio.Stream = gjson.Get(json, "data.dash.flac.audio.base_url").String()
-		v.Format = AudioType.flac
+		v.Format = constants.AudioType.Flac
 
 		return nil
 	}

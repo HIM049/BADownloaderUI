@@ -6,7 +6,7 @@
 import MainPage from './components/main_page.vue'
 import { ref, onBeforeMount } from 'vue'
 import { StyleProvider, Themes } from '@varlet/ui'
-import { GetTheme } from '../wailsjs/go/main/App'
+import { GetTheme } from '../wailsjs/go/wails_api/WailsApi'
 
 const ThemeLightPink = {
     '--color-primary': '#9c4146',
