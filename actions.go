@@ -172,12 +172,13 @@ func (a *App) RefreshConfig() error {
 }
 
 // 打开下载文件夹
+// TODO
 func (a *App) OpenDownloadFolader() error {
 
-	err := OpenFolder(config.Cfg.GetDownloadPath())
-	if err != nil {
-		return err
-	}
+	//err := OpenFolder(config.Cfg.GetDownloadPath())
+	//if err != nil {
+	//	return err
+	//}
 
 	return nil
 }

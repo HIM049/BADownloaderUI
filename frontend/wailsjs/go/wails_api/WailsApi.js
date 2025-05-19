@@ -22,24 +22,24 @@ export function AddVideoToList(arg1, arg2, arg3) {
   return window['go']['wails_api']['WailsApi']['AddVideoToList'](arg1, arg2, arg3);
 }
 
-export function CreatVideoList() {
-  return window['go']['wails_api']['WailsApi']['CreatVideoList']();
+export function Checkffmpeg() {
+  return window['go']['wails_api']['WailsApi']['Checkffmpeg']();
+}
+
+export function DownloadTaskList() {
+  return window['go']['wails_api']['WailsApi']['DownloadTaskList']();
 }
 
 export function GetAppVersion() {
   return window['go']['wails_api']['WailsApi']['GetAppVersion']();
 }
 
-export function GetListCount(arg1) {
-  return window['go']['wails_api']['WailsApi']['GetListCount'](arg1);
+export function GetListCount() {
+  return window['go']['wails_api']['WailsApi']['GetListCount']();
 }
 
 export function GetTheme() {
   return window['go']['wails_api']['WailsApi']['GetTheme']();
-}
-
-export function LoadVideoList(arg1) {
-  return window['go']['wails_api']['WailsApi']['LoadVideoList'](arg1);
 }
 
 export function QueryAudio(arg1) {
@@ -60,12 +60,4 @@ export function QueryProfileVideo(arg1) {
 
 export function QueryVideo(arg1) {
   return window['go']['wails_api']['WailsApi']['QueryVideo'](arg1);
-}
-
-export function SaveVideoList(arg1, arg2) {
-  return window['go']['wails_api']['WailsApi']['SaveVideoList'](arg1, arg2);
-}
-
-export function TidyVideoList(arg1) {
-  return window['go']['wails_api']['WailsApi']['TidyVideoList'](arg1);
 }

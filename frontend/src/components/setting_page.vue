@@ -116,7 +116,7 @@
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
 import { reactive, ref, onMounted } from 'vue'
-import { LoadConfig, SaveConfig, ResetConfig, Checkffmpeg, RefreshConfig, SetDownloadPathDialog } from '../../wailsjs/go/main/App'
+import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig, SetDownloadPathDialog } from '../../wailsjs/go/main/App'
 import { Dialog, Snackbar } from '@varlet/ui'
 
 const changeCfg = ref(null) // 修改设置时的响应
@@ -222,14 +222,14 @@ function setUseAccount() {
 
 // 校验是否存在 ffmpeg
 function setConvertFormat() {
-    Checkffmpeg().then(result => {
-        if (result) {
-            saveConfig();
-        } else {
-            config.file_config.convert_format = false;
-            Snackbar.warning("未检测到 ffmpeg 安装");
-        }
-    })
+    // Checkffmpeg().then(result => {
+    //     if (result) {
+    //         saveConfig();
+    //     } else {
+    //         config.file_config.convert_format = false;
+    //         Snackbar.warning("未检测到 ffmpeg 安装");
+    //     }
+    // })
 }
 
 </script>

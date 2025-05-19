@@ -32,7 +32,8 @@
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { ref, reactive, computed } from 'vue'
-import { ListDownload, OpenDownloadFolader } from '../../../wailsjs/go/main/App'
+import { OpenDownloadFolader } from '../../../wailsjs/go/main/App'
+import { DownloadTaskList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 
 const downloading = ref(false)
@@ -74,7 +75,7 @@ function startDownload() {
         song_cover: parms.value.options.songCover,
         song_author: parms.value.options.songAuthor,
     }
-    ListDownload(parms.value.videoListPath, opt).then(result => {
+    DownloadTaskList().then(() => {
         downloading.value = false;
         status.value.allowNext = true;
         progress.successed = true;

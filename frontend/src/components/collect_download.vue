@@ -33,7 +33,7 @@ import AddVideos from '../components/collect_download/add_videos.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
-import { GetListCount, TidyVideoList } from '../../wailsjs/go/wails_api/WailsApi'
+import { GetListCount } from '../../wailsjs/go/wails_api/WailsApi'
 import { Dialog, Snackbar } from '@varlet/ui'
 import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
 // 页面索引值
@@ -112,13 +112,15 @@ watch(parms, (newPageIndex) => {
     // 列表编辑页面
     if (newPageIndex.pageIndex == 2) {
         nextButton.value = () => {
-            Dialog('清理删除项并下一步？').then(result => {
-                if (result == 'confirm') {
-                    TidyVideoList(parms.videoListPath);
-                    parms.pageIndex++;
-                }
-                return;
-            });
+            // Dialog('清理删除项并下一步？').then(result => {
+            //     if (result == 'confirm') {
+            //         // TidyVideoList(parms.videoListPath);
+            //         parms.pageIndex++;
+            //     }
+            //
+            //     return;
+            // });
+            parms.pageIndex++;
         };
         EventsEmit('refreshVideoList');
         updateBadge();

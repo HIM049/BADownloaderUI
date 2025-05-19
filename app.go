@@ -28,15 +28,19 @@ func (a *App) startup(ctx context.Context) {
 	err2 := os.MkdirAll(downloadPath, 0755)
 	err3 := os.MkdirAll(cachePath, 0755)
 	err4 := os.MkdirAll(cachePath+"/music", 0755)
-	err5 := os.MkdirAll(cachePath+"/cover", 0755)
-	err6 := os.MkdirAll(cachePath+"/single/cover", 0755)
-	err7 := os.MkdirAll(cachePath+"/single/music", 0755)
+	err5 := os.MkdirAll(cachePath+"/audio", 0755)
+	err6 := os.MkdirAll(cachePath+"/cover", 0755)
+	err7 := os.MkdirAll(cachePath+"/convented", 0755)
+	err8 := os.MkdirAll(cachePath+"/single/cover", 0755)
+	err9 := os.MkdirAll(cachePath+"/single/music", 0755)
 	if err2 != nil ||
 		err3 != nil ||
 		err4 != nil ||
 		err5 != nil ||
 		err6 != nil ||
-		err7 != nil {
+		err7 != nil ||
+		err8 != nil ||
+		err9 != nil {
 		wails.LogFatal(a.ctx, "Initialize Folder Failed")
 	} else {
 		wails.LogInfo(a.ctx, "Initialize Folder Successful")
@@ -77,10 +81,4 @@ func (a *App) shutdown(ctx context.Context) {
 	if config.Cfg.DeleteCache {
 		os.RemoveAll(config.Cfg.GetCachePath())
 	}
-}
-
-type DownloadOption struct {
-	SongName   bool `json:"song_name"`
-	SongCover  bool `json:"song_cover"`
-	SongAuthor bool `json:"song_author"`
 }

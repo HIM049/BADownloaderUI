@@ -63,7 +63,7 @@ import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, watch, ref } from 'vue'
 import { SaveVideoListTo } from '../../../wailsjs/go/main/App'
-import { LoadVideoList, SaveVideoList, TidyVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
+// import { LoadVideoList, SaveVideoList, TidyVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
 
@@ -106,16 +106,16 @@ EventsOn('refreshVideoList', () => {
 
 // 另存列表
 function saveListTo() {
-    Dialog('清理删除项并导出列表？').then(result => {
-        if (result == 'confirm') {
-            tidyAndRefresh(() => {
-                SaveVideoListTo(videoList.value).then(() => {
-                    Snackbar.success('导出成功');
-                });
-            });
-        }
-        return;
-    });
+    // Dialog('清理删除项并导出列表？').then(result => {
+    //     if (result == 'confirm') {
+    //         tidyAndRefresh(() => {
+    //             SaveVideoListTo(videoList.value).then(() => {
+    //                 Snackbar.success('导出成功');
+    //             });
+    //         });
+    //     }
+    //     return;
+    // });
 }
 
 // 清理并刷新列表
@@ -132,23 +132,23 @@ function tidyAndRefreshList() {
 
 // 清理并刷新列表
 function tidyAndRefresh(callback) {
-    TidyVideoList(parms.value.videoListPath).then(()=>{    
-        loadVideoList();
-        emit('refresh');
-        callback();
-    });
+    // TidyVideoList(parms.value.videoListPath).then(()=>{
+    //     loadVideoList();
+    //     emit('refresh');
+    //     callback();
+    // });
 }
 
 // 修改视频删除状态
 function setDeleteState(index) {
-    videoList.value.List[index].delete = !videoList.value.List[index].delete;
-    SaveVideoList(videoList.value, parms.value.videoListPath).then(result => {
-        if (result != null) {
-            Snackbar.error("保存失败" + result);
-        } else {
-            Snackbar.success("保存成功");
-        }
-    })
+    // videoList.value.List[index].delete = !videoList.value.List[index].delete;
+    // SaveVideoList(videoList.value, parms.value.videoListPath).then(result => {
+    //     if (result != null) {
+    //         Snackbar.error("保存失败" + result);
+    //     } else {
+    //         Snackbar.success("保存成功");
+    //     }
+    // })
 }
 
 // 打开右侧面板
@@ -161,10 +161,10 @@ function openRightPanel(index) {
 }
 
 function loadVideoList() {
-    LoadVideoList(parms.value.videoListPath).then(result => {
-        videoList.value = result;
-        CardStatus.ShowList = true;
-    })
+    // LoadVideoList(parms.value.videoListPath).then(result => {
+    //     videoList.value = result;
+    //     CardStatus.ShowList = true;
+    // })
 }
 
 // 保存列表修改
@@ -172,13 +172,13 @@ function saveVideoMeta() {
     videoList.value.List[CardStatus.ListIndex].Meta.song_name = CardStatus.Meta.song_name;
     videoList.value.List[CardStatus.ListIndex].Meta.author = CardStatus.Meta.author;
 
-    SaveVideoList(videoList.value, parms.value.videoListPath).then(result => {
-        if (result != null) {
-            Snackbar.error("保存失败" + result);
-        } else {
-            Snackbar.success("保存成功");
-        }
-    })
+    // SaveVideoList(videoList.value, parms.value.videoListPath).then(result => {
+    //     if (result != null) {
+    //         Snackbar.error("保存失败" + result);
+    //     } else {
+    //         Snackbar.success("保存成功");
+    //     }
+    // })
 
     CardStatus.RightPanel = false;
 }

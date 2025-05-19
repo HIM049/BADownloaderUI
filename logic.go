@@ -5,8 +5,6 @@ import (
 	"bili-audio-downloader/config"
 	"errors"
 	"net/http"
-	"os"
-	"os/exec"
 	"time"
 
 	qrcode "github.com/skip2/go-qrcode"
@@ -85,31 +83,10 @@ func (a *App) LoginBilibili() error {
 	return nil
 }
 
-// IsFileExists 检查文件是否存在
-func IsFileExists(path string) bool {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true // 文件存在
-	}
-	if os.IsNotExist(err) {
-		return false // 文件不存在
-	}
-	return false // 其他错误
-}
-
-// 工具函数
-// 检查结构体中的状态码
-func CheckObj(code int) bool {
-	if code == 0 {
-		return false
-	} else {
-		return true
-	}
-}
-
-// 打开文件夹
-func OpenFolder(path string) error {
-	cmd := exec.Command("cmd", "/c", "start", "", path)
-	setHideWindow(cmd)
-	return cmd.Start()
-}
+// TODO
+//// 打开文件夹
+//func OpenFolder(path string) error {
+//	cmd := exec.Command("cmd", "/c", "start", "", path)
+//	services.setHideWindow(cmd)
+//	return cmd.Start()
+//}

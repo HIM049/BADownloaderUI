@@ -1,9 +1,9 @@
-package main
+package services
 
 import (
 	"bili-audio-downloader/config"
 	"bili-audio-downloader/constants"
-	"bili-audio-downloader/services"
+	"bili-audio-downloader/models"
 	"bytes"
 	"html/template"
 	"os"
@@ -14,7 +14,7 @@ import (
 )
 
 // 修改 TAG
-func ChangeTag(cfg *config.Config, opt *DownloadOption, v *services.VideoInformation) error {
+func ChangeTag(cfg *config.Config, opt *models.Option, v *VideoInformation) error {
 
 	// 准备参数
 	file := cfg.FileConfig.CachePath + "/music/" + strconv.Itoa(v.Cid) + v.Format
@@ -65,7 +65,7 @@ type FileName struct {
 }
 
 // 输出文件
-func OutputFile(cfg *config.Config, v *services.VideoInformation, fileName FileName) error {
+func OutputFile(cfg *config.Config, v *VideoInformation, fileName FileName) error {
 	// 处理模板和生成文件名
 	tmpl, err := template.New("filename").Parse(cfg.FileConfig.FileNameTemplate)
 	if err != nil {
@@ -91,7 +91,7 @@ func OutputFile(cfg *config.Config, v *services.VideoInformation, fileName FileN
 }
 
 // 修改 TAG
-func SingleChangeTag(cfg *config.Config, opt *DownloadOption, auid, songName, songAuthor string) error {
+func SingleChangeTag(cfg *config.Config, opt *models.Option, auid, songName, songAuthor string) error {
 
 	// 准备参数
 	file := cfg.FileConfig.CachePath + "/single/music/" + auid + constants.AudioType.M4a
