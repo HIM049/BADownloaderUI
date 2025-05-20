@@ -4,6 +4,7 @@ import (
 	"bili-audio-downloader/constants"
 	"bili-audio-downloader/services"
 	"bili-audio-downloader/wails_api"
+	"context"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
@@ -41,8 +42,11 @@ func main() {
 		Windows: &windows.Options{
 			IsZoomControlEnabled: false, // 页面缩放比例
 		},
-		BackgroundColour:   &options.RGBA{R: 255, G: 255, B: 255, A: 1},
-		OnStartup:          app.startup,
+		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
+		OnStartup: func(ctx context.Context) {
+			app.startup(ctx)
+			wailsApi.Startup(ctx)
+		},
 		OnShutdown:         app.shutdown,
 		LogLevelProduction: logger.INFO,
 		Logger:             customLogger,

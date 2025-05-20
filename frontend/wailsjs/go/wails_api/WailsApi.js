@@ -61,3 +61,7 @@ export function QueryProfileVideo(arg1) {
 export function QueryVideo(arg1) {
   return window['go']['wails_api']['WailsApi']['QueryVideo'](arg1);
 }
+
+export function Startup(arg1) {
+  return window['go']['wails_api']['WailsApi']['Startup'](arg1);
+}
