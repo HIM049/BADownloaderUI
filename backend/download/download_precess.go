@@ -1,7 +1,7 @@
 package download
 
 import (
-	"bili-audio-downloader/config"
+	"bili-audio-downloader/backend/config"
 	"context"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"sync"

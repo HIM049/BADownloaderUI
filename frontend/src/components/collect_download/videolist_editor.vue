@@ -62,7 +62,7 @@
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, watch, ref } from 'vue'
-import { SaveVideoListTo } from '../../../wailsjs/go/main/App'
+// import { SaveVideoListTo } from '../../../wailsjs/go/main/App'
 // import { LoadVideoList, SaveVideoList, TidyVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'

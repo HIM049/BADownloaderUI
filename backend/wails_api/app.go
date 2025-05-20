@@ -1,9 +1,9 @@
 package wails_api
 
 import (
-	"bili-audio-downloader/config"
-	"bili-audio-downloader/constants"
-	"bili-audio-downloader/services"
+	"bili-audio-downloader/backend/config"
+	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/services"
 )
 
 // GetAppVersion 获取版本号

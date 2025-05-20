@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bili-audio-downloader/constants"
-	"bili-audio-downloader/services"
-	"bili-audio-downloader/wails_api"
+	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/services"
+	"bili-audio-downloader/backend/wails_api"
 	"context"
 	"embed"
 

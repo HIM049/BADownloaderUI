@@ -1,7 +1,7 @@
 package config
 
 import (
-	"bili-audio-downloader/constants"
+	"bili-audio-downloader/backend/constants"
 	"fmt"
 	"log"
 	"path/filepath"

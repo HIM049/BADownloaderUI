@@ -1,9 +1,9 @@
 package download
 
 import (
+	"bili-audio-downloader/backend/config"
+	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
-	"bili-audio-downloader/config"
-	"bili-audio-downloader/utils"
 	"errors"
 	"fmt"
 	"sync"

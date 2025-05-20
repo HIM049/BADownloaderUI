@@ -1,10 +1,10 @@
 package download
 
 import (
+	"bili-audio-downloader/backend/config"
+	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
-	"bili-audio-downloader/config"
-	"bili-audio-downloader/constants"
-	"bili-audio-downloader/utils"
 	"errors"
 	"fmt"
 	"github.com/tidwall/gjson"

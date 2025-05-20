@@ -1,8 +1,8 @@
 package wails_api
 
 import (
+	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/bilibili"
-	"bili-audio-downloader/config"
 	"github.com/tidwall/gjson"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )

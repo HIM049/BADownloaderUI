@@ -1,7 +1,7 @@
 package wails_api
 
 import (
-	"bili-audio-downloader/Download"
+	"bili-audio-downloader/backend/download"
 	"context"
 	"fmt"
 )

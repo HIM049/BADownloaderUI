@@ -1,8 +1,8 @@
 package download
 
 import (
+	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
-	"bili-audio-downloader/utils"
 	"github.com/tidwall/gjson"
 	"strconv"
 )

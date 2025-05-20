@@ -1,9 +1,9 @@
 package services
 
 import (
-	"bili-audio-downloader/config"
-	"bili-audio-downloader/constants"
-	"bili-audio-downloader/download"
+	"bili-audio-downloader/backend/config"
+	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/download"
 	tag "github.com/gcottom/audiometa"
 	"os"
 	"path"

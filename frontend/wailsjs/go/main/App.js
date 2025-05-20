@@ -42,10 +42,6 @@ export function SaveConfig(arg1) {
   return window['go']['main']['App']['SaveConfig'](arg1);
 }
 
-export function SaveVideoListTo(arg1) {
-  return window['go']['main']['App']['SaveVideoListTo'](arg1);
-}
-
 export function SetDownloadPathDialog() {
   return window['go']['main']['App']['SetDownloadPathDialog']();
 }

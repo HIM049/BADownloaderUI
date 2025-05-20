@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/bilibili"
-	"bili-audio-downloader/config"
 	"errors"
 	"net/http"
 	"time"

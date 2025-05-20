@@ -1,7 +1,7 @@
 package download
 
 import (
-	"bili-audio-downloader/config"
+	"bili-audio-downloader/backend/config"
 	"fmt"
 )
 

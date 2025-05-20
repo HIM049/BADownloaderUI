@@ -1,8 +1,8 @@
 package wails_api
 
 import (
-	"bili-audio-downloader/Download"
-	"bili-audio-downloader/config"
+	"bili-audio-downloader/backend/config"
+	"bili-audio-downloader/backend/download"
 )
 
 // GetListCount 获取列表中视频数量

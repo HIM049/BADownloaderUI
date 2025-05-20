@@ -1,9 +1,8 @@
 package main
 
 import (
+	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/bilibili"
-	"bili-audio-downloader/config"
-	"bili-audio-downloader/services"
 	"errors"
 	"strconv"
 
@@ -88,42 +87,42 @@ func (a *App) SetDownloadPathDialog() {
 
 }
 
-// 调用保存窗口
-func (a *App) SaveVideoListTo(videolist services.VideoList) error {
-	var FileFilter []wails.FileFilter
-
-	fileFilter := wails.FileFilter{
-		DisplayName: "视频下载列表 (*.json)",
-		Pattern:     "*.json",
-	}
-	FileFilter = append(FileFilter, fileFilter)
-
-	option := wails.SaveDialogOptions{
-		DefaultDirectory: "./",
-		DefaultFilename:  "BAD_VideoList",
-		Title:            "另存视频列表",
-		Filters:          FileFilter,
-	}
-
-	// 弹出对话框
-	path, err := wails.SaveFileDialog(a.ctx, option)
-	if err != nil {
-		return err
-	}
-
-	// 用户取消操作
-	if path == "" {
-		wails.EventsEmit(a.ctx, "error", "未选择保存路径")
-		return nil
-	}
-
-	// 保存列表
-	err = videolist.Save(path)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//// 调用保存窗口
+//func (a *App) SaveVideoListTo(videolist services.VideoList) error {
+//	var FileFilter []wails.FileFilter
+//
+//	fileFilter := wails.FileFilter{
+//		DisplayName: "视频下载列表 (*.json)",
+//		Pattern:     "*.json",
+//	}
+//	FileFilter = append(FileFilter, fileFilter)
+//
+//	option := wails.SaveDialogOptions{
+//		DefaultDirectory: "./",
+//		DefaultFilename:  "BAD_VideoList",
+//		Title:            "另存视频列表",
+//		Filters:          FileFilter,
+//	}
+//
+//	// 弹出对话框
+//	path, err := wails.SaveFileDialog(a.ctx, option)
+//	if err != nil {
+//		return err
+//	}
+//
+//	// 用户取消操作
+//	if path == "" {
+//		wails.EventsEmit(a.ctx, "error", "未选择保存路径")
+//		return nil
+//	}
+//
+//	// 保存列表
+//	err = videolist.Save(path)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
 // 获取已登录用户的信息
 func (a *App) GetUserInf() (bilibili.AccountInformation, error) {
