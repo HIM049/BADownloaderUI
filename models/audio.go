@@ -45,11 +45,15 @@ func (a *Audio) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = a.downloadStream(a.path.StreamPath)
 			if err != nil {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
 				continue
+
 			}
 			if !utils.IsFileExists(a.path.StreamPath) {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
 				continue
 			}
+			break
 		}
 		if err != nil {
 			errorResults <- err
@@ -65,11 +69,14 @@ func (a *Audio) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = utils.SaveFromURL(a.coverUrl, a.path.CoverPath)
 			if err != nil {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
 				continue
 			}
 			if !utils.IsFileExists(a.path.CoverPath) {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
 				continue
 			}
+			break
 		}
 		if err != nil {
 			errorResults <- err

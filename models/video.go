@@ -66,11 +66,14 @@ func (v *Video) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = v.downloadStream(v.path.StreamPath)
 			if err != nil {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
 				continue
 			}
 			if !utils.IsFileExists(v.path.StreamPath) {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
 				continue
 			}
+			break
 		}
 		if err != nil {
 			errorResults <- err
@@ -86,11 +89,14 @@ func (v *Video) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = utils.SaveFromURL(v.coverUrl, v.path.CoverPath)
 			if err != nil {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
 				continue
 			}
 			if !utils.IsFileExists(v.path.CoverPath) {
+				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
 				continue
 			}
+			break
 		}
 		if err != nil {
 			errorResults <- err
@@ -99,11 +105,13 @@ func (v *Video) Download() error {
 	}()
 
 	wg.Wait()
+	fmt.Println("等待结束")
 	close(errorResults)
 
 	if len(errorResults) > 0 {
 		return <-errorResults
 	}
+	fmt.Println("下载完成")
 
 	return nil
 }
