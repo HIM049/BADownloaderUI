@@ -2,9 +2,12 @@ build/bin
 node_modules
 frontend/dist
 frontend/package-lock.json
-config.json
-Cache/*
 package-lock.json
 *.log
 .DS_Store
 .idea
+
+# 程序生成
+config.json
+Cache/*
+Download/*
