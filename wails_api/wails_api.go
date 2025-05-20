@@ -16,5 +16,5 @@ func (w *WailsApi) Startup(ctx context.Context) {
 }
 
 func (a *WailsApi) DownloadTaskList() {
-	Download.DownloadTaskList(a.ctx)
+	download.DownloadTaskList(a.ctx)
 }

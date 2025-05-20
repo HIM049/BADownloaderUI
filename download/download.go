@@ -1,9 +1,13 @@
-package models
+package download
 
 import (
 	"bili-audio-downloader/config"
 	"fmt"
 )
+
+type DownloadTask interface {
+	Download() error
+}
 
 type Option struct {
 	SongName     bool `json:"song_name"`
@@ -18,6 +22,15 @@ type Path struct {
 	ConventPath  string
 	OutputName   string
 	OutputFormat string
+}
+
+type MetaData struct {
+	Title     string
+	PageTitle string
+	PartId    int
+	SongName  string
+	Author    string
+	LyricsUrl string
 }
 
 func (p *Path) GetOutputPath() string {

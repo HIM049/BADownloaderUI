@@ -1,4 +1,4 @@
-package models
+package download
 
 import (
 	"bili-audio-downloader/bilibili"
@@ -21,15 +21,6 @@ type Video struct {
 	option   Option
 	path     Path
 	metaData MetaData
-}
-
-type MetaData struct {
-	Title     string
-	PageTitle string
-	PartId    int
-	SongName  string
-	Author    string
-	LyricsUrl string
 }
 
 func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData MetaData) *Video {

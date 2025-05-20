@@ -37,7 +37,7 @@ import { GetListCount } from '../../wailsjs/go/wails_api/WailsApi'
 import { Dialog, Snackbar } from '@varlet/ui'
 import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
 // 页面索引值
-const pageIndex = ref(0)
+const pageIndex = ref(1)
 
 // 底部翻页按钮距离
 const scrollTop = ref(10)

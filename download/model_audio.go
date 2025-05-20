@@ -1,4 +1,4 @@
-package models
+package download
 
 import (
 	"bili-audio-downloader/bilibili"

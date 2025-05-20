@@ -7,7 +7,7 @@ import (
 
 // GetListCount 获取列表中视频数量
 func (a *WailsApi) GetListCount() int {
-	return len(Download.DownloadList)
+	return len(download.DownloadList)
 }
 
 //// CreatVideoList 创建视频列表
@@ -28,7 +28,7 @@ func (a *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation boo
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := Download.AddVideoTask(sessdata, bvid, downloadCompilation)
+	err := download.AddVideoTask(sessdata, bvid, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (a *WailsApi) AddCollectionToList(listPath, fid string, count int, download
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := Download.AddCollectionTask(sessdata, fid, count, downloadCompilation)
+	err := download.AddCollectionTask(sessdata, fid, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (a *WailsApi) AddCompilationToList(listPath string, mid, sid, count int, do
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := Download.AddCompilationTask(sessdata, mid, sid, count, downloadCompilation)
+	err := download.AddCompilationTask(sessdata, mid, sid, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (a *WailsApi) AddAudioToList(listPath, auid string) error {
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := Download.AddAudioTask(sessdata, auid)
+	err := download.AddAudioTask(sessdata, auid)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (a *WailsApi) AddProfileVideoToList(listPath string, mid, count int, downlo
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := Download.AddProfileVideoTask(sessdata, mid, count, downloadCompilation)
+	err := download.AddProfileVideoTask(sessdata, mid, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
