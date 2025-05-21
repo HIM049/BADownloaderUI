@@ -3,6 +3,7 @@ package download
 import (
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/ffmpeg"
 	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
 	"errors"
@@ -30,9 +31,9 @@ func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData MetaData
 		coverUrl: coverUrl,
 		sessdata: sessdata,
 		path: Path{
-			StreamPath:   fmt.Sprintf("%s/music/%d", config.Cfg.GetCachePath(), cid),
-			CoverPath:    fmt.Sprintf("%s/cover/%d.jpg", config.Cfg.GetCachePath(), cid),
-			ConventPath:  fmt.Sprintf("%s/convented/%d", config.Cfg.GetCachePath(), cid),
+			StreamPath: fmt.Sprintf("%s/music/%d", config.Cfg.GetCachePath(), cid),
+			CoverPath:  fmt.Sprintf("%s/cover/%d.jpg", config.Cfg.GetCachePath(), cid),
+			//ConventPath:  fmt.Sprintf("%s/convented/%d", config.Cfg.GetCachePath(), cid),
 			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
@@ -123,6 +124,7 @@ func (v *Video) downloadStream(streamPath string) error {
 	flacStream := gjson.Get(json, "data.dash.flac.audio.base_url").String()
 	if v.option.DownloadFlac && flacStream != "" {
 		stream = flacStream
+		v.path.OutputFormat = constants.AudioType.Flac
 	}
 
 	if stream == "" {
@@ -133,6 +135,33 @@ func (v *Video) downloadStream(streamPath string) error {
 	err = utils.StreamingDownloader(stream, streamPath)
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to download stream: %s", err))
+	}
+	return nil
+}
+
+func (v *Video) ConventFormat() error {
+	// 根据目标格式转码
+	if v.path.OutputFormat == constants.AudioType.M4a {
+		err := ffmpeg.ConvertToMP3(v.path.StreamPath, v.path.StreamPath)
+		if err != nil {
+			return err
+		}
+		v.path.OutputFormat = constants.AudioType.Mp3
+	} else {
+		err := ffmpeg.ConvertToFlac(v.path.StreamPath, v.path.StreamPath)
+		if err != nil {
+			return err
+		}
+		v.path.OutputFormat = constants.AudioType.Flac
+	}
+	return nil
+}
+
+func (v *Video) WriteMetadata() error {
+	isMp3 := v.path.OutputFormat == constants.AudioType.Mp3
+	err := ffmpeg.WriteMetadata(v.path.StreamPath, v.path.StreamPath, v.path.CoverPath, v.metaData.SongName, v.metaData.Author, isMp3)
+	if err != nil {
+		return err
 	}
 	return nil
 }

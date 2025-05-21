@@ -1,10 +1,15 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
 	"regexp"
+	"runtime"
+	"syscall"
 )
 
 // CheckFileName 剔除文件名中的奇怪字符
@@ -63,4 +68,25 @@ func IsFileExists(path string) bool {
 		return false
 	}
 	return true
+}
+
+// 复用命令行参数函数
+func RunCommand(name string, args ...string) (string, error) {
+	cmd := exec.Command(name, args...)
+
+	// 跨平台隐藏控制台窗口（仅 Windows 需要）
+	if runtime.GOOS == "windows" {
+		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	}
+
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+
+	err := cmd.Run()
+	if err != nil {
+		return out.String(), fmt.Errorf("command '%s' failed: %v", name, err)
+	}
+
+	return out.String(), nil
 }

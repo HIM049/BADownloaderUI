@@ -3,7 +3,7 @@ package wails_api
 import (
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
-	"bili-audio-downloader/backend/services"
+	"bili-audio-downloader/backend/ffmpeg"
 )
 
 // GetAppVersion 获取版本号
@@ -17,5 +17,5 @@ func (a *WailsApi) GetTheme() string {
 }
 
 func (a *WailsApi) Checkffmpeg() bool {
-	return services.Checkffmpeg()
+	return ffmpeg.CheckExists()
 }

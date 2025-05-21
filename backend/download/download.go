@@ -7,6 +7,8 @@ import (
 
 type DownloadTask interface {
 	Download() error
+	ConventFormat() error
+	WriteMetadata() error
 }
 
 type Option struct {
@@ -19,7 +21,6 @@ type Option struct {
 type Path struct {
 	StreamPath   string
 	CoverPath    string
-	ConventPath  string
 	OutputName   string
 	OutputFormat string
 }

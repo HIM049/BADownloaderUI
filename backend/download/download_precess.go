@@ -25,18 +25,41 @@ func DownloadTaskList(ctx context.Context) {
 	//	audioType = constants.AudioType.Mp3
 	//}
 
-	wails.LogPrintf(ctx, "start download task list")
+	wails.LogPrintf(ctx, "start list download process")
 	// 遍历下载队列
 	for i, task := range DownloadList {
-		// 并发函数
-		sem <- struct{}{} // 给通道中填入数据
-		wg.Add(1)         // 任务 +1
-		// 下载完成后
-		defer func() {
-			<-sem     // 释放一个并发槽
-			wg.Done() // 发出任务完成通知
+		go func() {
+			// 并发函数
+			sem <- struct{}{} // 给通道中填入数据
+			wg.Add(1)         // 任务 +1
+			// 下载完成后
+			defer func() {
+				<-sem     // 释放一个并发槽
+				wg.Done() // 发出任务完成通知
 
-			wails.EventsEmit(ctx, "downloadFinish", i)
+				wails.EventsEmit(ctx, "downloadFinish", i)
+			}()
+
+			// 下载媒体流和封面
+			wails.LogPrintf(ctx, "Downloading file: %d", i)
+			err := task.Download()
+			if err != nil {
+				wails.LogErrorf(ctx, "Failed to download (file%d): %v", i, err)
+				return
+			}
+
+			// 转码文件
+			if config.Cfg.FileConfig.ConvertFormat {
+				err = task.ConventFormat()
+				if err != nil {
+					wails.LogErrorf(ctx, "Failed to convert file (file%d): %v", i, err)
+				}
+			}
+
+			err = task.WriteMetadata()
+			if err != nil {
+				wails.LogErrorf(ctx, "Failed to write metadata (file%d): %v", i, err)
+			}
 		}()
 
 		//// 处理文件名结构体
@@ -54,14 +77,6 @@ func DownloadTaskList(ctx context.Context) {
 		//}
 
 		//musicPathAndName := config.Cfg.GetCachePath() + "/music/" + strconv.Itoa(v.Cid)
-
-		// 下载媒体流和封面
-		wails.LogPrintf(ctx, "开始下载: %d", i)
-		err := task.Download()
-		if err != nil {
-			wails.LogErrorf(ctx, "下载失败：%d ERROR: %v", i, err)
-			return
-		}
 
 		//// 判断文件类型并转码
 		//if v.Format == constants.AudioType.M4a && config.Cfg.FileConfig.ConvertFormat {

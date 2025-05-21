@@ -9,14 +9,12 @@ require (
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/viper v1.20.1
 	github.com/tidwall/gjson v1.18.0
-	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/wailsapp/wails/v2 v2.10.1
 )
 
 require (
 	github.com/abema/go-mp4 v1.4.1 // indirect
 	github.com/aler9/writerseeker v1.1.0 // indirect
-	github.com/aws/aws-sdk-go v1.55.6 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/bogem/id3v2/v2 v2.1.4 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
@@ -28,7 +26,6 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/labstack/echo/v4 v4.13.3 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect
@@ -52,7 +49,6 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.8 // indirect
-	github.com/u2takey/go-utils v0.3.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.21 // indirect

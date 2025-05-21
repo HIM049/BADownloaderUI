@@ -2,6 +2,8 @@ package download
 
 import (
 	"bili-audio-downloader/backend/config"
+	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/ffmpeg"
 	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
 	"errors"
@@ -91,6 +93,24 @@ func (a *Audio) Download() error {
 		return <-errorResults
 	}
 
+	return nil
+}
+
+func (v *Audio) ConventFormat() error {
+	err := ffmpeg.ConvertToMP3(v.path.StreamPath, v.path.StreamPath)
+	if err != nil {
+		return err
+	}
+	v.path.OutputFormat = constants.AudioType.Mp3
+	return nil
+}
+
+func (v *Audio) WriteMetadata() error {
+	isMp3 := v.path.OutputFormat == constants.AudioType.Mp3
+	err := ffmpeg.WriteMetadata(v.path.StreamPath, v.path.StreamPath, v.path.CoverPath, v.metaData.SongName, v.metaData.Author, isMp3)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
