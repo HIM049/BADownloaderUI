@@ -52,7 +52,7 @@ func AddVideoTask(sessdata, bvid string, downloadCompilation bool) error {
 		metaData := MetaData{
 			Title:     Title,
 			PageTitle: PageTitle,
-			PartId:    0,
+			PartId:    i,
 			SongName:  SongName,
 			Author:    video.Up.Name,
 			LyricsUrl: "",

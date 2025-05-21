@@ -52,13 +52,6 @@ import (
 //	return nil
 //}
 //
-//type FileName struct {
-//	Title    string
-//	Subtitle string
-//	Quality  string
-//	ID       int
-//	Format   string
-//}
 
 //// 输出文件
 //func OutputFile(cfg *config.Config, v *VideoInformation, fileName FileName) error {

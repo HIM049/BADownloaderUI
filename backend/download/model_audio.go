@@ -15,9 +15,14 @@ type Audio struct {
 	auid     string
 	coverUrl string
 	sessdata string
+	listId   int
 	option   Option
 	path     Path
 	metaData MetaData
+}
+
+func (a *Audio) SetID(id int) {
+	a.listId = id
 }
 
 func NewAudio(auid string, coverUrl, sessdata string, metaData MetaData) *Audio {
@@ -96,18 +101,29 @@ func (a *Audio) Download() error {
 	return nil
 }
 
-func (v *Audio) ConventFormat() error {
-	err := ffmpeg.ConvertToMP3(v.path.StreamPath, v.path.StreamPath)
+func (a *Audio) ConventFormat() error {
+	newPath := fmt.Sprintf("%s.c", a.path.StreamPath)
+	err := ffmpeg.ConvertToMP3(a.path.CurrentPath, newPath)
 	if err != nil {
 		return err
 	}
-	v.path.OutputFormat = constants.AudioType.Mp3
+	a.path.OutputFormat = constants.AudioType.Mp3
+	a.path.CurrentPath = newPath
 	return nil
 }
 
-func (v *Audio) WriteMetadata() error {
-	isMp3 := v.path.OutputFormat == constants.AudioType.Mp3
-	err := ffmpeg.WriteMetadata(v.path.StreamPath, v.path.StreamPath, v.path.CoverPath, v.metaData.SongName, v.metaData.Author, isMp3)
+func (a *Audio) WriteMetadata() error {
+	newPath := fmt.Sprintf("%s.meta", a.path.StreamPath)
+	err := ffmpeg.WriteMetadata(a.path.CurrentPath, newPath, a.path.CoverPath, a.metaData.SongName, a.metaData.Author, a.path.OutputFormat)
+	if err != nil {
+		return err
+	}
+	a.path.CurrentPath = newPath
+	return nil
+}
+
+func (a *Audio) ExportFile() error {
+	err := ExportFile(a.metaData.Title, a.metaData.PageTitle, a.path.OutputFormat, a.listId, a.path.CurrentPath)
 	if err != nil {
 		return err
 	}

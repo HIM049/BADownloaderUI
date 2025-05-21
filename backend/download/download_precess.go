@@ -40,6 +40,8 @@ func DownloadTaskList(ctx context.Context) {
 				wails.EventsEmit(ctx, "downloadFinish", i)
 			}()
 
+			task.SetID(i)
+
 			// 下载媒体流和封面
 			wails.LogPrintf(ctx, "Downloading file: %d", i)
 			err := task.Download()
@@ -49,16 +51,27 @@ func DownloadTaskList(ctx context.Context) {
 			}
 
 			// 转码文件
+			wails.LogPrintf(ctx, "Converting format: %d", i)
 			if config.Cfg.FileConfig.ConvertFormat {
 				err = task.ConventFormat()
 				if err != nil {
 					wails.LogErrorf(ctx, "Failed to convert file (file%d): %v", i, err)
+					return
 				}
 			}
 
+			wails.LogPrintf(ctx, "Writing metadata: %d", i)
 			err = task.WriteMetadata()
 			if err != nil {
 				wails.LogErrorf(ctx, "Failed to write metadata (file%d): %v", i, err)
+				return
+			}
+
+			wails.LogPrintf(ctx, "Finishing download task: %d", i)
+			err = task.ExportFile()
+			if err != nil {
+				wails.LogErrorf(ctx, "Failed to export file (file%d): %v", i, err)
+				return
 			}
 		}()
 

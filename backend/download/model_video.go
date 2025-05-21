@@ -31,9 +31,9 @@ func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData MetaData
 		coverUrl: coverUrl,
 		sessdata: sessdata,
 		path: Path{
-			StreamPath: fmt.Sprintf("%s/music/%d", config.Cfg.GetCachePath(), cid),
-			CoverPath:  fmt.Sprintf("%s/cover/%d.jpg", config.Cfg.GetCachePath(), cid),
-			//ConventPath:  fmt.Sprintf("%s/convented/%d", config.Cfg.GetCachePath(), cid),
+			StreamPath:   fmt.Sprintf("%s/music/%d", config.Cfg.GetCachePath(), cid),
+			CoverPath:    fmt.Sprintf("%s/cover/%d.jpg", config.Cfg.GetCachePath(), cid),
+			CurrentPath:  fmt.Sprintf("%s/music/%d", config.Cfg.GetCachePath(), cid),
 			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
@@ -108,10 +108,6 @@ func (v *Video) Download() error {
 	return nil
 }
 
-//func (v *Video) ConventToMp3() error {
-//	services.ConventFile(v.path.StreamPath)
-//}
-
 func (v *Video) downloadStream(streamPath string) error {
 	// 请求流地址
 	json, err := bilibili.GetVideoStream(v.bvid, strconv.Itoa(v.cid), v.sessdata)
@@ -141,49 +137,38 @@ func (v *Video) downloadStream(streamPath string) error {
 
 func (v *Video) ConventFormat() error {
 	// 根据目标格式转码
+	newPath := fmt.Sprintf("%s.c", v.path.StreamPath)
 	if v.path.OutputFormat == constants.AudioType.M4a {
-		err := ffmpeg.ConvertToMP3(v.path.StreamPath, v.path.StreamPath)
+		err := ffmpeg.ConvertToMP3(v.path.CurrentPath, newPath)
 		if err != nil {
 			return err
 		}
 		v.path.OutputFormat = constants.AudioType.Mp3
 	} else {
-		err := ffmpeg.ConvertToFlac(v.path.StreamPath, v.path.StreamPath)
+		err := ffmpeg.ConvertToMP3(v.path.CurrentPath, newPath)
 		if err != nil {
 			return err
 		}
 		v.path.OutputFormat = constants.AudioType.Flac
 	}
+	v.path.CurrentPath = newPath
 	return nil
 }
 
 func (v *Video) WriteMetadata() error {
-	isMp3 := v.path.OutputFormat == constants.AudioType.Mp3
-	err := ffmpeg.WriteMetadata(v.path.StreamPath, v.path.StreamPath, v.path.CoverPath, v.metaData.SongName, v.metaData.Author, isMp3)
+	newPath := fmt.Sprintf("%s.meta", v.path.StreamPath)
+	err := ffmpeg.WriteMetadata(v.path.CurrentPath, newPath, v.path.CoverPath, v.metaData.SongName, v.metaData.Author, v.path.OutputFormat)
+	if err != nil {
+		return err
+	}
+	v.path.CurrentPath = newPath
+	return nil
+}
+
+func (v *Video) ExportFile() error {
+	err := ExportFile(v.metaData.Title, v.metaData.PageTitle, v.path.OutputFormat, v.listId, v.path.CurrentPath)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
-//func (v *Video) getFileName() error {
-//	// 处理文件名结构体
-//	fileName := new(services.FileName)
-//	fileName.Title = v.metaData.Title
-//	fileName.Subtitle = v.metaData.PageTitle
-//	fileName.ID = v.listId
-//	fileName.Quality = "" // TODO
-//
-//	// 处理模板和生成文件名
-//	tmpl, err := template.New("filename").Parse(config.Cfg.FileConfig.FileNameTemplate)
-//	if err != nil {
-//		return err
-//	}
-//
-//	var output bytes.Buffer
-//	err = tmpl.Execute(&output, fileName)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}

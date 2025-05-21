@@ -1,11 +1,12 @@
 package ffmpeg
 
 import (
+	"bili-audio-downloader/backend/constants"
 	"bili-audio-downloader/backend/utils"
 	"fmt"
 )
 
-func WriteMetadata(input, output, coverPath, songName, songAuthor string, isMp3 bool) error {
+func WriteMetadata(input, output, coverPath, songName, songAuthor string, format string) error {
 	err := initFfmpeg(&input, &output)
 	if err != nil {
 		return err
@@ -13,6 +14,7 @@ func WriteMetadata(input, output, coverPath, songName, songAuthor string, isMp3 
 
 	// 基础 ffmpeg 参数
 	args := []string{
+		"-y",
 		"-i", input,
 	}
 
@@ -56,11 +58,11 @@ func WriteMetadata(input, output, coverPath, songName, songAuthor string, isMp3 
 	args = append(args, "-c", "copy")
 
 	// 如果是 mp3，推荐设置 id3v2 版本
-	if isMp3 {
+	if format == constants.AudioType.Mp3 {
 		args = append(args, "-id3v2_version", "3")
 	}
 
-	args = append(args, output)
+	args = append(args, "-f", format[1:], output)
 
 	log, err := utils.RunCommand("ffmpeg", args...)
 	if err != nil {
