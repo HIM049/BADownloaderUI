@@ -2,8 +2,10 @@ package config
 
 import (
 	"bili-audio-downloader/backend/constants"
-	"fmt"
+	"context"
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -43,7 +45,7 @@ type Account struct {
 
 var Cfg Config
 
-func InitConfig() {
+func InitConfig(ctx context.Context) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath("./")
@@ -51,12 +53,23 @@ func InitConfig() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Println("Config file not found: ", err)
+			wails.LogInfof(ctx, "Config file not found: %v", err)
 			newConfig := DefaultConfig()
-			newConfig.UpdateAndSave()
-			fmt.Println("Created a new config")
+
+			// 创建配置文件
+			_, err = os.Create("config.json")
+			if err != nil {
+				wails.LogFatalf(ctx, "Failed to create config file: %v", err)
+			}
+
+			// 保存默认配置到文件
+			err = newConfig.UpdateAndSave()
+			if err != nil {
+				wails.LogFatalf(ctx, "Failed to create new config file: %v", err)
+			}
+			wails.LogInfo(ctx, "Created new config file")
 		} else {
-			log.Fatalf("Failed to read config file: %v", err)
+			wails.LogFatalf(ctx, "Failed to read config file: %v", err)
 		}
 	}
 
@@ -100,10 +113,10 @@ func InitConfig() {
 		if Cfg.ConfigVersion < constants.CONFIG_VERSION {
 			err := migrateConfig("./config.json")
 			if err != nil {
-				log.Fatalf("Failed to migrate config: %v\n", err)
+				wails.LogFatalf(ctx, "Failed to migrate config: %v\n", err)
 			}
 		} else {
-			fmt.Println("Config version is higher than current version")
+			wails.LogInfo(ctx, "Config version is higher than current version")
 		}
 	}
 }

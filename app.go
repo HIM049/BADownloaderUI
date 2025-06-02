@@ -21,7 +21,7 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 
 	// 程序初始化
-	config.InitConfig()
+	config.InitConfig(a.ctx)
 
 	downloadPath := config.Cfg.GetDownloadPath()
 	cachePath := config.Cfg.GetCachePath()
