@@ -10,16 +10,44 @@ func (w *WailsApi) GetListCount() int {
 	return len(download.DownloadList)
 }
 
-//// CreatVideoList 创建视频列表
-//func (a *WailsApi) CreatVideoList() error {
-//	videoList := new(services.VideoList)
-//	err := videoList.Save()
-//	if err != nil {
-//		wails.EventsEmit(a.ctx, "error", "错误："+err.Error())
-//		return err
-//	}
-//	return nil
-//}
+// ResetDownloadList 重置列表
+func (w *WailsApi) ResetDownloadList() {
+	download.ResetTaskList()
+}
+
+// GetTaskListAll 获取完整的任务列表信息
+func (w *WailsApi) GetTaskListAll() []download.TaskInfo {
+	var taskList []download.TaskInfo
+
+	for i, task := range download.DownloadList {
+		info := task.GetTaskInfo()
+		info.Index = i
+		taskList = append(taskList, *info)
+	}
+
+	return taskList
+}
+
+// GetTaskListPage 获取一页的任务列表信息
+func (w *WailsApi) GetTaskListPage(page int) []download.TaskInfo {
+	var taskList []download.TaskInfo
+
+	const PageSize = 10
+	start := page * PageSize
+	end := page*PageSize + PageSize
+
+	if end > len(download.DownloadList) {
+		end = len(download.DownloadList)
+	}
+
+	for i, task := range download.DownloadList[start:end] {
+		info := task.GetTaskInfo()
+		info.Index = i + start
+		taskList = append(taskList, *info)
+	}
+
+	return taskList
+}
 
 // AddVideoToList 添加单个视频
 func (w *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation bool) error {
@@ -95,39 +123,3 @@ func (w *WailsApi) AddProfileVideoToList(listPath string, mid, count int, downlo
 
 	return nil
 }
-
-//// LoadVideoList 加载视频列表
-//func (a *WailsApi) LoadVideoList(listPath string) (services.VideoList, error) {
-//	videoList := new(services.VideoList)
-//	err := videoList.Get(listPath)
-//	if err != nil {
-//		return services.VideoList{}, err
-//	}
-//	return *videoList, nil
-//}
-
-//// SaveVideoList 保存视频列表
-//func (a *WailsApi) SaveVideoList(newList services.VideoList, path string) error {
-//	err := newList.Save(path)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
-
-//// TidyVideoList 删除列表中的废弃项
-//func (a *WailsApi) TidyVideoList(listPath string) error {
-//	videoList := new(services.VideoList)
-//	err := videoList.Get(listPath)
-//	if err != nil {
-//		return err
-//	}
-//
-//	videoList.Tidy()
-//
-//	err = videoList.Save(listPath)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}

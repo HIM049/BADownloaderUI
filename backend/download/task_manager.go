@@ -9,6 +9,10 @@ import (
 
 var DownloadList []DownloadTask
 
+func ResetTaskList() {
+	DownloadList = []DownloadTask{}
+}
+
 func AddTask(task DownloadTask) {
 	DownloadList = append(DownloadList, task)
 }
