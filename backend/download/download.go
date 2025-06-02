@@ -15,6 +15,7 @@ type DownloadTask interface {
 	ConventFormat() error
 	WriteMetadata() error
 	ExportFile() error
+	GetTaskInfo() *TaskInfo
 }
 
 type Option struct {
@@ -47,6 +48,13 @@ type FileName struct {
 	Quality  string
 	ID       int
 	Format   string
+}
+
+type TaskInfo struct {
+	Index      int
+	SongName   string
+	SongAuthor string
+	CoverUrl   string
 }
 
 func ExportFile(title, subtitle, outputFormat string, listid int, currentPath string) error {

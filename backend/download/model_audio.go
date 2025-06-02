@@ -148,3 +148,12 @@ func (a *Audio) downloadStream(streamPath string) error {
 	}
 	return nil
 }
+
+func (a *Audio) GetTaskInfo() *TaskInfo {
+	taskInfo := TaskInfo{
+		SongName:   a.metaData.SongName,
+		SongAuthor: a.metaData.Author,
+		CoverUrl:   a.coverUrl,
+	}
+	return &taskInfo
+}

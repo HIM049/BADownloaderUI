@@ -172,3 +172,12 @@ func (v *Video) ExportFile() error {
 	}
 	return nil
 }
+
+func (w *Video) GetTaskInfo() *TaskInfo {
+	taskInfo := TaskInfo{
+		SongName:   w.metaData.SongName,
+		SongAuthor: w.metaData.Author,
+		CoverUrl:   w.coverUrl,
+	}
+	return &taskInfo
+}
