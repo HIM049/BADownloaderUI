@@ -22,49 +22,9 @@ func (a *App) startup(ctx context.Context) {
 
 	// 程序初始化
 	config.InitConfig(a.ctx)
+	initFolder(a.ctx)
+	checkUpdateAndAlarm(a.ctx)
 
-	downloadPath := config.Cfg.GetDownloadPath()
-	cachePath := config.Cfg.GetCachePath()
-	err2 := os.MkdirAll(downloadPath, 0755)
-	err3 := os.MkdirAll(cachePath, 0755)
-	err5 := os.MkdirAll(cachePath+"/audio", 0755)
-	err6 := os.MkdirAll(cachePath+"/cover", 0755)
-	if err2 != nil ||
-		err3 != nil ||
-		err5 != nil ||
-		err6 != nil {
-		wails.LogFatal(a.ctx, "Initialize Folder Failed")
-	} else {
-		wails.LogInfo(a.ctx, "Initialize Folder Successful")
-	}
-
-	// 检查版本更新
-	version, err := services.CheckUpdate(constants.APP_VERSION)
-	if err != nil {
-		wails.LogErrorf(a.ctx, "Check for update Faild: %s", err)
-	} else if version == "0" {
-		wails.LogInfo(a.ctx, "No software update")
-	} else {
-		wails.LogInfof(a.ctx, "Found new version: %s", version)
-
-		result, err := wails.MessageDialog(a.ctx, wails.MessageDialogOptions{
-			Type:          wails.QuestionDialog,
-			Title:         "找到新版本：" + version,
-			Message:       "软件有新版本发布了，是否前往下载？",
-			DefaultButton: "Yes",
-		})
-
-		if err != nil {
-			wails.LogError(a.ctx, "弹出更新提示失败")
-		}
-
-		wails.LogDebugf(a.ctx, "选择结果：%s", result)
-
-		if result == "Yes" {
-			wails.BrowserOpenURL(a.ctx, "https://github.com/HIM049/BADownloaderUI/releases/tag/"+version)
-		}
-
-	}
 }
 
 // 程序关闭时
@@ -73,4 +33,55 @@ func (a *App) shutdown(ctx context.Context) {
 	if config.Cfg.DeleteCache {
 		os.RemoveAll(config.Cfg.GetCachePath())
 	}
+}
+
+// 检查更新并提示
+func checkUpdateAndAlarm(ctx context.Context) {
+	// 检查版本更新
+	version, err := services.CheckUpdate(constants.APP_VERSION)
+	if err != nil {
+		wails.LogErrorf(ctx, "Check update faild: %s", err)
+	} else if version == "0" {
+		wails.LogInfo(ctx, "No software update")
+	} else {
+		wails.LogInfof(ctx, "Founded new version: %s", version)
+
+		result, err := wails.MessageDialog(ctx, wails.MessageDialogOptions{
+			Type:          wails.QuestionDialog,
+			Title:         "找到新版本：" + version,
+			Message:       "软件有新版本发布了，是否前往下载？",
+			DefaultButton: "Yes",
+		})
+
+		if err != nil {
+			wails.LogError(ctx, "Failed to show message dialog: "+err.Error())
+		}
+
+		wails.LogDebugf(ctx, "Dialog result：%s", result)
+
+		if result == "Yes" {
+			wails.BrowserOpenURL(ctx, "https://github.com/HIM049/BADownloaderUI/releases/tag/"+version)
+		}
+	}
+}
+
+// 初始化必备文件夹
+func initFolder(ctx context.Context) {
+	downloadPath := config.Cfg.GetDownloadPath()
+	cachePath := config.Cfg.GetCachePath()
+
+	var paths = []string{
+		downloadPath,
+		cachePath,
+		cachePath + "/audio",
+		cachePath + "/cover",
+	}
+
+	for _, path := range paths {
+		err := os.MkdirAll(path, 0755)
+		if err != nil {
+			wails.LogFatalf(ctx, "Initialize Folder Failed: %s", err)
+		}
+	}
+	wails.LogInfo(ctx, "Initialize Folder Successful")
 }
