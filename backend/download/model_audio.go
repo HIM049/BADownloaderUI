@@ -31,8 +31,10 @@ func NewAudio(auid string, coverUrl, sessdata string, metaData MetaData) *Audio 
 		coverUrl: coverUrl,
 		sessdata: sessdata,
 		path: Path{
-			StreamPath: fmt.Sprintf("%s/audio/%s", config.Cfg.GetCachePath(), auid),
-			CoverPath:  fmt.Sprintf("%s/cover/%s.jpg", config.Cfg.GetCachePath(), auid),
+			StreamPath:   fmt.Sprintf("%s/audio/%s", config.Cfg.GetCachePath(), auid),
+			CoverPath:    fmt.Sprintf("%s/cover/%s.jpg", config.Cfg.GetCachePath(), auid),
+			CurrentPath:  fmt.Sprintf("%s/audio/%s", config.Cfg.GetCachePath(), auid),
+			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
 	}

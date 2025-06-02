@@ -31,9 +31,9 @@ func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData MetaData
 		coverUrl: coverUrl,
 		sessdata: sessdata,
 		path: Path{
-			StreamPath:   fmt.Sprintf("%s/music/%d", config.Cfg.GetCachePath(), cid),
+			StreamPath:   fmt.Sprintf("%s/audio/%d", config.Cfg.GetCachePath(), cid),
 			CoverPath:    fmt.Sprintf("%s/cover/%d.jpg", config.Cfg.GetCachePath(), cid),
-			CurrentPath:  fmt.Sprintf("%s/music/%d", config.Cfg.GetCachePath(), cid),
+			CurrentPath:  fmt.Sprintf("%s/audio/%d", config.Cfg.GetCachePath(), cid),
 			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
