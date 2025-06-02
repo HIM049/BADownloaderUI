@@ -1,5 +1,18 @@
 <template>
-    <FramePage title="添加内容">        
+    <FramePage title="添加内容">
+        <var-button type="danger" round icon-container style="float: right" @click="() => {
+            Dialog('删除当前任务列表').then(result => {
+                if (result === 'confirm') {
+                    ResetDownloadList().then(() => {
+                        emit('updateBadge');
+                        Snackbar.success('删除成功');
+                    });
+                }
+            });
+        }">
+            <var-icon name="window-close" />
+        </var-button>
+
         <var-radio-group v-model="QueryType" @change="queryInfornation">
             <var-radio :checked-value="0">收藏夹</var-radio>
             <var-radio :checked-value="1">视频合集</var-radio>
@@ -8,7 +21,7 @@
             <var-radio :checked-value="4">用户空间</var-radio>
         </var-radio-group>
 
-        <var-input :placeholder="inputTip" v-model="input" clearable 
+        <var-input :placeholder="inputTip" v-model="input" clearable
         style="margin-bottom: 25px;" >
             <template #prepend-icon>
                 <var-icon name="magnify" />
@@ -90,10 +103,21 @@
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
-// import { ClipboardGetText } from '../../../wailsjs/runtime'
-import { QueryVideo, QueryCollection, QueryCompilation, QueryAudio, QueryProfileVideo, AddVideoToList, AddCollectionToList, AddCompilationToList, AddAudioToList, AddProfileVideoToList } from '../../../wailsjs/go/wails_api/WailsApi'
+import {
+    QueryVideo,
+    QueryCollection,
+    QueryCompilation,
+    QueryAudio,
+    QueryProfileVideo,
+    AddVideoToList,
+    AddCollectionToList,
+    AddCompilationToList,
+    AddAudioToList,
+    AddProfileVideoToList,
+    ResetDownloadList
+} from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn, EventsEmit } from '../../../wailsjs/runtime'
-import { Snackbar } from '@varlet/ui'
+import {Dialog, Snackbar} from '@varlet/ui'
 
 const props = defineProps(['parms', 'status'])
 const emit = defineEmits(['update:parms', 'update:status', 'updateBadge'])
