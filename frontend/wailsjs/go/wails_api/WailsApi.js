@@ -38,6 +38,14 @@ export function GetListCount() {
   return window['go']['wails_api']['WailsApi']['GetListCount']();
 }
 
+export function GetTaskListAll() {
+  return window['go']['wails_api']['WailsApi']['GetTaskListAll']();
+}
+
+export function GetTaskListPage(arg1) {
+  return window['go']['wails_api']['WailsApi']['GetTaskListPage'](arg1);
+}
+
 export function GetTheme() {
   return window['go']['wails_api']['WailsApi']['GetTheme']();
 }
@@ -60,6 +68,10 @@ export function QueryProfileVideo(arg1) {
 
 export function QueryVideo(arg1) {
   return window['go']['wails_api']['WailsApi']['QueryVideo'](arg1);
+}
+
+export function ResetDownloadList() {
+  return window['go']['wails_api']['WailsApi']['ResetDownloadList']();
 }
 
 export function Startup(arg1) {
