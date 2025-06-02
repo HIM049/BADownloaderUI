@@ -6,7 +6,7 @@ import (
 )
 
 // GetListCount 获取列表中视频数量
-func (a *WailsApi) GetListCount() int {
+func (w *WailsApi) GetListCount() int {
 	return len(download.DownloadList)
 }
 
@@ -22,7 +22,7 @@ func (a *WailsApi) GetListCount() int {
 //}
 
 // AddVideoToList 添加单个视频
-func (a *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation bool) error {
+func (w *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation bool) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA
@@ -37,7 +37,7 @@ func (a *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation boo
 }
 
 // AddCollectionToList 添加收藏夹内容
-func (a *WailsApi) AddCollectionToList(listPath, fid string, count int, downloadCompilation bool) error {
+func (w *WailsApi) AddCollectionToList(listPath, fid string, count int, downloadCompilation bool) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA
@@ -52,7 +52,7 @@ func (a *WailsApi) AddCollectionToList(listPath, fid string, count int, download
 }
 
 // AddCompilationToList 添加视频合集
-func (a *WailsApi) AddCompilationToList(listPath string, mid, sid, count int, downloadCompilation bool) error {
+func (w *WailsApi) AddCompilationToList(listPath string, mid, sid, count int, downloadCompilation bool) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA
@@ -67,7 +67,7 @@ func (a *WailsApi) AddCompilationToList(listPath string, mid, sid, count int, do
 }
 
 // AddAudioToList 添加单个音频
-func (a *WailsApi) AddAudioToList(listPath, auid string) error {
+func (w *WailsApi) AddAudioToList(listPath, auid string) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA
@@ -82,7 +82,7 @@ func (a *WailsApi) AddAudioToList(listPath, auid string) error {
 }
 
 // AddProfileVideoToList 添加个人主页视频
-func (a *WailsApi) AddProfileVideoToList(listPath string, mid, count int, downloadCompilation bool) error {
+func (w *WailsApi) AddProfileVideoToList(listPath string, mid, count int, downloadCompilation bool) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA

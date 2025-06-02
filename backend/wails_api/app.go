@@ -7,15 +7,15 @@ import (
 )
 
 // GetAppVersion 获取版本号
-func (a *WailsApi) GetAppVersion() string {
+func (w *WailsApi) GetAppVersion() string {
 	return constants.APP_VERSION
 }
 
 // GetTheme 获取主题字符串
-func (a *WailsApi) GetTheme() string {
+func (w *WailsApi) GetTheme() string {
 	return config.Cfg.Theme
 }
 
-func (a *WailsApi) Checkffmpeg() bool {
+func (w *WailsApi) Checkffmpeg() bool {
 	return ffmpeg.CheckExists()
 }

@@ -13,6 +13,6 @@ func (w *WailsApi) Startup(ctx context.Context) {
 	w.ctx = ctx
 }
 
-func (a *WailsApi) DownloadTaskList() {
-	download.DownloadTaskList(a.ctx)
+func (w *WailsApi) DownloadTaskList() {
+	download.DownloadTaskList(w.ctx)
 }
