@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
-	"syscall"
 )
 
 // CheckFileName 剔除文件名中的奇怪字符
@@ -76,7 +75,7 @@ func RunCommand(name string, args ...string) (string, error) {
 
 	// 跨平台隐藏控制台窗口（仅 Windows 需要）
 	if runtime.GOOS == "windows" {
-		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+		setHideWindow(cmd)
 	}
 
 	var out bytes.Buffer
