@@ -34,6 +34,10 @@ export function GetAppVersion() {
   return window['go']['wails_api']['WailsApi']['GetAppVersion']();
 }
 
+export function GetFavCollect(arg1) {
+  return window['go']['wails_api']['WailsApi']['GetFavCollect'](arg1);
+}
+
 export function GetListCount() {
   return window['go']['wails_api']['WailsApi']['GetListCount']();
 }
@@ -48,6 +52,18 @@ export function GetTaskListPage(arg1) {
 
 export function GetTheme() {
   return window['go']['wails_api']['WailsApi']['GetTheme']();
+}
+
+export function GetUserInf() {
+  return window['go']['wails_api']['WailsApi']['GetUserInf']();
+}
+
+export function GetUsersCollect() {
+  return window['go']['wails_api']['WailsApi']['GetUsersCollect']();
+}
+
+export function LoadConfig() {
+  return window['go']['wails_api']['WailsApi']['LoadConfig']();
 }
 
 export function QueryAudio(arg1) {
@@ -70,8 +86,20 @@ export function QueryVideo(arg1) {
   return window['go']['wails_api']['WailsApi']['QueryVideo'](arg1);
 }
 
+export function RefreshConfig() {
+  return window['go']['wails_api']['WailsApi']['RefreshConfig']();
+}
+
+export function ResetConfig() {
+  return window['go']['wails_api']['WailsApi']['ResetConfig']();
+}
+
 export function ResetDownloadList() {
   return window['go']['wails_api']['WailsApi']['ResetDownloadList']();
+}
+
+export function SaveConfig(arg1) {
+  return window['go']['wails_api']['WailsApi']['SaveConfig'](arg1);
 }
 
 export function Startup(arg1) {

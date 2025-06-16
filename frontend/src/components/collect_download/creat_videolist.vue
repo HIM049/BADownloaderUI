@@ -10,7 +10,7 @@
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { reactive, computed, ref, watch } from 'vue'
-import { LoadConfig, OpenFileDialog } from '../../../wailsjs/go/main/App'
+import { OpenFileDialog } from '../../../wailsjs/go/main/App'
 // import { CreatVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { Snackbar } from '@varlet/ui'
 
@@ -34,15 +34,6 @@ const status = computed({
         emit('update:status', status)
     }
 })
-
-// 创建视频列表并保存路径
-function creatVideoList() {
-    LoadConfig().then(result => {
-        parms.value.videoListPath = result.file_config.videolist_path;
-        // CreatVideoList();
-        emit('nextpage');
-    })
-}
 
 // 选择已有的视频列表并保存路径
 function openFile() {

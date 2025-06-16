@@ -3,8 +3,10 @@ package wails_api
 import (
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/bilibili"
+	"errors"
 	"github.com/tidwall/gjson"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
+	"strconv"
 )
 
 // QueryVideo 查询视频信息
@@ -73,4 +75,50 @@ func (w *WailsApi) QueryProfileVideo(mid string) (int, error) {
 		return 0, err
 	}
 	return int(gjson.Get(respJson, "data.page.count").Int()), err
+}
+
+// GetUsersCollect 获取用户创建的收藏夹
+func (w *WailsApi) GetUsersCollect() bilibili.Collects {
+	// 获取收藏夹列表
+	collects := new(bilibili.Collects)
+	mid, _ := strconv.Atoi(config.Cfg.Account.DedeUserID)
+	collects.UserMid = mid
+	err := collects.GetUsersCollect(config.Cfg.Account.SESSDATA)
+	if err != nil {
+		wails.LogErrorf(w.ctx, "获取收藏夹列表失败：%s", err)
+		return bilibili.Collects{}
+	}
+
+	return *collects
+}
+
+// GetUserInf 获取已登录用户的信息
+func (w *WailsApi) GetUserInf() (bilibili.AccountInformation, error) {
+	if !config.Cfg.Account.IsLogin {
+		return bilibili.AccountInformation{}, errors.New("用户未登录")
+	}
+	sessdata := config.Cfg.Account.SESSDATA
+
+	accountInf := new(bilibili.AccountInformation)
+	err := accountInf.GetUserInf(sessdata)
+	if err != nil {
+		return bilibili.AccountInformation{}, err
+	}
+
+	return *accountInf, nil
+}
+
+// GetFavCollect 获取收藏的收藏夹
+func (w *WailsApi) GetFavCollect(pn int) bilibili.Collects {
+	// 获取收藏夹列表
+	collects := new(bilibili.Collects)
+	mid, _ := strconv.Atoi(config.Cfg.Account.DedeUserID)
+	collects.UserMid = mid
+	err := collects.GetFavCollect(config.Cfg.Account.SESSDATA, 20, pn)
+	if err != nil {
+		wails.LogErrorf(w.ctx, "获取收藏夹列表失败：%s", err)
+		return bilibili.Collects{}
+	}
+
+	return *collects
 }

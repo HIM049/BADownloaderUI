@@ -116,7 +116,9 @@
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
 import { reactive, ref, onMounted } from 'vue'
-import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig, SetDownloadPathDialog } from '../../wailsjs/go/main/App'
+import { SetDownloadPathDialog } from '../../wailsjs/go/main/App'
+import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig } from '../../wailsjs/go/wails_api/WailsApi'
+
 import { Dialog, Snackbar } from '@varlet/ui'
 
 const changeCfg = ref(null) // 修改设置时的响应
