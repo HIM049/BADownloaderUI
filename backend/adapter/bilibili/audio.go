@@ -1,6 +1,7 @@
-package download
+package bilibili
 
 import (
+	"bili-audio-downloader/backend/adapter"
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
 	"bili-audio-downloader/backend/ffmpeg"
@@ -16,21 +17,21 @@ type Audio struct {
 	coverUrl string
 	sessdata string
 	listId   int
-	option   Option
-	path     Path
-	metaData MetaData
+	option   adapter.Option
+	path     adapter.Path
+	metaData adapter.MetaData
 }
 
 func (a *Audio) SetID(id int) {
 	a.listId = id
 }
 
-func NewAudio(auid string, coverUrl, sessdata string, metaData MetaData) *Audio {
+func NewAudio(auid string, coverUrl, sessdata string, metaData adapter.MetaData) *Audio {
 	return &Audio{
 		auid:     auid,
 		coverUrl: coverUrl,
 		sessdata: sessdata,
-		path: Path{
+		path: adapter.Path{
 			StreamPath:   fmt.Sprintf("%s/audio/%s", config.Cfg.GetCachePath(), auid),
 			CoverPath:    fmt.Sprintf("%s/cover/%s.jpg", config.Cfg.GetCachePath(), auid),
 			CurrentPath:  fmt.Sprintf("%s/audio/%s", config.Cfg.GetCachePath(), auid),
@@ -125,7 +126,7 @@ func (a *Audio) WriteMetadata() error {
 }
 
 func (a *Audio) ExportFile() error {
-	err := ExportFile(a.metaData.Title, a.metaData.PageTitle, a.path.OutputFormat, a.listId, a.path.CurrentPath)
+	err := utils.ExportFile(a.metaData.Title, a.metaData.PageTitle, a.path.OutputFormat, a.listId, a.path.CurrentPath)
 	if err != nil {
 		return err
 	}
@@ -149,8 +150,8 @@ func (a *Audio) downloadStream(streamPath string) error {
 	return nil
 }
 
-func (a *Audio) GetTaskInfo() *TaskInfo {
-	taskInfo := TaskInfo{
+func (a *Audio) GetTaskInfo() *adapter.TaskInfo {
+	taskInfo := adapter.TaskInfo{
 		SongName:   a.metaData.SongName,
 		SongAuthor: a.metaData.Author,
 		CoverUrl:   a.coverUrl,

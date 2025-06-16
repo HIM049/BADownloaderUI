@@ -1,3 +1,26 @@
+export namespace adapter {
+	
+	export class TaskInfo {
+	    Index: number;
+	    SongName: string;
+	    SongAuthor: string;
+	    CoverUrl: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TaskInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Index = source["Index"];
+	        this.SongName = source["SongName"];
+	        this.SongAuthor = source["SongAuthor"];
+	        this.CoverUrl = source["CoverUrl"];
+	    }
+	}
+
+}
+
 export namespace bilibili {
 	
 	export class AccountInformation {
@@ -357,29 +380,6 @@ export namespace config {
 		}
 	}
 	
-
-}
-
-export namespace download {
-	
-	export class TaskInfo {
-	    Index: number;
-	    SongName: string;
-	    SongAuthor: string;
-	    CoverUrl: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new TaskInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Index = source["Index"];
-	        this.SongName = source["SongName"];
-	        this.SongAuthor = source["SongAuthor"];
-	        this.CoverUrl = source["CoverUrl"];
-	    }
-	}
 
 }
 

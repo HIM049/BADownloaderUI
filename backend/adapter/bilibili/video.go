@@ -1,6 +1,7 @@
-package download
+package bilibili
 
 import (
+	"bili-audio-downloader/backend/adapter"
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
 	"bili-audio-downloader/backend/ffmpeg"
@@ -19,18 +20,18 @@ type Video struct {
 	coverUrl string
 	sessdata string
 	listId   int
-	option   Option
-	path     Path
-	metaData MetaData
+	option   adapter.Option
+	path     adapter.Path
+	metaData adapter.MetaData
 }
 
-func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData MetaData) *Video {
+func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData adapter.MetaData) *Video {
 	return &Video{
 		bvid:     bvid,
 		cid:      cid,
 		coverUrl: coverUrl,
 		sessdata: sessdata,
-		path: Path{
+		path: adapter.Path{
 			StreamPath:   fmt.Sprintf("%s/audio/%d", config.Cfg.GetCachePath(), cid),
 			CoverPath:    fmt.Sprintf("%s/cover/%d.jpg", config.Cfg.GetCachePath(), cid),
 			CurrentPath:  fmt.Sprintf("%s/audio/%d", config.Cfg.GetCachePath(), cid),
@@ -166,15 +167,15 @@ func (v *Video) WriteMetadata() error {
 }
 
 func (v *Video) ExportFile() error {
-	err := ExportFile(v.metaData.Title, v.metaData.PageTitle, v.path.OutputFormat, v.listId, v.path.CurrentPath)
+	err := utils.ExportFile(v.metaData.Title, v.metaData.PageTitle, v.path.OutputFormat, v.listId, v.path.CurrentPath)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (w *Video) GetTaskInfo() *TaskInfo {
-	taskInfo := TaskInfo{
+func (w *Video) GetTaskInfo() *adapter.TaskInfo {
+	taskInfo := adapter.TaskInfo{
 		SongName:   w.metaData.SongName,
 		SongAuthor: w.metaData.Author,
 		CoverUrl:   w.coverUrl,

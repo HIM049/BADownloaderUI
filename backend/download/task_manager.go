@@ -1,6 +1,8 @@
 package download
 
 import (
+	"bili-audio-downloader/backend/adapter"
+	bilibili2 "bili-audio-downloader/backend/adapter/bilibili"
 	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
 	"github.com/tidwall/gjson"
@@ -53,7 +55,7 @@ func AddVideoTask(sessdata, bvid string, downloadCompilation bool) error {
 			}
 		}
 
-		metaData := MetaData{
+		metaData := adapter.MetaData{
 			Title:     Title,
 			PageTitle: PageTitle,
 			PartId:    i,
@@ -62,7 +64,7 @@ func AddVideoTask(sessdata, bvid string, downloadCompilation bool) error {
 			LyricsUrl: "",
 		}
 
-		video := NewVideo(video.Bvid, video.Videos[i].Cid, video.Meta.Cover, sessdata, metaData)
+		video := bilibili2.NewVideo(video.Bvid, video.Videos[i].Cid, video.Meta.Cover, sessdata, metaData)
 
 		AddTask(video)
 	}
@@ -78,7 +80,7 @@ func AddAudioTask(sessdata, auid string) error {
 		return err
 	}
 
-	metaData := MetaData{
+	metaData := adapter.MetaData{
 		Title:     utils.CheckFileName(audio.Meta.Title),
 		PageTitle: utils.CheckFileName(audio.Meta.Title),
 		PartId:    0,
@@ -87,7 +89,7 @@ func AddAudioTask(sessdata, auid string) error {
 		LyricsUrl: audio.Meta.Lyric,
 	}
 
-	audioTask := NewAudio(auid, audio.Meta.Cover, sessdata, metaData)
+	audioTask := bilibili2.NewAudio(auid, audio.Meta.Cover, sessdata, metaData)
 	AddTask(audioTask)
 
 	return nil

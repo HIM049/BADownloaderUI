@@ -1,6 +1,7 @@
 package wails_api
 
 import (
+	"bili-audio-downloader/backend/adapter"
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/download"
 )
@@ -16,8 +17,8 @@ func (w *WailsApi) ResetDownloadList() {
 }
 
 // GetTaskListAll 获取完整的任务列表信息
-func (w *WailsApi) GetTaskListAll() []download.TaskInfo {
-	var taskList []download.TaskInfo
+func (w *WailsApi) GetTaskListAll() []adapter.TaskInfo {
+	var taskList []adapter.TaskInfo
 
 	for i, task := range download.DownloadList {
 		info := task.GetTaskInfo()
@@ -29,8 +30,8 @@ func (w *WailsApi) GetTaskListAll() []download.TaskInfo {
 }
 
 // GetTaskListPage 获取一页的任务列表信息
-func (w *WailsApi) GetTaskListPage(page int) []download.TaskInfo {
-	var taskList []download.TaskInfo
+func (w *WailsApi) GetTaskListPage(page int) []adapter.TaskInfo {
+	var taskList []adapter.TaskInfo
 
 	const PageSize = 10
 	start := page * PageSize

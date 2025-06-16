@@ -5,7 +5,6 @@ go 1.23.0
 toolchain go1.23.6
 
 require (
-	github.com/gcottom/audiometa v1.3.1
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/viper v1.20.1
 	github.com/tidwall/gjson v1.18.0
@@ -13,14 +12,8 @@ require (
 )
 
 require (
-	github.com/abema/go-mp4 v1.4.1 // indirect
-	github.com/aler9/writerseeker v1.1.0 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
-	github.com/bogem/id3v2/v2 v2.1.4 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
-	github.com/go-flac/flacpicture v0.3.0 // indirect
-	github.com/go-flac/flacvorbis v0.2.0 // indirect
-	github.com/go-flac/go-flac v1.0.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
@@ -45,7 +38,6 @@ require (
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/sunfish-shogi/bufseekio v0.1.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.8 // indirect
