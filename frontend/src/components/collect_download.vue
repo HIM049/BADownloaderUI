@@ -1,10 +1,6 @@
 <template>
     <var-tabs-items v-model:active="parms.pageIndex">
         <var-tab-item>
-            <CreatVideolist v-model:parms="parms" v-model:status="status" @nextpage="parms.pageIndex++"/>
-        </var-tab-item>
-
-        <var-tab-item>
             <AddVideos v-model:parms="parms" v-model:status="status" @updateBadge="updateBadge" />
         </var-tab-item>
 
@@ -28,7 +24,6 @@
 </template>
 
 <script setup>
-import CreatVideolist from '../components/collect_download/creat_videolist.vue'
 import AddVideos from '../components/collect_download/add_videos.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
@@ -37,8 +32,7 @@ import { GetListCount } from '../../wailsjs/go/wails_api/WailsApi'
 import { Dialog, Snackbar } from '@varlet/ui'
 import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
 // 页面索引值
-const pageIndex = ref(1)
-
+const pageIndex = ref(0)
 // 底部翻页按钮距离
 const scrollTop = ref(10)
 
@@ -49,7 +43,6 @@ const nextButton = ref(() => {
 // 收藏夹信息
 const parms = reactive({
     pageIndex: 0,
-    videoListPath: "",
     listCount: 0,
     // 下载设置
     options: reactive({
@@ -65,7 +58,7 @@ const parms = reactive({
 const status = reactive({
     showBack: false,
     allowBack: true,
-    showNext: false,
+    showNext: true,
     allowNext: false,
     showBadge: false,
 })
@@ -99,18 +92,13 @@ watch(parms, (newPageIndex) => {
     nextButton.value = () => {
         parms.pageIndex++
     };
-    // 列表选择或创建
-    if (newPageIndex.pageIndex == 0) {
-        status.showBack = false;
-        status.showNext = false;
-    }
     // 添加视频
-    if (newPageIndex.pageIndex == 1) {
+    if (newPageIndex.pageIndex === 0) {
         status.allowNext = false;
         updateBadge();
     }
     // 列表编辑页面
-    if (newPageIndex.pageIndex == 2) {
+    if (newPageIndex.pageIndex === 1) {
         nextButton.value = () => {
             // Dialog('清理删除项并下一步？').then(result => {
             //     if (result == 'confirm') {
@@ -126,12 +114,12 @@ watch(parms, (newPageIndex) => {
         updateBadge();
     }
     // 下载页面
-    if (newPageIndex.pageIndex == 3) {
+    if (newPageIndex.pageIndex == 2) {
         status.allowNext = false
         // status.allowBack = false
     }
     // 回到首页
-    if (newPageIndex.pageIndex > 3) {
+    if (newPageIndex.pageIndex > 2) {
         pageIndex.value = 0;
         window.location.reload();
     }
