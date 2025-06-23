@@ -44,33 +44,36 @@ func (a *App) shutdown(ctx context.Context) {
 func checkUpdateAndAlarm(ctx context.Context) {
 	// Check update
 	version, err := services.CheckUpdate(constants.APP_VERSION)
-
-	wails.LogDebugf(ctx, "Checked")
-
 	if err != nil {
 		wails.LogErrorf(ctx, "Check update faild: %s", err)
-	} else if version == "0" {
+	}
+
+	switch version {
+	case "-1":
+		wails.LogInfo(ctx, "It is special release version, no need to update")
+	case "0":
 		wails.LogInfo(ctx, "No software update")
-	} else {
+	default:
 		wails.LogInfof(ctx, "Founded new version: %s", version)
+		// Show dialog to user
+		{
+			result, err := wails.MessageDialog(ctx, wails.MessageDialogOptions{
+				Type:          wails.QuestionDialog,
+				Title:         "找到新版本：" + version,
+				Message:       "软件有新版本发布了，是否前往下载？",
+				DefaultButton: "Yes",
+			})
 
-		result, err := wails.MessageDialog(ctx, wails.MessageDialogOptions{
-			Type:          wails.QuestionDialog,
-			Title:         "找到新版本：" + version,
-			Message:       "软件有新版本发布了，是否前往下载？",
-			DefaultButton: "Yes",
-		})
+			if err != nil {
+				wails.LogError(ctx, "Failed to show message dialog: "+err.Error())
+			}
 
-		if err != nil {
-			wails.LogError(ctx, "Failed to show message dialog: "+err.Error())
+			wails.LogDebugf(ctx, "Dialog result：%s", result)
+
+			if result == "Yes" {
+				wails.BrowserOpenURL(ctx, "https://github.com/HIM049/BADownloaderUI/releases/tag/"+version)
+			}
 		}
-
-		wails.LogDebugf(ctx, "Dialog result：%s", result)
-
-		if result == "Yes" {
-			wails.BrowserOpenURL(ctx, "https://github.com/HIM049/BADownloaderUI/releases/tag/"+version)
-		}
-		wails.LogDebugf(ctx, "Check Update and Alarm222")
 	}
 }
 
