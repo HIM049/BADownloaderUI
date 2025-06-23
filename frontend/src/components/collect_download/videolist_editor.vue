@@ -1,19 +1,20 @@
 <template>
     <FramePage title="列表编辑">
         <var-space justify="center">                
-            <var-button type="primary" @click="tidyAndRefreshList" size="large"><var-icon name="refresh" />整理并刷新列表</var-button>
-            <var-button type="primary" @click="saveListTo" size="large"><var-icon name="share" />导出列表文件</var-button>
+            <var-button type="primary" @click="getTaskListPage" size="large"><var-icon name="refresh" />刷新列表</var-button>
+            <var-button type="primary" @click="getTaskListAll" size="large">显示完整列表</var-button>
+            <var-counter :min="0" v-model="TaskList.index" input-text-size="18px" input-width="47px" button-size="44px"/>
         </var-space>
     </FramePage>
     <AdditionCard v-if="CardStatus.ShowList">
 
-        <li v-for="(video, index) in videoList.List" style="list-style-type: none;">
-            <var-card :title="video.title" :src="video.Meta.cover" layout="row" image-width="250px" outlines v-if="!video.delete" style="margin-bottom: 20px;">
+        <li v-for="(video, index) in TaskList.tasks" style="list-style-type: none;">
+            <var-card :title="video.SongName" :src="video.CoverUrl" layout="row" image-width="250px" outlines v-if="!video.delete" style="margin-bottom: 20px;">
                 <template #description>
                     <var-divider />
                     <div style="margin: 0 10px;">
-                        <var-chip plain type="info" style="margin-bottom: 5px;">歌曲名称：{{ video.Meta.song_name }}</var-chip>
-                        <var-chip plain type="info" style="margin-bottom: 30px;">歌曲作者：{{ video.Meta.author }}</var-chip>
+                        <var-chip plain type="info" style="margin-bottom: 5px;">歌曲名称：{{ video.SongName }}</var-chip>
+                        <var-chip plain type="info" style="margin-bottom: 30px;">歌曲作者：{{ video.SongAuthor }}</var-chip>
                     </div>
                 </template>
 
@@ -63,11 +64,16 @@ import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, watch, ref } from 'vue'
 // import { SaveVideoListTo } from '../../../wailsjs/go/main/App'
-// import { LoadVideoList, SaveVideoList, TidyVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
+import { GetTaskListPage, GetTaskListAll } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
 
 const videoList = ref([])
+
+const TaskList = reactive({
+    tasks: [],
+    index: 0,
+})
 
 const CardStatus = reactive({
     RightPanel: false,
@@ -101,7 +107,11 @@ const status = computed({
 })
 
 EventsOn('refreshVideoList', () => {
-    loadVideoList();
+    getTaskListPage();
+})
+
+watch(() => TaskList.index, () => {
+    getTaskListPage();
 })
 
 // 另存列表
@@ -118,26 +128,25 @@ function saveListTo() {
     // });
 }
 
-// 清理并刷新列表
-function tidyAndRefreshList() {
-    Dialog('清理删除项并刷新列表？').then(result => {
-        if (result == 'confirm') {
-            tidyAndRefresh(() => {
-                Snackbar.success('刷新成功');
-            });
-        }
-        return;
-    });
-}
+// // 清理并刷新列表
+// function tidyAndRefreshList() {
+//     Dialog('清理删除项并刷新列表？').then(result => {
+//         if (result == 'confirm') {
+//             // tidyAndRefresh(() => {
+//             //     Snackbar.success('刷新成功');
+//             // });
+//         }
+//     });
+// }
 
-// 清理并刷新列表
-function tidyAndRefresh(callback) {
-    // TidyVideoList(parms.value.videoListPath).then(()=>{
-    //     loadVideoList();
-    //     emit('refresh');
-    //     callback();
-    // });
-}
+// // 清理并刷新列表
+// function tidyAndRefresh(callback) {
+//     TidyVideoList(parms.value.videoListPath).then(()=>{
+//         getTaskList();
+//         emit('refresh');
+//         callback();
+//     });
+// }
 
 // 修改视频删除状态
 function setDeleteState(index) {
@@ -160,11 +169,21 @@ function openRightPanel(index) {
 
 }
 
-function loadVideoList() {
-    // LoadVideoList(parms.value.videoListPath).then(result => {
-    //     videoList.value = result;
-    //     CardStatus.ShowList = true;
-    // })
+// 获取任务列表（页）
+function getTaskListPage() {
+    GetTaskListPage(TaskList.index).then(result => {
+        console.log(result);
+        TaskList.tasks = result;
+        CardStatus.ShowList = true;
+    })
+}
+
+function getTaskListAll() {
+    GetTaskListAll().then(result => {
+        console.log(result);
+        TaskList.tasks = result;
+        CardStatus.ShowList = true;
+    })
 }
 
 // 保存列表修改
