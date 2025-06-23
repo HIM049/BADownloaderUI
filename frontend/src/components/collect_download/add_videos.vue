@@ -175,15 +175,8 @@ watch(input, () => {
 
 // 一键添加事件
 EventsOn('addToList', (url, type) => {
-    if (parms.value.videoListPath == "") {
-        EventsEmit('turnToPage', 1);
-        Snackbar.warning('请先选择视频列表');
-        return;
-    }
-
-    QueryType.value = type == 0 ? 1 : 0;
+    QueryType.value = type === 0 ? 1 : 0;
     input.value = url;
-    parms.value.pageIndex = 1;
     openRightPanel();
 })
 
@@ -208,7 +201,7 @@ function queryInfornation() {
         break;
     }
 
-    if (input.value == "") {
+    if (input.value === "") {
         // 空输入判断
         CardStatus.InfoCard = false;
         return;
@@ -319,7 +312,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddCollectionToList(parms.value.videoListPath, resp.fid, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -329,7 +321,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddCompilationToList(parms.value.videoListPath, Number(resp.mid), Number(resp.fid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -340,7 +331,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddVideoToList(parms.value.videoListPath, resp.bvid, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -351,7 +341,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddAudioToList(parms.value.videoListPath, resp.bvid).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -361,7 +350,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddProfileVideoToList(parms.value.videoListPath, Number(resp.bvid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -371,6 +359,7 @@ function openRightPanel() {
 }
 
 function afterAdd() {
+    Snackbar.success("添加完成");
     CardStatus.RightPanel = false;
     input.value = "";
     props.parms.options.downCount = 0;
