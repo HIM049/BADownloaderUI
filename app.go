@@ -5,9 +5,8 @@ import (
 	"bili-audio-downloader/backend/constants"
 	"bili-audio-downloader/backend/services"
 	"context"
-	"os"
-
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
+	"os"
 )
 
 // App struct
@@ -15,19 +14,25 @@ type App struct {
 	ctx context.Context
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the wails methods
+// startup is called when the app starts
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 
-	// 程序初始化
+	// Initialize config
+	wails.LogDebug(a.ctx, "Start Initializing Config")
 	config.InitConfig(a.ctx)
+
+	// Create folder
+	wails.LogDebug(a.ctx, "Start Initializing Folder")
 	initFolder(a.ctx)
-	checkUpdateAndAlarm(a.ctx)
+
+	// Check software update
+	wails.LogDebug(a.ctx, "Start Check Update")
+	go checkUpdateAndAlarm(a.ctx)
 
 }
 
-// 程序关闭时
+// shutdown is called when the app shutdown
 func (a *App) shutdown(ctx context.Context) {
 	// 清理缓存
 	if config.Cfg.DeleteCache {
@@ -35,10 +40,13 @@ func (a *App) shutdown(ctx context.Context) {
 	}
 }
 
-// 检查更新并提示
+// Check update and alarm
 func checkUpdateAndAlarm(ctx context.Context) {
-	// 检查版本更新
+	// Check update
 	version, err := services.CheckUpdate(constants.APP_VERSION)
+
+	wails.LogDebugf(ctx, "Checked")
+
 	if err != nil {
 		wails.LogErrorf(ctx, "Check update faild: %s", err)
 	} else if version == "0" {
@@ -62,6 +70,7 @@ func checkUpdateAndAlarm(ctx context.Context) {
 		if result == "Yes" {
 			wails.BrowserOpenURL(ctx, "https://github.com/HIM049/BADownloaderUI/releases/tag/"+version)
 		}
+		wails.LogDebugf(ctx, "Check Update and Alarm222")
 	}
 }
 
