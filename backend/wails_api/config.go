@@ -2,7 +2,6 @@ package wails_api
 
 import (
 	"bili-audio-downloader/backend/config"
-	"github.com/spf13/viper"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -33,8 +32,7 @@ func (w *WailsApi) SaveConfig(cfg config.Config) {
 
 // RefreshConfig 刷新设置
 func (w *WailsApi) RefreshConfig() error {
-	err := viper.ReadInConfig()
-	if err != nil {
+	if err := config.LoadConfig(w.ctx); err != nil {
 		return err
 	}
 	return nil

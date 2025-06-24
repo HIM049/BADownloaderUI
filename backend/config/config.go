@@ -3,6 +3,8 @@ package config
 import (
 	"bili-audio-downloader/backend/constants"
 	"context"
+	"errors"
+	"fmt"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
 	"os"
@@ -50,30 +52,50 @@ func InitConfig(ctx context.Context) {
 	viper.SetConfigType("json")
 	viper.AddConfigPath("./")
 
+	err := LoadConfig(ctx)
+	if err != nil {
+		wails.LogFatalf(ctx, "Failed to load config: %v", err)
+	}
+
+	// Check config version
+	if Cfg.ConfigVersion != constants.CONFIG_VERSION {
+		if Cfg.ConfigVersion < constants.CONFIG_VERSION {
+			err := migrateConfig("./config.json")
+			if err != nil {
+				wails.LogFatalf(ctx, "Failed to migrate config: %v\n", err)
+			}
+		} else {
+			wails.LogInfo(ctx, "Config version is higher than current version")
+		}
+	}
+}
+
+// LoadConfig Read config file
+func LoadConfig(ctx context.Context) error {
 	err := viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			wails.LogInfof(ctx, "Config file not found: %v", err)
+			wails.LogWarningf(ctx, "Config file not found: %v, create a new one", err)
 			newConfig := DefaultConfig()
 
-			// 创建配置文件
+			// Creat config file
 			_, err = os.Create("config.json")
 			if err != nil {
-				wails.LogFatalf(ctx, "Failed to create config file: %v", err)
+				return errors.New(fmt.Sprintf("failed to create config file: %v", err))
 			}
 
-			// 保存默认配置到文件
+			// Write default config into file
 			err = newConfig.UpdateAndSave()
 			if err != nil {
-				wails.LogFatalf(ctx, "Failed to create new config file: %v", err)
+				return errors.New(fmt.Sprintf("failed to write config file: %v", err))
 			}
 			wails.LogInfo(ctx, "Created new config file")
 		} else {
-			wails.LogFatalf(ctx, "Failed to read config file: %v", err)
+			return errors.New(fmt.Sprintf("failed to read config file: %v", err))
 		}
 	}
 
-	// 初始化嵌套结构体
+	// Init config struct
 	downloadCfg := DownloadConfig{
 		DownloadThreads: viper.GetInt("download_config.download_threads"),
 		RetryCount:      viper.GetInt("download_config.retry_count"),
@@ -107,18 +129,7 @@ func InitConfig(ctx context.Context) {
 		FileConfig:     fileCfg,
 		Account:        account,
 	}
-
-	// 检查配置文件版本
-	if Cfg.ConfigVersion != constants.CONFIG_VERSION {
-		if Cfg.ConfigVersion < constants.CONFIG_VERSION {
-			err := migrateConfig("./config.json")
-			if err != nil {
-				wails.LogFatalf(ctx, "Failed to migrate config: %v\n", err)
-			}
-		} else {
-			wails.LogInfo(ctx, "Config version is higher than current version")
-		}
-	}
+	return nil
 }
 
 func (cfg *Config) UpdateAndSave() error {

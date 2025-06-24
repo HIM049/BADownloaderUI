@@ -177,7 +177,8 @@ function resetConfig() {
 function setTheme() {
     SaveConfig(config.value).then(result => {
         Dialog('立即重新加载主题？').then(result => {
-            if (result == 'confirm') {
+            if (result === 'confirm') {
+                loadConfig();
                 window.location.reload();
             }
             return;
@@ -189,7 +190,7 @@ function setTheme() {
 // 登出账户
 function logoutAccount() {
     Dialog('要退出登录吗？').then(result => {
-        if (result == 'confirm') {
+        if (result === 'confirm') {
             config.value.Account.is_login = false;
             config.value.Account.use_account = false;
             config.value.Account.sessdata = "";
