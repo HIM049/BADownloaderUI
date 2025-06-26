@@ -16,11 +16,7 @@
                             </template>
                         </var-cell>
 
-                        <var-cell> 关闭软件后清除缓存
-                            <template #extra>
-                                <var-switch v-model="config.delete_cache" variant @change="changeCfg" />
-                            </template>
-                        </var-cell>
+                        <CellSwitch title="关闭软件后清除缓存" v-model:parms="config.delete_cache" :onchange="changeCfg"></CellSwitch>
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
@@ -28,12 +24,7 @@
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
                     <var-collapse-item title="账号使用" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
-                        <var-cell> 
-                            获取内容时使用账号
-                            <template #extra>
-                                <var-switch v-model="config.Account.use_account" variant @change="setUseAccount"/>
-                            </template>
-                        </var-cell>
+                        <CellSwitch title="获取内容时使用账号" v-model:parms="config.Account.use_account" :onchange="setUseAccount"></CellSwitch>
                         <var-cell>
                             清除保存的账号信息
                             <template #extra>
@@ -69,11 +60,7 @@
                     <var-collapse-item title="文件与路径" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
 
                     <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%; margin-bottom: 10px;">
-                        <var-cell> 使用 ffmpeg 转码音频
-                            <template #extra>
-                                <var-switch v-model="config.file_config.convert_format" variant @change="setConvertFormat" />
-                            </template>
-                        </var-cell>
+                        <CellSwitch title="使用 ffmpeg 转码音频" v-model:parms="config.file_config.convert_format" :onchange="setConvertFormat"></CellSwitch>
                     </var-tooltip>
 
                     <var-tooltip content="双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名" style="width: 100%; margin-bottom: 10px;" trigger="click">
@@ -105,8 +92,8 @@
 
             <var-space direction="column" size="large">
                 <var-space justify="flex-end">
-                    <var-button type="danger" @click="resetConfig">重置设置</var-button>
-                    <var-button type="success" @click="changeCfg">保存更改</var-button>
+                    <var-button type="danger" icon-container @click="resetConfig"><var-icon name="refresh" />重置设置</var-button>
+                    <var-button type="success" icon-container @click="changeCfg"><var-icon name="file-document-outline" />保存更改</var-button>
                 </var-space>
             </var-space>
         </var-form>
@@ -115,6 +102,7 @@
 
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
+import CellSwitch from './modules/setting_switch_cell.vue'
 import { reactive, ref, onMounted } from 'vue'
 import { SetDownloadPathDialog } from '../../wailsjs/go/main/App'
 import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig } from '../../wailsjs/go/wails_api/WailsApi'
@@ -137,6 +125,9 @@ onMounted(() => {
         changeCfg.value = saveConfig
     }, 100)
 })
+
+// TODO: fix ffmpeg checker
+// TODO: ffmpeg path setter
 
 // 设置内容
 const config = ref([])
