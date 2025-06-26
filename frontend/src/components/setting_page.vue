@@ -5,17 +5,12 @@
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
                     <var-collapse-item title="软件行为与外观" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
-                        <var-cell> 
-                            主题颜色
-                            <template #extra>
-                                
-                                <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" style="width: 150px;" @change="setTheme">
-                                    <var-option label="粉色" :value="'lightPink'" />
-                                    <var-option label="蓝色" :value="'lightBlue'" />
-                                </var-select>
-                            </template>
-                        </var-cell>
-
+                        <SettingCell title="主题颜色">
+                            <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" style="width: 150px;" @change="setTheme">
+                                <var-option label="粉色" :value="'lightPink'" />
+                                <var-option label="蓝色" :value="'lightBlue'" />
+                            </var-select>
+                        </SettingCell>
                         <CellSwitch title="关闭软件后清除缓存" v-model:parms="config.delete_cache" :onchange="changeCfg"></CellSwitch>
                     </var-collapse-item>
                 </var-collapse>
@@ -25,12 +20,9 @@
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
                     <var-collapse-item title="账号使用" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
                         <CellSwitch title="获取内容时使用账号" v-model:parms="config.Account.use_account" :onchange="setUseAccount"></CellSwitch>
-                        <var-cell>
-                            清除保存的账号信息
-                            <template #extra>
-                                <var-button type="danger" @click="logoutAccount" :disabled="!config.Account.is_login">退出登录</var-button>
-                            </template>
-                        </var-cell>
+                        <SettingCell title="清除保存的账号信息">
+                            <var-button type="danger" @click="logoutAccount" :disabled="!config.Account.is_login">退出登录</var-button>
+                        </SettingCell>
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
@@ -38,19 +30,12 @@
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass2" :offset="true" elevation="0">
                     <var-collapse-item title="软件下载行为" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
-                        <var-cell> 
-                            最大下载线程数
-                            <template #extra>
-                                <var-counter v-model="config.download_config.download_threads" @change="changeCfg" />
-                            </template>
-                        </var-cell>        
-
-                        <var-cell> 
-                            下载重试次数
-                            <template #extra>
-                                <var-counter v-model="config.download_config.retry_count" @change="changeCfg" />
-                            </template>
-                        </var-cell>
+                        <SettingCell title="最大下载线程数">
+                            <var-counter v-model="config.download_config.download_threads" @change="changeCfg" />
+                        </SettingCell>
+                        <SettingCell title="下载重试次数">
+                            <var-counter v-model="config.download_config.retry_count" @change="changeCfg" />
+                        </SettingCell>
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
@@ -103,6 +88,7 @@
 <script setup>
 import FramePage from '../components/modules/frame_page.vue'
 import CellSwitch from './modules/setting_switch_cell.vue'
+import SettingCell from './modules/setting_cell.vue'
 import { reactive, ref, onMounted } from 'vue'
 import { SetDownloadPathDialog } from '../../wailsjs/go/main/App'
 import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig } from '../../wailsjs/go/wails_api/WailsApi'

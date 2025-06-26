@@ -1,13 +1,11 @@
 <template>
-    <var-cell>
-        {{ props.title }}
-        <template #extra>
-            <var-switch v-model="parms" variant @change="onchange()" />
-        </template>
-    </var-cell>
+    <SettingCell :title="props.title">
+        <var-switch v-model="parms" variant @change="onchange()" />
+    </SettingCell>
 </template>
 
 <script setup lang="ts">
+import SettingCell from "./setting_cell.vue"
 import { computed } from 'vue'
 
 const props = defineProps({
