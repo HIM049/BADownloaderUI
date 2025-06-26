@@ -1,7 +1,10 @@
 <template>
     <body class="page-body" >
         <var-paper :elevation="2" >
-            <h2>{{ title }}</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h2>{{ title }}</h2>
+                <div><slot name="actions"/></div>
+            </div>
             <slot />
         </var-paper>
     </body>

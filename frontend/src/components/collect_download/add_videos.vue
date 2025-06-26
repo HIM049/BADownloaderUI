@@ -1,17 +1,20 @@
 <template>
     <FramePage title="添加内容">
-        <var-button type="danger" round icon-container style="float: right" @click="() => {
-            Dialog('删除当前任务列表').then(result => {
+        <template #actions>
+            <var-button type="danger" icon-container style="float: right" @click="() => {
+            Dialog('清除当前任务列表').then(result => {
                 if (result === 'confirm') {
                     ResetDownloadList().then(() => {
                         emit('updateBadge');
-                        Snackbar.success('删除成功');
+                        Snackbar.success('清除成功');
                     });
                 }
             });
         }">
-            <var-icon name="window-close" />
-        </var-button>
+                <var-icon name="delete" />
+                清除列表
+            </var-button>
+        </template>
 
         <var-radio-group v-model="QueryType" @change="queryInfornation">
             <var-radio :checked-value="0">收藏夹</var-radio>
@@ -187,7 +190,7 @@ function queryInfornation() {
         case 0: // collect
             inputTip.value = '请输入 收藏夹网页 URL'
             break;
-        case 1: // comliation
+        case 1: // compilation
             inputTip.value = '请输入 视频合集网页 URL'
             break;
         case 2: // video
