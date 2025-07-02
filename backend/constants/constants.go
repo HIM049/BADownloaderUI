@@ -1,7 +1,7 @@
 package constants
 
 const CONFIG_VERSION int = 2
-const APP_VERSION string = "4.10.0-rc1"
+const APP_VERSION string = "4.10.0"
 
 var AudioType = struct {
 	M4a  string
