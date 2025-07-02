@@ -30,7 +30,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { WindowMinimise, Quit } from '../../../wailsjs/runtime'
-import { GetAppVersion } from '../../../wailsjs/go/main/App'
+import { GetAppVersion } from '../../../wailsjs/go/wails_api/WailsApi'
 
 const APP_VERSION = ref(null)
 onMounted(() => {

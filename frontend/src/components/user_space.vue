@@ -54,7 +54,8 @@
 import FramePage from '../components/modules/frame_page.vue'
 import AdditionCard from './modules/addition_card.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
-import { LoginBilibili, LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf } from '../../wailsjs/go/main/App'
+import { LoginBilibili } from '../../wailsjs/go/main/App'
+import { LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf } from '../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn, EventsEmit, ClipboardSetText } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 

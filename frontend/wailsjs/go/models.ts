@@ -1,3 +1,26 @@
+export namespace adapter {
+	
+	export class TaskInfo {
+	    Index: number;
+	    SongName: string;
+	    SongAuthor: string;
+	    CoverUrl: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TaskInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Index = source["Index"];
+	        this.SongName = source["SongName"];
+	        this.SongAuthor = source["SongAuthor"];
+	        this.CoverUrl = source["CoverUrl"];
+	    }
+	}
+
+}
+
 export namespace bilibili {
 	
 	export class AccountInformation {
@@ -357,139 +380,6 @@ export namespace config {
 		}
 	}
 	
-
-}
-
-export namespace main {
-	
-	export class AudioInformation {
-	    quality: number;
-	    stream: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new AudioInformation(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.quality = source["quality"];
-	        this.stream = source["stream"];
-	    }
-	}
-	export class DownloadOption {
-	    song_name: boolean;
-	    song_cover: boolean;
-	    song_author: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new DownloadOption(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.song_name = source["song_name"];
-	        this.song_cover = source["song_cover"];
-	        this.song_author = source["song_author"];
-	    }
-	}
-	export class MetaInformation {
-	    song_name: string;
-	    cover: string;
-	    author: string;
-	    lyrics_path: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new MetaInformation(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.song_name = source["song_name"];
-	        this.cover = source["cover"];
-	        this.author = source["author"];
-	        this.lyrics_path = source["lyrics_path"];
-	    }
-	}
-	export class VideoInformation {
-	    bvid: string;
-	    cid: number;
-	    title: string;
-	    page_title: string;
-	    format: string;
-	    part_id: number;
-	    is_audio: boolean;
-	    delete: boolean;
-	    Audio: AudioInformation;
-	    Meta: MetaInformation;
-	
-	    static createFrom(source: any = {}) {
-	        return new VideoInformation(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.bvid = source["bvid"];
-	        this.cid = source["cid"];
-	        this.title = source["title"];
-	        this.page_title = source["page_title"];
-	        this.format = source["format"];
-	        this.part_id = source["part_id"];
-	        this.is_audio = source["is_audio"];
-	        this.delete = source["delete"];
-	        this.Audio = this.convertValues(source["Audio"], AudioInformation);
-	        this.Meta = this.convertValues(source["Meta"], MetaInformation);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class VideoList {
-	    count: number;
-	    List: VideoInformation[];
-	
-	    static createFrom(source: any = {}) {
-	        return new VideoList(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.count = source["count"];
-	        this.List = this.convertValues(source["List"], VideoInformation);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
 
 }
 

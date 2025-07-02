@@ -1,5 +1,21 @@
 <template>
-    <FramePage title="添加内容">        
+    <FramePage title="添加内容">
+        <template #actions>
+            <var-button type="danger" icon-container style="float: right" @click="() => {
+            Dialog('清除当前任务列表').then(result => {
+                if (result === 'confirm') {
+                    ResetDownloadList().then(() => {
+                        emit('updateBadge');
+                        Snackbar.success('清除成功');
+                    });
+                }
+            });
+        }">
+                <var-icon name="delete" />
+                清除列表
+            </var-button>
+        </template>
+
         <var-radio-group v-model="QueryType" @change="queryInfornation">
             <var-radio :checked-value="0">收藏夹</var-radio>
             <var-radio :checked-value="1">视频合集</var-radio>
@@ -8,7 +24,7 @@
             <var-radio :checked-value="4">用户空间</var-radio>
         </var-radio-group>
 
-        <var-input :placeholder="inputTip" v-model="input" clearable 
+        <var-input :placeholder="inputTip" v-model="input" clearable
         style="margin-bottom: 25px;" >
             <template #prepend-icon>
                 <var-icon name="magnify" />
@@ -90,10 +106,21 @@
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
-// import { ClipboardGetText } from '../../../wailsjs/runtime'
-import { QueryVideo, QueryCollection, QueryCompilation, QueryAudio, QueryProfileVideo, AddVideoToList, AddCollectionToList, AddCompilationToList, AddAudioToList, AddProfileVideoToList } from '../../../wailsjs/go/main/App'
+import {
+    QueryVideo,
+    QueryCollection,
+    QueryCompilation,
+    QueryAudio,
+    QueryProfileVideo,
+    AddVideoToList,
+    AddCollectionToList,
+    AddCompilationToList,
+    AddAudioToList,
+    AddProfileVideoToList,
+    ResetDownloadList
+} from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn, EventsEmit } from '../../../wailsjs/runtime'
-import { Snackbar } from '@varlet/ui'
+import {Dialog, Snackbar} from '@varlet/ui'
 
 const props = defineProps(['parms', 'status'])
 const emit = defineEmits(['update:parms', 'update:status', 'updateBadge'])
@@ -151,15 +178,8 @@ watch(input, () => {
 
 // 一键添加事件
 EventsOn('addToList', (url, type) => {
-    if (parms.value.videoListPath == "") {
-        EventsEmit('turnToPage', 1);
-        Snackbar.warning('请先选择视频列表');
-        return;
-    }
-
-    QueryType.value = type == 0 ? 1 : 0;
+    QueryType.value = type === 0 ? 1 : 0;
     input.value = url;
-    parms.value.pageIndex = 1;
     openRightPanel();
 })
 
@@ -170,7 +190,7 @@ function queryInfornation() {
         case 0: // collect
             inputTip.value = '请输入 收藏夹网页 URL'
             break;
-        case 1: // comliation
+        case 1: // compilation
             inputTip.value = '请输入 视频合集网页 URL'
             break;
         case 2: // video
@@ -184,7 +204,7 @@ function queryInfornation() {
         break;
     }
 
-    if (input.value == "") {
+    if (input.value === "") {
         // 空输入判断
         CardStatus.InfoCard = false;
         return;
@@ -295,7 +315,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddCollectionToList(parms.value.videoListPath, resp.fid, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -305,7 +324,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddCompilationToList(parms.value.videoListPath, Number(resp.mid), Number(resp.fid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -316,7 +334,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddVideoToList(parms.value.videoListPath, resp.bvid, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -327,7 +344,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddAudioToList(parms.value.videoListPath, resp.bvid).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -337,7 +353,6 @@ function openRightPanel() {
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
                 AddProfileVideoToList(parms.value.videoListPath, Number(resp.bvid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    Snackbar.success("添加完成");
                     afterAdd();
                 });
             }
@@ -347,6 +362,7 @@ function openRightPanel() {
 }
 
 function afterAdd() {
+    Snackbar.success("添加完成");
     CardStatus.RightPanel = false;
     input.value = "";
     props.parms.options.downCount = 0;

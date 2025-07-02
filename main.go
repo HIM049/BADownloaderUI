@@ -1,7 +1,10 @@
 package main
 
 import (
-	"bili-audio-downloader/services"
+	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/services"
+	"bili-audio-downloader/backend/wails_api"
+	"context"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
@@ -14,12 +17,10 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
-// 全局版本号
-const APP_VERSION string = "4.9.1"
-
 func main() {
 	// Create an instance of the app structure
 	app := &App{}
+	wailsApi := &wails_api.WailsApi{}
 
 	// Init logger
 	customLogger, err := services.NewCustomLogger()
@@ -30,7 +31,7 @@ func main() {
 
 	// Create application with options
 	err = wails.Run(&options.App{
-		Title:  "BiliAudioDownloader " + APP_VERSION,
+		Title:  "BiliAudioDownloader " + constants.APP_VERSION,
 		Width:  1024,
 		Height: 720,
 		AssetServer: &assetserver.Options{
@@ -41,13 +42,17 @@ func main() {
 		Windows: &windows.Options{
 			IsZoomControlEnabled: false, // 页面缩放比例
 		},
-		BackgroundColour:   &options.RGBA{R: 255, G: 255, B: 255, A: 1},
-		OnStartup:          app.startup,
+		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
+		OnStartup: func(ctx context.Context) {
+			app.startup(ctx)
+			wailsApi.Startup(ctx)
+		},
 		OnShutdown:         app.shutdown,
 		LogLevelProduction: logger.INFO,
 		Logger:             customLogger,
 		Bind: []interface{}{
 			app,
+			wailsApi,
 		},
 	})
 

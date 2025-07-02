@@ -1,13 +1,17 @@
-package bilibili
+package utils
 
 import (
-	"encoding/json"
+	"bili-audio-downloader/backend/config"
+	"bili-audio-downloader/backend/constants"
+	"bytes"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
+	"text/template"
 )
 
-// 用于下载音频流的函数
+// StreamingDownloader 用于下载音频流的函数
 // 传入流 URL 和文件名
 func StreamingDownloader(audioURL, filePathAndName string) error {
 	// 先判断文件是否存在，如果存在则跳过下载，否则创建文件
@@ -61,10 +65,41 @@ func SaveFromURL(url string, filePath string) error {
 	return nil
 }
 
-// 工具函数
-// json解析函数
-func DecodeJson(jsonFile string, object any) error {
-	err := json.Unmarshal([]byte([]byte(jsonFile)), object)
+type FileName struct {
+	Title    string
+	Subtitle string
+	Quality  string
+	ID       int
+	Format   string
+}
+
+func ExportFile(title, subtitle, outputFormat string, listid int, currentPath string) error {
+	quality := "normal"
+	if outputFormat == constants.AudioType.Flac {
+		quality = "hires"
+
+	}
+	// 处理模板和生成文件名
+	fileName := FileName{
+		Title:    title,
+		Subtitle: subtitle,
+		Quality:  quality,
+		ID:       listid,
+		Format:   outputFormat,
+	}
+	tmpl, err := template.New("filename").Parse(config.Cfg.FileConfig.FileNameTemplate)
+	if err != nil {
+		return err
+	}
+
+	var output bytes.Buffer
+	err = tmpl.Execute(&output, fileName)
+	if err != nil {
+		return err
+	}
+
+	// 重命名歌曲文件并移动位置
+	err = os.Rename(currentPath, filepath.Join(config.Cfg.GetDownloadPath(), output.String()))
 	if err != nil {
 		return err
 	}
