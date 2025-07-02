@@ -18,10 +18,6 @@ type App struct {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 
-	// Initialize config
-	wails.LogDebug(a.ctx, "Start Initializing Config")
-	config.InitConfig(a.ctx)
-
 	// Create folder
 	wails.LogDebug(a.ctx, "Start Initializing Folder")
 	initFolder(a.ctx)

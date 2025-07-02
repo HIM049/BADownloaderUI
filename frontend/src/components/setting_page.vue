@@ -1,6 +1,6 @@
 <template>
 
-    <FramePage title="应用设置" v-if="overload">
+    <FramePage title="应用设置" v-if="isPageLoaded">
         <var-form>
             <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
                 <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
@@ -96,7 +96,7 @@ import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig } from '../../wailsj
 import { Dialog, Snackbar } from '@varlet/ui'
 
 const changeCfg = ref(null) // 修改设置时的响应
-const overload = ref(false) // 是否完成页面加载
+const isPageLoaded = ref(false) // 是否完成页面加载
 
 const CardStatus = reactive({
     configClass0: [],
@@ -107,8 +107,9 @@ const CardStatus = reactive({
 
 onMounted(() => {
     setTimeout(() => {
+        console.log("loading config...")
         loadConfig();
-        changeCfg.value = saveConfig
+        changeCfg.value = saveConfig;
     }, 100)
 })
 
@@ -126,11 +127,13 @@ function setDownloadPathDialog() {
 
 // 读取配置文件
 function loadConfig() {
-    RefreshConfig();
-    LoadConfig().then(result => {
-        config.value = result;
-        overload.value = true;
-    })
+    RefreshConfig().then( () => {
+        LoadConfig().then(result => {
+            console.log("配置文件: ", result);
+            config.value = result;
+            isPageLoaded.value = true;
+        })}
+    );
 }
 
 // 保存配置文件

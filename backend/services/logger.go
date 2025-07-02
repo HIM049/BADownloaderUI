@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+var Logger *CustomLogger
+
 type CustomLogger struct {
 	logFile *os.File
 }

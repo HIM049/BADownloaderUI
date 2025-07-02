@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
 	"bili-audio-downloader/backend/services"
 	"bili-audio-downloader/backend/wails_api"
 	"context"
 	"embed"
-
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -28,6 +28,9 @@ func main() {
 		println("Error:", err.Error())
 		return
 	}
+
+	// Initialize assets
+	InitApp(customLogger)
 
 	// Create application with options
 	err = wails.Run(&options.App{
@@ -60,4 +63,17 @@ func main() {
 		println("Error:", err.Error())
 	}
 
+}
+
+func InitApp(logger *services.CustomLogger) {
+
+	// Initialize logger
+	services.Logger = logger
+
+	// Initialize config
+	services.Logger.Debug("Start Initializing Config")
+	err := config.InitConfig()
+	if err != nil {
+		services.Logger.Fatal("Failed to initialize config: " + err.Error())
+	}
 }

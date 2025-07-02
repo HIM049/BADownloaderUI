@@ -305,6 +305,18 @@ export namespace config {
 	        this.sid = source["sid"];
 	    }
 	}
+	export class FFmpegConfig {
+	    ffmpeg_path: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FFmpegConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ffmpeg_path = source["ffmpeg_path"];
+	    }
+	}
 	export class FileConfig {
 	    convert_format: boolean;
 	    file_name_template: string;
@@ -345,7 +357,8 @@ export namespace config {
 	    theme: string;
 	    download_config: DownloadConfig;
 	    file_config: FileConfig;
-	    Account: Account;
+	    account: Account;
+	    ffmpeg_config: FFmpegConfig;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -358,7 +371,8 @@ export namespace config {
 	        this.theme = source["theme"];
 	        this.download_config = this.convertValues(source["download_config"], DownloadConfig);
 	        this.file_config = this.convertValues(source["file_config"], FileConfig);
-	        this.Account = this.convertValues(source["Account"], Account);
+	        this.account = this.convertValues(source["account"], Account);
+	        this.ffmpeg_config = this.convertValues(source["ffmpeg_config"], FFmpegConfig);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -379,6 +393,7 @@ export namespace config {
 		    return a;
 		}
 	}
+	
 	
 
 }

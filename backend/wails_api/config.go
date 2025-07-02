@@ -32,7 +32,7 @@ func (w *WailsApi) SaveConfig(cfg config.Config) {
 
 // RefreshConfig 刷新设置
 func (w *WailsApi) RefreshConfig() error {
-	if err := config.LoadConfig(w.ctx); err != nil {
+	if err := config.LoadConfig(); err != nil {
 		return err
 	}
 	return nil

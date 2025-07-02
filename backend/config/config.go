@@ -2,10 +2,9 @@ package config
 
 import (
 	"bili-audio-downloader/backend/constants"
-	"context"
+	"bili-audio-downloader/backend/services"
 	"errors"
 	"fmt"
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,7 +18,8 @@ type Config struct {
 	Theme          string         `json:"theme"`
 	DownloadConfig DownloadConfig `json:"download_config"`
 	FileConfig     FileConfig     `json:"file_config"`
-	Account        Account
+	Account        Account        `json:"account"`
+	FFmpegConfig   FFmpegConfig   `json:"ffmpeg_config"`
 }
 
 type DownloadConfig struct {
@@ -45,16 +45,20 @@ type Account struct {
 	Sid               string `json:"sid"`
 }
 
+type FFmpegConfig struct {
+	FFmpegPath string `json:"ffmpeg_path"`
+}
+
 var Cfg Config
 
-func InitConfig(ctx context.Context) {
+func InitConfig() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath("./")
 
-	err := LoadConfig(ctx)
+	err := LoadConfig()
 	if err != nil {
-		wails.LogFatalf(ctx, "Failed to load config: %v", err)
+		return errors.New(fmt.Sprintf("failed to load config: %v\n", err))
 	}
 
 	// Check config version
@@ -62,20 +66,22 @@ func InitConfig(ctx context.Context) {
 		if Cfg.ConfigVersion < constants.CONFIG_VERSION {
 			err := migrateConfig("./config.json")
 			if err != nil {
-				wails.LogFatalf(ctx, "Failed to migrate config: %v\n", err)
+				return errors.New(fmt.Sprintf("failed to migrate config%v\n", err))
 			}
 		} else {
-			wails.LogInfo(ctx, "Config version is higher than current version")
+			return errors.New("config version is higher than current version")
 		}
 	}
+
+	return nil
 }
 
 // LoadConfig Read config file
-func LoadConfig(ctx context.Context) error {
+func LoadConfig() error {
 	err := viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			wails.LogWarningf(ctx, "Config file not found: %v, create a new one", err)
+			services.Logger.Warning(fmt.Sprintf("Config file not found: %v, create a new one", err))
 			newConfig := DefaultConfig()
 
 			// Creat config file
@@ -89,7 +95,7 @@ func LoadConfig(ctx context.Context) error {
 			if err != nil {
 				return errors.New(fmt.Sprintf("failed to write config file: %v", err))
 			}
-			wails.LogInfo(ctx, "Created new config file")
+			services.Logger.Warning("Created new config file")
 		} else {
 			return errors.New(fmt.Sprintf("failed to read config file: %v", err))
 		}
