@@ -33,12 +33,17 @@ func (w *WailsApi) GetTaskListAll() []adapter.TaskInfo {
 func (w *WailsApi) GetTaskListPage(page int) []adapter.TaskInfo {
 	var taskList []adapter.TaskInfo
 
-	const PageSize = 10
+	const PageSize = 20
+	length := len(download.DownloadList)
 	start := page * PageSize
-	end := page*PageSize + PageSize
+	end := start + PageSize
 
-	if end > len(download.DownloadList) {
-		end = len(download.DownloadList)
+	if start >= length {
+		return []adapter.TaskInfo{}
+	}
+
+	if end > length {
+		end = length
 	}
 
 	for i, task := range download.DownloadList[start:end] {
