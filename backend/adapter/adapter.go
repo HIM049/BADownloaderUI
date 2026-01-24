@@ -29,4 +29,5 @@ type TaskInfo struct {
 	SongName   string
 	SongAuthor string
 	CoverUrl   string
+	IsDelete   bool
 }

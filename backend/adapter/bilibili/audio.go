@@ -20,6 +20,7 @@ type Audio struct {
 	option   adapter.Option
 	path     adapter.Path
 	metaData adapter.MetaData
+	isDelete bool
 }
 
 func (a *Audio) SetID(id int) {
@@ -38,10 +39,23 @@ func NewAudio(auid string, coverUrl, sessdata string, metaData adapter.MetaData)
 			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
+		isDelete: false,
 	}
 }
 
+func (a *Audio) SetDelete(del bool) {
+	a.isDelete = del
+}
+
+func (a *Audio) SetMeta(songName, author string) {
+	a.metaData.SongName = songName
+	a.metaData.Author = author
+}
+
 func (a *Audio) Download() error {
+	if a.isDelete {
+		return nil
+	}
 	var wg sync.WaitGroup
 	errorResults := make(chan error, 2)
 
@@ -155,6 +169,7 @@ func (a *Audio) GetTaskInfo() *adapter.TaskInfo {
 		SongName:   a.metaData.SongName,
 		SongAuthor: a.metaData.Author,
 		CoverUrl:   a.coverUrl,
+		IsDelete:   a.isDelete,
 	}
 	return &taskInfo
 }

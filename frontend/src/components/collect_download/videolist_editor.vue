@@ -1,5 +1,8 @@
 <template>
     <FramePage title="列表编辑">
+        <template #actions>
+            <var-button type="primary" @click="saveListTo">另存为</var-button>
+        </template>
         <!-- Removed manual controls -->
     </FramePage>
     <AdditionCard v-if="CardStatus.ShowList">
@@ -67,8 +70,7 @@
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, watch, ref, onMounted } from 'vue'
-// import { SaveVideoListTo } from '../../../wailsjs/go/main/App'
-import { GetTaskListPage, GetTaskListAll } from '../../../wailsjs/go/wails_api/WailsApi'
+import { GetTaskListPage, GetTaskListAll, SetTaskDeleteState, UpdateTaskMeta, SaveVideoListTo, ExportVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
 
@@ -126,47 +128,40 @@ EventsOn('refreshVideoList', () => {
 
 // 另存列表
 function saveListTo() {
-    // Dialog('清理删除项并导出列表？').then(result => {
-    //     if (result == 'confirm') {
-    //         tidyAndRefresh(() => {
-    //             SaveVideoListTo(videoList.value).then(() => {
-    //                 Snackbar.success('导出成功');
-    //             });
-    //         });
-    //     }
-    //     return;
-    // });
+    ExportVideoList().then(err => {
+        if (err) {
+            Snackbar.error("导出失败: " + err);
+        } else if (err === null) {
+             Snackbar.success("操作完成");
+        }
+    });
 }
 
 // 修改视频删除状态
 function setDeleteState(index) {
-    // videoList.value.List[index].delete = !videoList.value.List[index].delete;
-    // SaveVideoList(videoList.value, parms.value.videoListPath).then(result => {
-    //     if (result != null) {
-    //         Snackbar.error("保存失败" + result);
-    //     } else {
-    //         Snackbar.success("保存成功");
-    //     }
-    // })
+    const currentState = TaskList.tasks[index].IsDelete;
+    // Optimistic update
+    TaskList.tasks[index].IsDelete = !currentState;
+    TaskList.tasks[index].delete = !currentState; // Keep compatibility if 'delete' prop used in template
+
+    SetTaskDeleteState(TaskList.tasks[index].Index, !currentState).then(() => { // Use real index from task
+         // Success
+    }).catch(err => {
+        // Revert on failure
+        TaskList.tasks[index].IsDelete = currentState;
+        TaskList.tasks[index].delete = currentState;
+        Snackbar.error("状态更新失败");
+    });
 }
 
 // 打开右侧面板
 function openRightPanel(index) {
     CardStatus.ListIndex = index;
-    // Note: This logic assumes videoList.value.List is updated, but current code uses TaskList.tasks.
-    // Need to check where videoList is populated or update to use TaskList.tasks
-    // Assuming TaskList.tasks is the source of truth for display
-    if (TaskList.tasks[index].Meta) {
-        CardStatus.Meta.song_name = TaskList.tasks[index].Meta.song_name;
-        CardStatus.Meta.author = TaskList.tasks[index].Meta.author;
-    } else {
-         // Fallback if Meta matches original structure
-        CardStatus.Meta.song_name = TaskList.tasks[index].SongName;
-        CardStatus.Meta.author = TaskList.tasks[index].SongAuthor;
-    }
-    
+    // Assuming TaskList.tasks matches backend order for now, or using Index from task
+    const task = TaskList.tasks[index];
+    CardStatus.Meta.song_name = task.SongName;
+    CardStatus.Meta.author = task.SongAuthor;
     CardStatus.RightPanel = true;
-
 }
 
 // 动态加载数据
@@ -182,6 +177,11 @@ function load() {
             return
         }
         
+        // Map IsDelete to 'delete' prop for compatibility with template v-ifs
+        result.forEach(task => {
+            task.delete = task.IsDelete;
+        });
+
         TaskList.tasks.push(...result)
         TaskList.index++
         CardStatus.loading = false
@@ -195,19 +195,17 @@ function load() {
 
 // 保存列表修改
 function saveVideoMeta() {
-    // Logic needs to be adapted to backend sync
-    // videoList.value.List[CardStatus.ListIndex].Meta.song_name = CardStatus.Meta.song_name;
-    // videoList.value.List[CardStatus.ListIndex].Meta.author = CardStatus.Meta.author;
-
-    // SaveVideoList(videoList.value, parms.value.videoListPath).then(result => {
-    //     if (result != null) {
-    //         Snackbar.error("保存失败" + result);
-    //     } else {
-    //         Snackbar.success("保存成功");
-    //     }
-    // })
-
-    CardStatus.RightPanel = false;
+    const index = CardStatus.ListIndex;
+    const taskIndex = TaskList.tasks[index].Index;
+    
+    UpdateTaskMeta(taskIndex, CardStatus.Meta.song_name, CardStatus.Meta.author).then(() => {
+        TaskList.tasks[index].SongName = CardStatus.Meta.song_name;
+        TaskList.tasks[index].SongAuthor = CardStatus.Meta.author;
+        Snackbar.success("保存成功");
+        CardStatus.RightPanel = false;
+    }).catch(err => {
+         Snackbar.error("保存失败: " + err);
+    });
 }
 </script>
 

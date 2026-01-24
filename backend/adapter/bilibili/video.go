@@ -24,6 +24,7 @@ type Video struct {
 	option   adapter.Option
 	path     adapter.Path
 	metaData adapter.MetaData
+	isDelete bool
 }
 
 func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData adapter.MetaData) *Video {
@@ -39,6 +40,7 @@ func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData adapter.
 			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
+		isDelete: false,
 	}
 }
 
@@ -46,7 +48,20 @@ func (v *Video) SetID(id int) {
 	v.listId = id
 }
 
+func (v *Video) SetDelete(del bool) {
+	v.isDelete = del
+}
+
+func (v *Video) SetMeta(songName, author string) {
+	v.metaData.SongName = songName
+	v.metaData.Author = author
+}
+
 func (v *Video) Download() error {
+	if v.isDelete {
+		return nil
+	}
+
 	var wg sync.WaitGroup
 	errorResults := make(chan error, 2)
 
@@ -180,6 +195,7 @@ func (w *Video) GetTaskInfo() *adapter.TaskInfo {
 		SongName:   w.metaData.SongName,
 		SongAuthor: w.metaData.Author,
 		CoverUrl:   w.coverUrl,
+		IsDelete:   w.isDelete,
 	}
 	return &taskInfo
 }

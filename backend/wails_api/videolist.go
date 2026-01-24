@@ -4,6 +4,10 @@ import (
 	"bili-audio-downloader/backend/adapter"
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/download"
+	"encoding/json"
+	"os"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // GetListCount 获取列表中视频数量
@@ -123,6 +127,63 @@ func (w *WailsApi) AddProfileVideoToList(listPath string, mid, count int, downlo
 	}
 
 	err := download.AddProfileVideoTask(sessdata, mid, count, downloadCompilation)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// SetTaskDeleteState 设置任务删除状态
+func (w *WailsApi) SetTaskDeleteState(index int, delete bool) {
+	if index >= 0 && index < len(download.DownloadList) {
+		download.DownloadList[index].SetDelete(delete)
+	}
+}
+
+// UpdateTaskMeta 更新任务元数据
+func (w *WailsApi) UpdateTaskMeta(index int, songName, author string) {
+	if index >= 0 && index < len(download.DownloadList) {
+		download.DownloadList[index].SetMeta(songName, author)
+	}
+}
+
+// ExportVideoList 导出任务列表（带对话框）
+func (w *WailsApi) ExportVideoList() error {
+	path, err := runtime.SaveFileDialog(w.ctx, runtime.SaveDialogOptions{
+		Title:           "保存列表",
+		DefaultFilename: "video_list.json",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "JSON Files (*.json)", Pattern: "*.json"},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	if path == "" {
+		return nil
+	}
+	return w.SaveVideoListTo(path)
+}
+
+// SaveVideoListTo 导出任务列表
+func (w *WailsApi) SaveVideoListTo(path string) error {
+	var listToExport []adapter.TaskInfo
+	for i, task := range download.DownloadList {
+		info := task.GetTaskInfo()
+		info.Index = i
+		listToExport = append(listToExport, *info)
+	}
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(listToExport)
 	if err != nil {
 		return err
 	}
