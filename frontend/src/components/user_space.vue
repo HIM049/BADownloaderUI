@@ -1,14 +1,14 @@
 <template>
     <FramePage title="个人空间">
-        <var-space style="align-items: center;" justify="center" v-if="!showLoginWindow && !is_login">
+        <var-space class="items-center" justify="center" v-if="!showLoginWindow && !is_login">
             你还没有登录
             <var-button type="primary" @click="login">登录</var-button>
         </var-space>
         <var-collapse-transition :expand="showLoginWindow">
             <var-paper style="background-color: var(--color-primary-container);">
                 <h3>扫码登录</h3>
-                <img style="display: flex; margin: 0 auto; border-radius: 15px;" :src="qrcodeStr" alt="Image">
-                <p style="display: flex; justify-content: center;">{{ loginText }}</p>
+                <img class="flex mx-auto rounded-[15px]" :src="qrcodeStr" alt="Image">
+                <p class="flex justify-center">{{ loginText }}</p>
             </var-paper>
         </var-collapse-transition>   
         <var-space v-if="is_login && CardStatus.LoadUserInf" justify="center">
@@ -18,9 +18,9 @@
     </FramePage>
     <AdditionCard title="创建的收藏夹" v-if="is_login && CardStatus.LoadUsersCollect">
         <var-paper style="background-color: var(--color-primary-container);">
-            <div v-for="(collect, index) in user_collect.List" style="margin: 5px 20px;">
+            <div v-for="(collect, index) in user_collect.List" class="my-1.5 mx-5">
                 <var-space justify="space-between" align="center">
-                    <text style="font-size: 15px; font-weight: 600;">{{ collect.title }}</text> 
+                    <text class="text-[15px] font-semibold">{{ collect.title }}</text> 
                     <var-button type="primary" @click="addToList('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=create', 11)"><var-icon name="plus" />添加至列表</var-button>
                 </var-space>
             </div>
@@ -30,9 +30,9 @@
     <AdditionCard title="收藏和订阅" v-if="is_login && CardStatus.LoadFavCollect">
         
         <var-paper style="background-color: var(--color-primary-container);">
-            <div v-for="(collect, index) in user_Favourite.List" style="margin: 5px 20px;">
+            <div v-for="(collect, index) in user_Favourite.List" class="my-1.5 mx-5">
                 <var-space justify="space-between" align="center">
-                    <text style="font-size: 15px; font-weight: 600;">{{ collect.title }}</text> 
+                    <text class="text-[15px] font-semibold">{{ collect.title }}</text> 
                     
                     <var-button type="primary" @click="
                         addToList(collect.attr == 0 ? 'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=21':'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=11', collect.attr)
@@ -41,7 +41,7 @@
             </div>
         </var-paper>
 
-        <var-space style="display: flex; align-items: center;">
+        <var-space class="flex items-center">
             <var-button-group type="primary" size="normal" outline >
                 <var-button @click="page_index--">上一页</var-button>
                 <var-button @click="page_index++">下一页</var-button>

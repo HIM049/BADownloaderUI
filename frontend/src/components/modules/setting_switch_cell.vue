@@ -26,9 +26,3 @@ const parms = computed({
 
 </script>
 
-<style>
-.add-body {
-    width: 60%;
-    margin: 0px auto 20px auto;;
-}
-</style>

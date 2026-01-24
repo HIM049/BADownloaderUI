@@ -12,7 +12,7 @@
             </var-space>
 
             <var-space justify="center">
-                <var-chip type="info" style="margin-top: 10px;">正在下载：{{ progress.downloadingTitle }} ( {{ progress.downFinished }} / {{ parms.listCount }} )</var-chip>
+                <var-chip type="info" class="mt-2.5">正在下载：{{ progress.downloadingTitle }} ( {{ progress.downFinished }} / {{ parms.listCount }} )</var-chip>
                 
             </var-space>
         </div>

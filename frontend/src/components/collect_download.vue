@@ -13,7 +13,7 @@
         </var-tab-item>
     </var-tabs-items>
 
-    <footer class="page-turning" :style="{bottom: scrollTop + 'px'}">
+    <footer class="fixed bottom-2.5 right-2.5 w-[calc(100%-20px)]" :style="{bottom: scrollTop + 'px'}">
         <var-space justify="space-between">
             <var-button type="primary" size="large" @click="parms.pageIndex--" :disabled="!status.allowBack" v-show="status.showBack">< 上一步</var-button>
             <var-badge type="danger" position="left-top" :value="parms.listCount" :hidden="!status.showBadge">
@@ -140,12 +140,3 @@ function updateBadge() {
     });
 }
 </script>
-
-<style>
-footer.page-turning {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    width: calc( 100% - 20px );
-}
-</style>

@@ -7,42 +7,42 @@
     </FramePage>
     <AdditionCard v-if="CardStatus.ShowList">
         <var-list :finished="CardStatus.finished" :loading="CardStatus.loading" @load="load" :immediate-check="false">
-            <li v-for="(video, index) in TaskList.tasks" :key="index" style="list-style-type: none;">
-                <var-card :title="video.SongName" :src="video.CoverUrl" layout="row" image-width="250px" outlines v-if="!video.delete" style="margin-bottom: 20px;">
+            <li v-for="(video, index) in TaskList.tasks" :key="index" class="list-none">
+                <var-card :title="video.SongName" :src="video.CoverUrl" layout="row" image-width="250px" outlines v-if="!video.delete" class="mb-5">
                     <template #description>
                         <var-divider />
-                        <div style="margin: 0 10px;">
-                            <var-chip plain type="info" style="margin-bottom: 5px;">歌曲名称：{{ video.SongName }}</var-chip>
-                            <var-chip plain type="info" style="margin-bottom: 30px;">歌曲作者：{{ video.SongAuthor }}</var-chip>
+                        <div class="mx-2.5">
+                            <var-chip plain type="info" class="mb-1.5">歌曲名称：{{ video.SongName }}</var-chip>
+                            <var-chip plain type="info" class="mb-[30px]">歌曲作者：{{ video.SongAuthor }}</var-chip>
                         </div>
                     </template>
 
                     <template #extra>
-                        <div style="display: flex; align-items: center;">
-                            <var-button type="danger" size="large" round @click="setDeleteState(index)" style="margin-right: 10px;"> <var-icon name="delete" /> </var-button>
+                        <div class="flex items-center">
+                            <var-button type="danger" size="large" round @click="setDeleteState(index)" class="mr-2.5"> <var-icon name="delete" /> </var-button>
                             <var-button type="primary" @click="openRightPanel(index)">编辑</var-button>
                         </div>
                     </template>
                 </var-card>
 
                 
-                <var-card :title="video.title" outlines style="margin-bottom: 20px; height: 187px;" v-if="video.delete">
+                <var-card :title="video.title" outlines class="mb-5 h-[187px]" v-if="video.delete">
                     <template #description>
-                        <div style="display: flex; justify-content: center;">
+                        <div class="flex justify-center">
                             
                         <h3>已设为删除</h3>
                         </div>
                     </template>
                     <template #extra>
-                        <div style="display: flex; align-items: center;">
-                            <var-button type="success" @click="setDeleteState(index)" style="margin-right: 10px;"> <var-icon name="history" />  恢复 </var-button>
+                        <div class="flex items-center">
+                            <var-button type="success" @click="setDeleteState(index)" class="mr-2.5"> <var-icon name="history" />  恢复 </var-button>
                             <var-button type="primary" disabled>编辑</var-button>
                         </div>
                     </template>
                 </var-card>
             </li>
             <template #finished>
-                <div class="footer-text">已经到底了</div>
+                <div class="py-5 text-center text-[#888]">已经到底了</div>
             </template>
         </var-list>
         
@@ -51,15 +51,15 @@
         
     </AdditionCard>
 
-    <var-popup position="right" v-model:show="CardStatus.RightPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" style=" height: 75%; right: 35px; top: auto; bottom: 35px; border-radius: 8px;">
-        <div class="popup-example-block">
+    <var-popup position="right" v-model:show="CardStatus.RightPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
+        <div class="p-6 w-[280px]">
             <h3>元数据编辑</h3>
             <div>
                 <var-cell><var-input variant="outlined" placeholder="曲名" size="small" v-model="CardStatus.Meta.song_name"/></var-cell>
                 <var-cell><var-input variant="outlined" placeholder="歌手" size="small" v-model="CardStatus.Meta.author"/></var-cell>
             </div>
         </div>
-        <var-space style="position: absolute; right: 20px; bottom: 20px;">
+        <var-space class="absolute right-5 bottom-5">
             <var-button type="primary" :loading="CardStatus.ConfirmBtnLoadig" loading-type="wave" @click="saveVideoMeta">保存</var-button>
         </var-space>
     </var-popup>
@@ -208,10 +208,3 @@ function saveVideoMeta() {
     });
 }
 </script>
-
-<style>
-.popup-example-block {
-  padding: 24px;
-  width: 280px;
-}
-</style>
