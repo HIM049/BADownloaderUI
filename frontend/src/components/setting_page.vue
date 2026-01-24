@@ -2,11 +2,11 @@
 
     <FramePage title="应用设置" v-if="overload">
         <var-form>
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
-                    <var-collapse-item title="软件行为与外观" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件行为与外观" name="1" class="font-bold text-lg" style="background: none;">
                         <SettingCell title="主题颜色">
-                            <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" style="width: 150px;" @change="setTheme">
+                            <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" class="w-[150px]" @change="setTheme">
                                 <var-option label="粉色" :value="'lightPink'" />
                                 <var-option label="蓝色" :value="'lightBlue'" />
                             </var-select>
@@ -16,9 +16,9 @@
                 </var-collapse>
             </var-paper>
 
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
-                    <var-collapse-item title="账号使用" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="账号使用" name="1" class="font-bold text-lg" style="background: none;">
                         <CellSwitch title="获取内容时使用账号" v-model:parms="config.Account.use_account" :onchange="setUseAccount"></CellSwitch>
                         <SettingCell title="清除保存的账号信息">
                             <var-button type="danger" @click="logoutAccount" :disabled="!config.Account.is_login">退出登录</var-button>
@@ -27,9 +27,9 @@
                 </var-collapse>
             </var-paper>
 
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass2" :offset="true" elevation="0">
-                    <var-collapse-item title="软件下载行为" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件下载行为" name="1" class="font-bold text-lg" style="background: none;">
                         <SettingCell title="最大下载线程数">
                             <var-counter v-model="config.download_config.download_threads" @change="changeCfg" />
                         </SettingCell>
@@ -40,36 +40,36 @@
                 </var-collapse>
             </var-paper>
 
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass3" :offset="true" elevation="0">
-                    <var-collapse-item title="文件与路径" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="文件与路径" name="1" class="font-bold text-lg" style="background: none;">
 
-                    <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%; margin-bottom: 10px;">
+                    <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" class="w-full mb-4">
                         <CellSwitch title="使用 ffmpeg 转码音频" v-model:parms="config.file_config.convert_format" :onchange="setConvertFormat"></CellSwitch>
                     </var-tooltip>
 
-                    <var-tooltip content="双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名" style="width: 100%; margin-bottom: 10px;" trigger="click">
+                    <var-tooltip content="双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名" class="w-full mb-4" trigger="click">
                         <template #content>
                             
                             <p v-pre>双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名</p>
                             <p v-pre>列表编号{{.ID}} 视频标题{{.Title}} 单集标题{{.Subtitle}} 音频质量{{.Quality}} 格式后缀名{{.Format}}</p>
                         </template>
-                        <var-input style="margin: 10px;" variant="outlined" placeholder="文件命名方式" size="small" v-model="config.file_config.file_name_template"
+                        <var-input class="m-2.5" variant="outlined" placeholder="文件命名方式" size="small" v-model="config.file_config.file_name_template"
                             :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
                     </var-tooltip>
                     
 
-                    <div style="display: flex; align-items: center;">
-                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="音频保存路径" size="small" readonly v-model="config.file_config.download_path" />
+                    <div class="flex items-center">
+                        <var-input class="m-2.5 w-full" variant="outlined" placeholder="音频保存路径" size="small" readonly v-model="config.file_config.download_path" />
                         <var-button type="primary" @click="setDownloadPathDialog">更改</var-button>
                     </div>
 
-                    <div style="display: flex; align-items: center;">    
-                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="下载缓存路径" size="small" readonly  v-model="config.file_config.cache_path" />
+                    <div class="flex items-center">    
+                        <var-input class="m-2.5 w-full" variant="outlined" placeholder="下载缓存路径" size="small" readonly  v-model="config.file_config.cache_path" />
                         <var-button type="primary" @click="" disabled>更改</var-button>
                     </div>
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
+                    <var-input class="m-2.5" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
                         :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
                     </var-collapse-item>
                 </var-collapse>

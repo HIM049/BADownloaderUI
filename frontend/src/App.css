@@ -1,3 +1,7 @@
-body, html, #root {
-  font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+@import "tailwindcss";
+
+body,
+html,
+#root {
+    font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
