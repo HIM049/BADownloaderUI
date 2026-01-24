@@ -62,7 +62,13 @@ func WriteMetadata(input, output, coverPath, songName, songAuthor string, format
 		args = append(args, "-id3v2_version", "3")
 	}
 
-	args = append(args, "-f", format[1:], output)
+	// 确定 ffmpeg 的 -f 参数
+	formatFlag := format[1:]
+	if format == constants.AudioType.M4a {
+		formatFlag = "mp4"
+	}
+
+	args = append(args, "-f", formatFlag, output)
 
 	log, err := utils.RunCommand("ffmpeg", args...)
 	if err != nil {

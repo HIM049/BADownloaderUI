@@ -116,7 +116,7 @@ func (a *Audio) ConventFormat() error {
 }
 
 func (a *Audio) WriteMetadata() error {
-	newPath := fmt.Sprintf("%s.meta", a.path.StreamPath)
+	newPath := fmt.Sprintf("%s_meta%s", a.path.StreamPath, a.path.OutputFormat)
 	err := ffmpeg.WriteMetadata(a.path.CurrentPath, newPath, a.path.CoverPath, a.metaData.SongName, a.metaData.Author, a.path.OutputFormat)
 	if err != nil {
 		return err

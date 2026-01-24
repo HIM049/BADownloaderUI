@@ -9,9 +9,10 @@ import (
 	"bili-audio-downloader/bilibili"
 	"errors"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"strconv"
 	"sync"
+
+	"github.com/tidwall/gjson"
 )
 
 type Video struct {

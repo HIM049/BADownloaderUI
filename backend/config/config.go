@@ -5,10 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
 	"os"
 	"path/filepath"
+
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/spf13/viper"
 )
@@ -172,7 +173,7 @@ func DefaultConfig() *Config {
 		},
 		FileConfig: FileConfig{
 			ConvertFormat:    false, // TODO
-			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}.{{.Format}}",
+			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}{{.Format}}",
 			DownloadPath:     "./Download",
 			CachePath:        "./Cache",
 			VideoListPath:    "./Cache/video_list.json",
