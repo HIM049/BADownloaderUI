@@ -3,17 +3,12 @@ package bilibili
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/tidwall/gjson"
 )
 
 var (
@@ -112,32 +107,4 @@ func getWbiKeysCached() (string, string) {
 	imgKeyI, _ := cache.Load("imgKey")
 	subKeyI, _ := cache.Load("subKey")
 	return imgKeyI.(string), subKeyI.(string)
-}
-
-func getWbiKeys() (string, string) {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", "https://api.bilibili.com/x/web-interface/nav", nil)
-	if err != nil {
-		fmt.Printf("Error creating request: %s", err)
-		return "", ""
-	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-	req.Header.Set("Referer", "https://www.bilibili.com/")
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Printf("Error sending request: %s", err)
-		return "", ""
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("Error reading response: %s", err)
-		return "", ""
-	}
-	json := string(body)
-	imgURL := gjson.Get(json, "data.wbi_img.img_url").String()
-	subURL := gjson.Get(json, "data.wbi_img.sub_url").String()
-	imgKey := strings.Split(strings.Split(imgURL, "/")[len(strings.Split(imgURL, "/"))-1], ".")[0]
-	subKey := strings.Split(strings.Split(subURL, "/")[len(strings.Split(subURL, "/"))-1], ".")[0]
-	return imgKey, subKey
 }
