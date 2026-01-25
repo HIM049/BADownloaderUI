@@ -39,6 +39,8 @@ export function GetUsersCollect():Promise<bilibili.Collects>;
 
 export function LoadConfig():Promise<config.Config>;
 
+export function LoginBilibili():Promise<void>;
+
 export function OpenDownloadFolader():Promise<void>;
 
 export function OpenFileDialog():Promise<string>;

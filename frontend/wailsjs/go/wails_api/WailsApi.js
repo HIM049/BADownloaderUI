@@ -70,6 +70,10 @@ export function LoadConfig() {
   return window['go']['wails_api']['WailsApi']['LoadConfig']();
 }
 
+export function LoginBilibili() {
+  return window['go']['wails_api']['WailsApi']['LoginBilibili']();
+}
+
 export function OpenDownloadFolader() {
   return window['go']['wails_api']['WailsApi']['OpenDownloadFolader']();
 }

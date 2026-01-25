@@ -10,39 +10,41 @@
                 <img class="flex mx-auto rounded-[15px]" :src="qrcodeStr" alt="Image">
                 <p class="flex justify-center">{{ loginText }}</p>
             </var-paper>
-        </var-collapse-transition>   
+        </var-collapse-transition>
         <var-space v-if="is_login && CardStatus.LoadUserInf" justify="center">
             <var-avatar :src="user_Information.avatar" />
             <p>{{ user_Information.name }}</p>
-        </var-space>     
+        </var-space>
     </FramePage>
     <AdditionCard title="创建的收藏夹" v-if="is_login && CardStatus.LoadUsersCollect">
         <var-paper style="background-color: var(--color-primary-container);">
             <div v-for="(collect, index) in user_collect.List" class="my-1.5 mx-5">
                 <var-space justify="space-between" align="center">
-                    <text class="text-[15px] font-semibold">{{ collect.title }}</text> 
-                    <var-button type="primary" @click="addToList('https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=create', 11)"><var-icon name="plus" />添加至列表</var-button>
+                    <text class="text-[15px] font-semibold">{{ collect.title }}</text>
+                    <var-button type="primary"
+                        @click="addToList('https://space.bilibili.com/' + user_collect.user_mid + '/favlist?fid=' + collect.id + '&ftype=create', 11)"><var-icon
+                            name="plus" />添加至列表</var-button>
                 </var-space>
             </div>
         </var-paper>
     </AdditionCard>
 
     <AdditionCard title="收藏和订阅" v-if="is_login && CardStatus.LoadFavCollect">
-        
+
         <var-paper style="background-color: var(--color-primary-container);">
             <div v-for="(collect, index) in user_Favourite.List" class="my-1.5 mx-5">
                 <var-space justify="space-between" align="center">
-                    <text class="text-[15px] font-semibold">{{ collect.title }}</text> 
-                    
+                    <text class="text-[15px] font-semibold">{{ collect.title }}</text>
+
                     <var-button type="primary" @click="
-                        addToList(collect.attr == 0 ? 'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=21':'https://space.bilibili.com/'+user_collect.user_mid+'/favlist?fid='+collect.id+'&ftype=collect&ctype=11', collect.attr)
-                    "><var-icon name="plus" />添加至列表</var-button>
+                        addToList(collect.attr == 0 ? 'https://space.bilibili.com/' + user_collect.user_mid + '/favlist?fid=' + collect.id + '&ftype=collect&ctype=21' : 'https://space.bilibili.com/' + user_collect.user_mid + '/favlist?fid=' + collect.id + '&ftype=collect&ctype=11', collect.attr)
+                        "><var-icon name="plus" />添加至列表</var-button>
                 </var-space>
             </div>
         </var-paper>
 
         <var-space class="flex items-center">
-            <var-button-group type="primary" size="normal" outline >
+            <var-button-group type="primary" size="normal" outline>
                 <var-button @click="page_index--">上一页</var-button>
                 <var-button @click="page_index++">下一页</var-button>
             </var-button-group>
@@ -54,9 +56,8 @@
 import FramePage from '../components/modules/frame_page.vue'
 import AdditionCard from './modules/addition_card.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
-import { LoginBilibili } from '../../wailsjs/go/main/App'
-import { LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf } from '../../wailsjs/go/wails_api/WailsApi'
-import { EventsOn, EventsEmit, ClipboardSetText } from '../../wailsjs/runtime'
+import { LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf, LoginBilibili } from '../../wailsjs/go/wails_api/WailsApi'
+import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
 
 const loginText = ref("请扫描二维码登录") // 登录时的提示字符
@@ -109,7 +110,7 @@ function getFavCollect() {
 watch(page_index, (newValue) => {
     if (newValue <= 0) {
         page_index.value = 1;
-    }else if (newValue > fav_count.value / 20 + 1) {
+    } else if (newValue > fav_count.value / 20 + 1) {
         page_index.value = parseInt(fav_count.value / 20 + 1);
     }
     getFavCollect();
@@ -117,7 +118,7 @@ watch(page_index, (newValue) => {
 })
 
 // 获取二维码事件
-EventsOn("qrcodeStr", (qr)=>{
+EventsOn("qrcodeStr", (qr) => {
     qrcodeStr.value = "data:image/png;base64," + qr;
 })
 

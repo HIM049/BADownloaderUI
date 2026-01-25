@@ -51,7 +51,6 @@ func main() {
 		LogLevelProduction: logger.INFO,
 		Logger:             customLogger,
 		Bind: []interface{}{
-			app,
 			wailsApi,
 		},
 	})
