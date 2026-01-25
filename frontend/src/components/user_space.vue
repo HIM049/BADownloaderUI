@@ -13,7 +13,7 @@
         </var-collapse-transition>
         <var-space v-if="is_login && CardStatus.LoadUserInf" justify="center">
             <var-avatar :src="user_Information.avatar" />
-            <p>{{ user_Information.name }}</p>
+            <p class="text-md font-bold my-3">{{ user_Information.name }}</p>
         </var-space>
     </FramePage>
     <AdditionCard title="创建的收藏夹" v-if="is_login && CardStatus.LoadUsersCollect">

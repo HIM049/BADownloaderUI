@@ -2,6 +2,7 @@ package wails_api
 
 import (
 	"bili-audio-downloader/backend/config"
+
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -12,7 +13,6 @@ func (w *WailsApi) ResetConfig() {
 	if err != nil {
 		wails.LogErrorf(w.ctx, "写入设置文件失败：%s", err)
 		wails.EventsEmit(w.ctx, "error", "写入设置时出错:"+err.Error())
-		// TODO 增加统一前端错误提示接口
 	}
 }
 
