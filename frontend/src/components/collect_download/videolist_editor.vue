@@ -150,7 +150,7 @@ function setDeleteState(index) {
         // Revert on failure
         TaskList.tasks[index].IsDelete = currentState;
         TaskList.tasks[index].delete = currentState;
-        Snackbar.error("状态更新失败");
+        Snackbar.error("状态更新失败: " + err);
     });
 }
 
