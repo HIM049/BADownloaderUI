@@ -166,7 +166,7 @@ func DefaultConfig() *Config {
 	cfg := Config{
 		ConfigVersion: constants.CONFIG_VERSION,
 		DeleteCache:   true,
-		Theme:         "lightPink",
+		Theme:         "lightBlue",
 		DownloadConfig: DownloadConfig{
 			DownloadThreads: 5,
 			RetryCount:      10,
