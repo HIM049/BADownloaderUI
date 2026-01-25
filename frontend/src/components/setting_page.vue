@@ -4,7 +4,7 @@
         <var-form>
             <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
-                    <var-collapse-item title="软件行为与外观" name="1" class="font-bold text-lg" style="background: none;">
+                    <var-collapse-item title="软件行为与外观" name="1" class="font-bold text-lg bg-transparent!">
                         <SettingCell title="主题颜色">
                             <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" class="w-[150px]" @change="setTheme">
                                 <var-option label="粉色" :value="'lightPink'" />
@@ -18,7 +18,7 @@
 
             <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
-                    <var-collapse-item title="账号使用" name="1" class="font-bold text-lg" style="background: none;">
+                    <var-collapse-item title="账号使用" name="1" class="font-bold text-lg bg-transparent!">
                         <CellSwitch title="获取内容时使用账号" v-model:parms="config.Account.use_account" :onchange="setUseAccount"></CellSwitch>
                         <SettingCell title="清除保存的账号信息">
                             <var-button type="danger" @click="logoutAccount" :disabled="!config.Account.is_login">退出登录</var-button>
@@ -29,7 +29,7 @@
 
             <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass2" :offset="true" elevation="0">
-                    <var-collapse-item title="软件下载行为" name="1" class="font-bold text-lg" style="background: none;">
+                    <var-collapse-item title="软件下载行为" name="1" class="font-bold text-lg bg-transparent!">
                         <SettingCell title="最大下载线程数">
                             <var-counter v-model="config.download_config.download_threads" @change="changeCfg" />
                         </SettingCell>
@@ -42,7 +42,7 @@
 
             <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass3" :offset="true" elevation="0">
-                    <var-collapse-item title="文件与路径" name="1" class="font-bold text-lg" style="background: none;">
+                    <var-collapse-item title="文件与路径" name="1" class="font-bold text-lg bg-transparent!">
 
                     <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" class="w-full mb-4">
                         <CellSwitch title="使用 ffmpeg 转码音频" v-model:parms="config.file_config.convert_format" :onchange="setConvertFormat"></CellSwitch>

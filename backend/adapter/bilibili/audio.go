@@ -91,7 +91,7 @@ func (a *Audio) Download() error {
 
 		var err error
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
-			err = utils.SaveFromURL(a.coverUrl, a.path.CoverPath)
+			err = utils.SaveFromURL(a.coverUrl, a.path.CoverPath, bilibili.GetRandomUA())
 			if err != nil {
 				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
 				continue
@@ -157,7 +157,7 @@ func (a *Audio) downloadStream(streamPath string) error {
 	}
 
 	// 通过流地址下载
-	err = utils.StreamingDownloader(audio.Stream.StreamLink, streamPath)
+	err = utils.StreamingDownloader(audio.Stream.StreamLink, streamPath, bilibili.GetRandomUA())
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to download stream: %s", err))
 	}
