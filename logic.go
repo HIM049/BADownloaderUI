@@ -82,11 +82,3 @@ func (a *App) LoginBilibili() error {
 
 	return nil
 }
-
-// TODO
-//// 打开文件夹
-//func OpenFolder(path string) error {
-//	cmd := exec.Command("cmd", "/c", "start", "", path)
-//	services.setHideWindow(cmd)
-//	return cmd.Start()
-//}

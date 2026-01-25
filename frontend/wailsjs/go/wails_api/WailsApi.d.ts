@@ -39,6 +39,10 @@ export function GetUsersCollect():Promise<bilibili.Collects>;
 
 export function LoadConfig():Promise<config.Config>;
 
+export function OpenDownloadFolader():Promise<void>;
+
+export function OpenFileDialog():Promise<string>;
+
 export function QueryAudio(arg1:string):Promise<bilibili.Audio>;
 
 export function QueryCollection(arg1:string):Promise<bilibili.FavList>;
@@ -58,6 +62,8 @@ export function ResetDownloadList():Promise<void>;
 export function SaveConfig(arg1:config.Config):Promise<void>;
 
 export function SaveVideoListTo(arg1:string):Promise<void>;
+
+export function SetDownloadPathDialog():Promise<void>;
 
 export function SetTaskDeleteState(arg1:number,arg2:boolean):Promise<void>;
 

@@ -70,6 +70,14 @@ export function LoadConfig() {
   return window['go']['wails_api']['WailsApi']['LoadConfig']();
 }
 
+export function OpenDownloadFolader() {
+  return window['go']['wails_api']['WailsApi']['OpenDownloadFolader']();
+}
+
+export function OpenFileDialog() {
+  return window['go']['wails_api']['WailsApi']['OpenFileDialog']();
+}
+
 export function QueryAudio(arg1) {
   return window['go']['wails_api']['WailsApi']['QueryAudio'](arg1);
 }
@@ -108,6 +116,10 @@ export function SaveConfig(arg1) {
 
 export function SaveVideoListTo(arg1) {
   return window['go']['wails_api']['WailsApi']['SaveVideoListTo'](arg1);
+}
+
+export function SetDownloadPathDialog() {
+  return window['go']['wails_api']['WailsApi']['SetDownloadPathDialog']();
 }
 
 export function SetTaskDeleteState(arg1, arg2) {

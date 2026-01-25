@@ -32,8 +32,7 @@
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { ref, reactive, computed } from 'vue'
-import { OpenDownloadFolader } from '../../../wailsjs/go/main/App'
-import { DownloadTaskList } from '../../../wailsjs/go/wails_api/WailsApi'
+import { DownloadTaskList, OpenDownloadFolader } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 
 const downloading = ref(false)
