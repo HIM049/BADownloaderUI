@@ -1,4 +1,4 @@
-package main
+package wails_api
 
 import (
 	"bili-audio-downloader/backend/config"
@@ -11,8 +11,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// 登录 bilibili
-func (a *App) LoginBilibili() error {
+// LoginBilibili 登录 bilibili
+func (w *WailsApi) LoginBilibili() error {
 	// 获取二维码和请求密钥
 	url, key, err := bilibili.GetLoginKey()
 	if err != nil {
@@ -30,7 +30,7 @@ func (a *App) LoginBilibili() error {
 	if err != nil {
 		return err
 	}
-	runtime.EventsEmit(a.ctx, "qrcodeStr", base64Data)
+	runtime.EventsEmit(w.ctx, "qrcodeStr", base64Data)
 
 	// 请求登录
 	cookies, err := func() (*[]*http.Cookie, error) {
@@ -44,22 +44,22 @@ func (a *App) LoginBilibili() error {
 			switch returnObj.Data.Code {
 			case 0:
 				// 登录成功
-				runtime.LogDebug(a.ctx, "登录成功")
-				runtime.EventsEmit(a.ctx, "loginStatus", "登录成功")
+				runtime.LogDebug(w.ctx, "登录成功")
+				runtime.EventsEmit(w.ctx, "loginStatus", "登录成功")
 				return cookies, nil
 			case 86038:
 				// 二维码失效
-				runtime.LogDebug(a.ctx, "二维码已失效")
-				runtime.EventsEmit(a.ctx, "loginStatus", "二维码已失效")
+				runtime.LogDebug(w.ctx, "二维码已失效")
+				runtime.EventsEmit(w.ctx, "loginStatus", "二维码已失效")
 				return nil, errors.New("二维码已失效")
 			case 86090:
 				// 扫描成功，待确认
-				runtime.LogDebug(a.ctx, "扫描成功，待确认")
-				runtime.EventsEmit(a.ctx, "loginStatus", "扫描成功，待确认")
+				runtime.LogDebug(w.ctx, "扫描成功，待确认")
+				runtime.EventsEmit(w.ctx, "loginStatus", "扫描成功，待确认")
 			case 86101:
 				// 未扫描
-				runtime.LogDebug(a.ctx, "未扫描")
-				runtime.EventsEmit(a.ctx, "loginStatus", "请扫描二维码登录")
+				runtime.LogDebug(w.ctx, "未扫描")
+				runtime.EventsEmit(w.ctx, "loginStatus", "请扫描二维码登录")
 			}
 		}
 	}()
@@ -82,11 +82,3 @@ func (a *App) LoginBilibili() error {
 
 	return nil
 }
-
-// TODO
-//// 打开文件夹
-//func OpenFolder(path string) error {
-//	cmd := exec.Command("cmd", "/c", "start", "", path)
-//	services.setHideWindow(cmd)
-//	return cmd.Start()
-//}

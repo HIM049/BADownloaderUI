@@ -1,7 +1,7 @@
 <template>
     <FramePage title="添加内容">
         <template #actions>
-            <var-button type="danger" icon-container style="float: right" @click="() => {
+            <var-button type="danger" icon-container class="float-right" @click="() => {
             Dialog('清除当前任务列表').then(result => {
                 if (result === 'confirm') {
                     ResetDownloadList().then(() => {
@@ -25,7 +25,7 @@
         </var-radio-group>
 
         <var-input :placeholder="inputTip" v-model="input" clearable
-        style="margin-bottom: 25px;" >
+        class="mb-6" >
             <template #prepend-icon>
                 <var-icon name="magnify" />
             </template>
@@ -34,16 +34,16 @@
 
 
     </FramePage>
-    <var-collapse-transition :expand="CardStatus.InfoCard" style="margin-bottom: 30px;">
+    <var-collapse-transition :expand="CardStatus.InfoCard" class="mb-8">
         <AdditionCard title="查询结果">
-            <div style="display: flex; justify-content: center;">
-                <img :src="resp.cover" style="width: 250px; height: 156px; border-radius: 8px;">
-                <div style="margin-left: 20px; display: flex; flex-direction: column;">
-                    <text style="font-size: 18px; font-weight: 700;">{{ resp.title }}</text>
+            <div class="flex justify-center">
+                <img :src="resp.cover" class="w-[250px] h-[156px] rounded-lg">
+                <div class="ml-5 flex flex-col">
+                    <text class="text-lg font-bold">{{ resp.title }}</text>
                     <br>
-                    <var-chip type="primary" style="margin-top: 5px;">视频数量：{{ resp.count }}</var-chip>
+                    <var-chip type="primary" class="mt-1.5">视频数量：{{ resp.count }}</var-chip>
                     <!-- <br> -->
-                    <var-chip type="primary" style="margin-top: 5px;">创建人：{{ resp.up_name }}</var-chip>
+                    <var-chip type="primary" class="mt-1.5">创建人：{{ resp.up_name }}</var-chip>
                 </div>
             </div>
 
@@ -55,8 +55,8 @@
         </AdditionCard>
     </var-collapse-transition>
 
-    <var-popup position="right" v-model:show="CardStatus.RightPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" style=" height: 75%; right: 35px; top: auto; bottom: 35px; border-radius: 8px;">
-        <div class="popup-example-block">
+    <var-popup position="right" v-model:show="CardStatus.RightPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
+        <div class="p-6">
             <h3>添加选项</h3>
             <var-cell> 下载全部
                 <template #extra>
@@ -95,7 +95,7 @@
                 </template>
             </var-cell>
             <br>
-            <var-space style="position: absolute; right: 20px; bottom: 20px;">
+            <var-space class="absolute right-5 bottom-5">
                 <var-button type="primary" :loading="CardStatus.ConfirmBtnLoadig" loading-type="wave" @click="addItToList">确定添加</var-button>
             </var-space>
         </div>
@@ -426,13 +426,3 @@ function extractMid(url) {
 }
 
 </script>
-
-<style>
-.var-popup--right {
-    height: 75%;
-    position: absolute;
-    right: 35px;
-    bottom: 35px;
-    border-radius: 8px;
-}
-</style>

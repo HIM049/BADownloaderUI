@@ -9,9 +9,10 @@ import (
 	"bili-audio-downloader/bilibili"
 	"errors"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"strconv"
 	"sync"
+
+	"github.com/tidwall/gjson"
 )
 
 type Video struct {
@@ -23,6 +24,7 @@ type Video struct {
 	option   adapter.Option
 	path     adapter.Path
 	metaData adapter.MetaData
+	isDelete bool
 }
 
 func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData adapter.MetaData) *Video {
@@ -38,6 +40,7 @@ func NewVideo(bvid string, cid int, coverUrl, sessdata string, metaData adapter.
 			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
+		isDelete: false,
 	}
 }
 
@@ -45,7 +48,20 @@ func (v *Video) SetID(id int) {
 	v.listId = id
 }
 
+func (v *Video) SetDelete(del bool) {
+	v.isDelete = del
+}
+
+func (v *Video) SetMeta(songName, author string) {
+	v.metaData.SongName = songName
+	v.metaData.Author = author
+}
+
 func (v *Video) Download() error {
+	if v.isDelete {
+		return nil
+	}
+
 	var wg sync.WaitGroup
 	errorResults := make(chan error, 2)
 
@@ -80,7 +96,7 @@ func (v *Video) Download() error {
 
 		var err error
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
-			err = utils.SaveFromURL(v.coverUrl, v.path.CoverPath)
+			err = utils.SaveFromURL(v.coverUrl, v.path.CoverPath, bilibili.GetRandomUA())
 			if err != nil {
 				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
 				continue
@@ -129,7 +145,7 @@ func (v *Video) downloadStream(streamPath string) error {
 	}
 
 	// 通过流地址下载
-	err = utils.StreamingDownloader(stream, streamPath)
+	err = utils.StreamingDownloader(stream, streamPath, bilibili.GetRandomUA())
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to download stream: %s", err))
 	}
@@ -179,6 +195,7 @@ func (w *Video) GetTaskInfo() *adapter.TaskInfo {
 		SongName:   w.metaData.SongName,
 		SongAuthor: w.metaData.Author,
 		CoverUrl:   w.coverUrl,
+		IsDelete:   w.isDelete,
 	}
 	return &taskInfo
 }

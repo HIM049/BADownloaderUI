@@ -5,6 +5,7 @@ export namespace adapter {
 	    SongName: string;
 	    SongAuthor: string;
 	    CoverUrl: string;
+	    IsDelete: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new TaskInfo(source);
@@ -16,6 +17,7 @@ export namespace adapter {
 	        this.SongName = source["SongName"];
 	        this.SongAuthor = source["SongAuthor"];
 	        this.CoverUrl = source["CoverUrl"];
+	        this.IsDelete = source["IsDelete"];
 	    }
 	}
 

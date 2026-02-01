@@ -5,8 +5,9 @@ import (
 	bilibili2 "bili-audio-downloader/backend/adapter/bilibili"
 	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
-	"github.com/tidwall/gjson"
 	"strconv"
+
+	"github.com/tidwall/gjson"
 )
 
 var DownloadList []DownloadTask
@@ -119,6 +120,12 @@ func AddCollectionTask(sessdata, favlistId string, count int, downloadCompilatio
 
 	// 主循环
 	for i := 0; i < pageCount; i++ {
+		pageSize := 20
+		// 处理非完整尾页
+		if i+1 == pageCount && count%20 != 0 {
+			pageSize = count % 20
+		}
+
 		// 获取当前分页信息
 		favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 20, i+1)
 		if err != nil {
@@ -126,7 +133,7 @@ func AddCollectionTask(sessdata, favlistId string, count int, downloadCompilatio
 		}
 
 		// 遍历分页
-		for j := 0; j < len(favlist.Data.Medias); j++ {
+		for j := 0; j < len(favlist.Data.Medias) && j < pageSize; j++ {
 
 			if favlist.Data.Medias[j].Type == 2 {
 				// 添加视频到列表
@@ -170,13 +177,19 @@ func AddCompilationTask(sessdata string, mid, sid, count int, downloadCompilatio
 
 	// 主循环
 	for i := 0; i < pageCount; i++ {
+		pageSize := 20
+		// 处理非完整尾页
+		if i+1 == pageCount && count%20 != 0 {
+			pageSize = count % 20
+		}
+
 		// 获取当前分页信息
 		favlist, err := bilibili.GetCompliationObj(mid, sid, 20, i+1)
 		if err != nil {
 			return err
 		}
 		// 遍历分页
-		for j := 0; j < len(favlist.Data.Archives); j++ {
+		for j := 0; j < len(favlist.Data.Archives) && j < pageSize; j++ {
 			// 添加视频到列表
 			err := AddVideoTask(sessdata, favlist.Data.Archives[j].Bvid, downloadCompilation)
 			if err != nil {

@@ -1,6 +1,6 @@
 <template>
     <SettingCell :title="props.title">
-        <var-switch v-model="parms" variant @change="onchange()" />
+        <var-switch v-model="parms" variant @change="handleChange" />
     </SettingCell>
 </template>
 
@@ -8,11 +8,12 @@
 import SettingCell from "./setting_cell.vue"
 import { computed } from 'vue'
 
-const props = defineProps({
-    title: String,
-    parms: Boolean,
-    onchange: Function,
-})
+const props = defineProps<{
+    title?: string
+    parms?: boolean
+    onchange?: () => void
+}>()
+
 const emit = defineEmits(['update:parms'])
 
 const parms = computed({
@@ -24,11 +25,9 @@ const parms = computed({
     }
 })
 
+function handleChange() {
+    props.onchange?.()
+}
+
 </script>
 
-<style>
-.add-body {
-    width: 60%;
-    margin: 0px auto 20px auto;;
-}
-</style>

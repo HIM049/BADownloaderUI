@@ -89,3 +89,10 @@ func RunCommand(name string, args ...string) (string, error) {
 
 	return out.String(), nil
 }
+
+// 打开文件夹
+func OpenFolder(path string) error {
+	cmd := exec.Command("cmd", "/c", "start", "", path)
+	// services.setHideWindow(cmd)
+	return cmd.Start()
+}

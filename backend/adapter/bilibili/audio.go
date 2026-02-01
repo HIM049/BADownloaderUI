@@ -20,6 +20,7 @@ type Audio struct {
 	option   adapter.Option
 	path     adapter.Path
 	metaData adapter.MetaData
+	isDelete bool
 }
 
 func (a *Audio) SetID(id int) {
@@ -38,10 +39,23 @@ func NewAudio(auid string, coverUrl, sessdata string, metaData adapter.MetaData)
 			OutputFormat: constants.AudioType.M4a,
 		},
 		metaData: metaData,
+		isDelete: false,
 	}
 }
 
+func (a *Audio) SetDelete(del bool) {
+	a.isDelete = del
+}
+
+func (a *Audio) SetMeta(songName, author string) {
+	a.metaData.SongName = songName
+	a.metaData.Author = author
+}
+
 func (a *Audio) Download() error {
+	if a.isDelete {
+		return nil
+	}
 	var wg sync.WaitGroup
 	errorResults := make(chan error, 2)
 
@@ -77,7 +91,7 @@ func (a *Audio) Download() error {
 
 		var err error
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
-			err = utils.SaveFromURL(a.coverUrl, a.path.CoverPath)
+			err = utils.SaveFromURL(a.coverUrl, a.path.CoverPath, bilibili.GetRandomUA())
 			if err != nil {
 				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
 				continue
@@ -116,7 +130,7 @@ func (a *Audio) ConventFormat() error {
 }
 
 func (a *Audio) WriteMetadata() error {
-	newPath := fmt.Sprintf("%s.meta", a.path.StreamPath)
+	newPath := fmt.Sprintf("%s_meta%s", a.path.StreamPath, a.path.OutputFormat)
 	err := ffmpeg.WriteMetadata(a.path.CurrentPath, newPath, a.path.CoverPath, a.metaData.SongName, a.metaData.Author, a.path.OutputFormat)
 	if err != nil {
 		return err
@@ -143,7 +157,7 @@ func (a *Audio) downloadStream(streamPath string) error {
 	}
 
 	// 通过流地址下载
-	err = utils.StreamingDownloader(audio.Stream.StreamLink, streamPath)
+	err = utils.StreamingDownloader(audio.Stream.StreamLink, streamPath, bilibili.GetRandomUA())
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to download stream: %s", err))
 	}
@@ -155,6 +169,7 @@ func (a *Audio) GetTaskInfo() *adapter.TaskInfo {
 		SongName:   a.metaData.SongName,
 		SongAuthor: a.metaData.Author,
 		CoverUrl:   a.coverUrl,
+		IsDelete:   a.isDelete,
 	}
 	return &taskInfo
 }

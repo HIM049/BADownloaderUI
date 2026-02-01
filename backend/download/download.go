@@ -11,4 +11,6 @@ type DownloadTask interface {
 	WriteMetadata() error
 	ExportFile() error
 	GetTaskInfo() *adapter.TaskInfo
+	SetDelete(bool)
+	SetMeta(string, string)
 }

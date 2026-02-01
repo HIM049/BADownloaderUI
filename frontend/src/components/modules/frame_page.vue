@@ -1,8 +1,8 @@
 <template>
-    <body class="page-body" >
+    <body class="w-[60%] mx-auto my-5" >
         <var-paper :elevation="2" >
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <h2>{{ title }}</h2>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold ml-5 my-3">{{ title }}</h2>
                 <div><slot name="actions"/></div>
             </div>
             <slot />
@@ -14,10 +14,3 @@
 const props = defineProps(['title'])
 
 </script>
-
-<style>
-    .page-body {
-        width: 60%;
-        margin: 20px auto;
-    }
-</style>

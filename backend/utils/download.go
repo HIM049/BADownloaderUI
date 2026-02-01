@@ -13,7 +13,7 @@ import (
 
 // StreamingDownloader 用于下载音频流的函数
 // 传入流 URL 和文件名
-func StreamingDownloader(audioURL, filePathAndName string) error {
+func StreamingDownloader(audioURL, filePathAndName, ua string) error {
 	// 先判断文件是否存在，如果存在则跳过下载，否则创建文件
 	out, err := os.Create(filePathAndName)
 	if err != nil {
@@ -28,6 +28,7 @@ func StreamingDownloader(audioURL, filePathAndName string) error {
 		return err
 	}
 	request.Header.Set("referer", "https://www.bilibili.com")
+	request.Header.Set("User-Agent", ua)
 	response, err := client.Do(request)
 	if err != nil {
 		return err
@@ -42,7 +43,7 @@ func StreamingDownloader(audioURL, filePathAndName string) error {
 }
 
 // 从 URL 下载图片
-func SaveFromURL(url string, filePath string) error {
+func SaveFromURL(url string, filePath, ua string) error {
 	file, err := os.Create(filePath)
 	if err != nil {
 		return err
@@ -50,7 +51,14 @@ func SaveFromURL(url string, filePath string) error {
 	defer file.Close()
 
 	// 发起 HTTP 请求获取图片内容
-	response, err := http.Get(url)
+	client := &http.Client{}
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	request.Header.Set("User-Agent", ua)
+
+	response, err := client.Do(request)
 	if err != nil {
 		return err
 	}

@@ -1,14 +1,14 @@
 <template>
     <HeadBar> 
-        <var-tabs v-model:active="activePage" style="max-width: 45%; margin: 0px auto;">
+        <var-tabs v-model:active="activePage" class="max-w-[45%] mx-auto">
             <var-tab><var-icon name="account-circle-outline" /> 个人空间</var-tab>
             <var-tab><var-icon name="content-copy" /> 批量下载</var-tab>
             <var-tab><var-icon name="code-json" /> 软件设置</var-tab>
         </var-tabs>
     </HeadBar>
     <div>
-        <div id="page-background" class="page-background" style="overflow: auto;">
-            <var-tabs-items v-model:active="activePage" style="height: 100%;">
+        <div id="page-background" class="absolute w-[calc(100%-20px)] h-[calc(100%-130px)] rounded-[28px] overflow-auto" style="background: var(--color-body);">
+            <var-tabs-items v-model:active="activePage" class="h-full">
                 <var-tab-item>
                     <UserSpace/>
                 </var-tab-item>
@@ -50,15 +50,6 @@ EventsOn('turnToPage', (i) => {
 </script>
 
 <style>
-/* 背景框 */
-.page-background {
-    background: var(--color-body);
-    position: absolute;
-    width: calc(100% - 20px);
-    height: calc(100% - 130px);
-    border-radius: 28px;
-}
-
 /* 修复 input 刷新后不显示提示文字 */
 .var-input label {
     max-width: none;

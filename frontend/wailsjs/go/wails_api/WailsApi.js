@@ -30,6 +30,10 @@ export function DownloadTaskList() {
   return window['go']['wails_api']['WailsApi']['DownloadTaskList']();
 }
 
+export function ExportVideoList() {
+  return window['go']['wails_api']['WailsApi']['ExportVideoList']();
+}
+
 export function GetAppVersion() {
   return window['go']['wails_api']['WailsApi']['GetAppVersion']();
 }
@@ -64,6 +68,18 @@ export function GetUsersCollect() {
 
 export function LoadConfig() {
   return window['go']['wails_api']['WailsApi']['LoadConfig']();
+}
+
+export function LoginBilibili() {
+  return window['go']['wails_api']['WailsApi']['LoginBilibili']();
+}
+
+export function OpenDownloadFolader() {
+  return window['go']['wails_api']['WailsApi']['OpenDownloadFolader']();
+}
+
+export function OpenFileDialog() {
+  return window['go']['wails_api']['WailsApi']['OpenFileDialog']();
 }
 
 export function QueryAudio(arg1) {
@@ -102,6 +118,22 @@ export function SaveConfig(arg1) {
   return window['go']['wails_api']['WailsApi']['SaveConfig'](arg1);
 }
 
+export function SaveVideoListTo(arg1) {
+  return window['go']['wails_api']['WailsApi']['SaveVideoListTo'](arg1);
+}
+
+export function SetDownloadPathDialog() {
+  return window['go']['wails_api']['WailsApi']['SetDownloadPathDialog']();
+}
+
+export function SetTaskDeleteState(arg1, arg2) {
+  return window['go']['wails_api']['WailsApi']['SetTaskDeleteState'](arg1, arg2);
+}
+
 export function Startup(arg1) {
   return window['go']['wails_api']['WailsApi']['Startup'](arg1);
+}
+
+export function UpdateTaskMeta(arg1, arg2, arg3) {
+  return window['go']['wails_api']['WailsApi']['UpdateTaskMeta'](arg1, arg2, arg3);
 }

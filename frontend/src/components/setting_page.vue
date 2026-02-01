@@ -2,23 +2,23 @@
 
     <FramePage title="应用设置" v-if="overload">
         <var-form>
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass0" :offset="true" elevation="0">
-                    <var-collapse-item title="软件行为与外观" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件行为与外观" name="1" class="font-bold text-lg bg-transparent!">
                         <SettingCell title="主题颜色">
-                            <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" style="width: 150px;" @change="setTheme">
+                            <var-select variant="outlined" size="small" placeholder="主题色" v-model="config.theme" class="w-[150px]" @change="setTheme">
                                 <var-option label="粉色" :value="'lightPink'" />
                                 <var-option label="蓝色" :value="'lightBlue'" />
                             </var-select>
                         </SettingCell>
-                        <CellSwitch title="关闭软件后清除缓存" v-model:parms="config.delete_cache" :onchange="changeCfg"></CellSwitch>
+                        <CellSwitch title="关闭软件后清除缓存" v-model:parms="config.delete_cache" :onchange="handleSave"></CellSwitch>
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
 
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
-                    <var-collapse-item title="账号使用" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="账号使用" name="1" class="font-bold text-lg bg-transparent!">
                         <CellSwitch title="获取内容时使用账号" v-model:parms="config.Account.use_account" :onchange="setUseAccount"></CellSwitch>
                         <SettingCell title="清除保存的账号信息">
                             <var-button type="danger" @click="logoutAccount" :disabled="!config.Account.is_login">退出登录</var-button>
@@ -27,50 +27,50 @@
                 </var-collapse>
             </var-paper>
 
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass2" :offset="true" elevation="0">
-                    <var-collapse-item title="软件下载行为" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="软件下载行为" name="1" class="font-bold text-lg bg-transparent!">
                         <SettingCell title="最大下载线程数">
-                            <var-counter v-model="config.download_config.download_threads" @change="changeCfg" />
+                            <var-counter v-model="config.download_config.download_threads" @change="handleSave" />
                         </SettingCell>
                         <SettingCell title="下载重试次数">
-                            <var-counter v-model="config.download_config.retry_count" @change="changeCfg" />
+                            <var-counter v-model="config.download_config.retry_count" @change="handleSave" />
                         </SettingCell>
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
 
-            <var-paper ripple style="background-color: var(--color-primary-container); margin-bottom: 10px">
+            <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass3" :offset="true" elevation="0">
-                    <var-collapse-item title="文件与路径" name="1" style="background: none; font-size: 1.19em; font-weight: bold;">
+                    <var-collapse-item title="文件与路径" name="1" class="font-bold text-lg bg-transparent!">
 
-                    <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" style="width: 100%; margin-bottom: 10px;">
+                    <var-tooltip content="如果您的计算机中安装了 ffmpeg ，可以打开此开关将音频转码为 MP3 格式输出" class="w-full mb-4">
                         <CellSwitch title="使用 ffmpeg 转码音频" v-model:parms="config.file_config.convert_format" :onchange="setConvertFormat"></CellSwitch>
                     </var-tooltip>
 
-                    <var-tooltip content="双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名" style="width: 100%; margin-bottom: 10px;" trigger="click">
+                    <var-tooltip content="双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名" class="w-full mb-4" trigger="click">
                         <template #content>
                             
                             <p v-pre>双大括号中的为文件名变量，可以通过自行修改或删除自定义文件名</p>
                             <p v-pre>列表编号{{.ID}} 视频标题{{.Title}} 单集标题{{.Subtitle}} 音频质量{{.Quality}} 格式后缀名{{.Format}}</p>
                         </template>
-                        <var-input style="margin: 10px;" variant="outlined" placeholder="文件命名方式" size="small" v-model="config.file_config.file_name_template"
-                            :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
+                        <var-input class="m-2.5" variant="outlined" placeholder="文件命名方式" size="small" v-model="config.file_config.file_name_template"
+                            :rules="[v => !!v || '该选项不能为空']" @change="handleSave" />
                     </var-tooltip>
                     
 
-                    <div style="display: flex; align-items: center;">
-                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="音频保存路径" size="small" readonly v-model="config.file_config.download_path" />
+                    <div class="flex items-center">
+                        <var-input class="m-2.5 w-full" variant="outlined" placeholder="音频保存路径" size="small" readonly v-model="config.file_config.download_path" />
                         <var-button type="primary" @click="setDownloadPathDialog">更改</var-button>
                     </div>
 
-                    <div style="display: flex; align-items: center;">    
-                        <var-input style="margin: 10px; width: 100%;" variant="outlined" placeholder="下载缓存路径" size="small" readonly  v-model="config.file_config.cache_path" />
+                    <div class="flex items-center">    
+                        <var-input class="m-2.5 w-full" variant="outlined" placeholder="下载缓存路径" size="small" readonly  v-model="config.file_config.cache_path" />
                         <var-button type="primary" @click="" disabled>更改</var-button>
                     </div>
 
-                    <var-input style="margin: 10px" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
-                        :rules="[v => !!v || '该选项不能为空']" @change="changeCfg" />
+                    <var-input class="m-2.5" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
+                        :rules="[v => !!v || '该选项不能为空']" @change="handleSave" />
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>
@@ -78,37 +78,40 @@
             <var-space direction="column" size="large">
                 <var-space justify="flex-end">
                     <var-button type="danger" icon-container @click="resetConfig"><var-icon name="refresh" />重置设置</var-button>
-                    <var-button type="success" icon-container @click="changeCfg"><var-icon name="file-document-outline" />保存更改</var-button>
+                    <var-button type="success" icon-container @click="handleSave"><var-icon name="file-document-outline" />保存更改</var-button>
                 </var-space>
             </var-space>
         </var-form>
     </FramePage>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import FramePage from '../components/modules/frame_page.vue'
 import CellSwitch from './modules/setting_switch_cell.vue'
 import SettingCell from './modules/setting_cell.vue'
 import { reactive, ref, onMounted } from 'vue'
-import { SetDownloadPathDialog } from '../../wailsjs/go/main/App'
-import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig } from '../../wailsjs/go/wails_api/WailsApi'
+import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig, SetDownloadPathDialog } from '../../wailsjs/go/wails_api/WailsApi'
+import { config as ConfigModels } from '../../wailsjs/go/models'
 
 import { Dialog, Snackbar } from '@varlet/ui'
 
-const changeCfg = ref(null) // 修改设置时的响应
-const overload = ref(false) // 是否完成页面加载
+const allowSave = ref(false) // Whether saving is allowed (avoids initial load triggers)
+const overload = ref(false) // Whether page is loaded
 
 const CardStatus = reactive({
-    configClass0: [],
-    configClass1: [],
-    configClass2: [],
-    configClass3: [],
+    configClass0: [] as string[],
+    configClass1: [] as string[],
+    configClass2: [] as string[],
+    configClass3: [] as string[],
 })
 
 onMounted(() => {
+    // Delay enabling save to avoid triggering on initial value setting
     setTimeout(() => {
         loadConfig();
-        changeCfg.value = saveConfig
+        setTimeout(() => {
+            allowSave.value = true
+        }, 100)
     }, 100)
 })
 
@@ -116,7 +119,7 @@ onMounted(() => {
 // TODO: ffmpeg path setter
 
 // 设置内容
-const config = ref([])
+const config = ref(new ConfigModels.Config())
 
 function setDownloadPathDialog() {
     SetDownloadPathDialog().then(() => {    
@@ -133,10 +136,17 @@ function loadConfig() {
     })
 }
 
+// Unified change handler that respects the safety flag
+function handleSave() {
+    if (allowSave.value) {
+        saveConfig()
+    }
+}
+
 // 保存配置文件
 function saveConfig() {
     setTimeout(function () {
-        SaveConfig(config.value).then(result => {
+        SaveConfig(config.value).then(() => {
             Snackbar.success("保存成功");
         })
     },100);
@@ -144,7 +154,7 @@ function saveConfig() {
 
 // 重置配置文件
 function resetConfig() {
-    ResetConfig().then(result => {
+    ResetConfig().then(() => {
         loadConfig();
     })
     Snackbar.success("已重置配置文件");
@@ -152,7 +162,7 @@ function resetConfig() {
 
 // 切换主题
 function setTheme() {
-    SaveConfig(config.value).then(result => {
+    SaveConfig(config.value).then(() => {
         Dialog('立即重新加载主题？').then(result => {
             if (result === 'confirm') {
                 loadConfig();

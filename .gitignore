@@ -11,3 +11,5 @@ package-lock.json
 config.json
 Cache/*
 Download/*
+
+.agent

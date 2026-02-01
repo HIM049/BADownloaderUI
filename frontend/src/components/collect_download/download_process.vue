@@ -12,7 +12,7 @@
             </var-space>
 
             <var-space justify="center">
-                <var-chip type="info" style="margin-top: 10px;">正在下载：{{ progress.downloadingTitle }} ( {{ progress.downFinished }} / {{ parms.listCount }} )</var-chip>
+                <var-chip type="info" class="mt-2.5">正在下载：{{ progress.downloadingTitle }} ( {{ progress.downFinished }} / {{ parms.listCount }} )</var-chip>
                 
             </var-space>
         </div>
@@ -32,8 +32,7 @@
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import { ref, reactive, computed } from 'vue'
-import { OpenDownloadFolader } from '../../../wailsjs/go/main/App'
-import { DownloadTaskList } from '../../../wailsjs/go/wails_api/WailsApi'
+import { DownloadTaskList, OpenDownloadFolader } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 
 const downloading = ref(false)

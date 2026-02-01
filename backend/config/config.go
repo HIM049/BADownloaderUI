@@ -5,10 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
 	"os"
 	"path/filepath"
+
+	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/spf13/viper"
 )
@@ -165,14 +166,14 @@ func DefaultConfig() *Config {
 	cfg := Config{
 		ConfigVersion: constants.CONFIG_VERSION,
 		DeleteCache:   true,
-		Theme:         "lightPink",
+		Theme:         "lightBlue",
 		DownloadConfig: DownloadConfig{
 			DownloadThreads: 5,
 			RetryCount:      10,
 		},
 		FileConfig: FileConfig{
 			ConvertFormat:    false, // TODO
-			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}.{{.Format}}",
+			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}{{.Format}}",
 			DownloadPath:     "./Download",
 			CachePath:        "./Cache",
 			VideoListPath:    "./Cache/video_list.json",
