@@ -9,10 +9,13 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"strings"
 )
 
 // CheckFileName 剔除文件名中的奇怪字符
 func CheckFileName(SFileN string) string {
+	// 英文双引号转中文双引号
+	SFileN = strings.ReplaceAll(SFileN, "\"", "“")
 	re := regexp.MustCompile(`[/$<>?:*|]`)
 	newName := re.ReplaceAllString(SFileN, "")
 	return newName
