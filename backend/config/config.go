@@ -172,7 +172,7 @@ func DefaultConfig() *Config {
 			RetryCount:      10,
 		},
 		FileConfig: FileConfig{
-			ConvertFormat:    false, // TODO
+			ConvertFormat:    false,
 			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}{{.Format}}",
 			DownloadPath:     "./Download",
 			CachePath:        "./Cache",
