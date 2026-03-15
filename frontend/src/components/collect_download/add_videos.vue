@@ -64,6 +64,12 @@
                 </template>
             </var-cell>
 
+            <var-cell> 起始位置
+                <template #extra>
+                    <var-counter :min="1" :max="resp.count" v-model="parms.options.downOffset"/>
+                </template>
+            </var-cell>
+
             <var-cell> 下载数量
                 <template #extra>
                     <var-counter :min="0" :max="resp.count" v-model="parms.options.downCount" :disabled="CardStatus.DownloadAll"/>
@@ -314,7 +320,7 @@ function openRightPanel() {
         case 0: // Collection
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
-                AddCollectionToList(parms.value.videoListPath, resp.fid, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
+                AddCollectionToList(parms.value.videoListPath, resp.fid, props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
                     afterAdd();
                 });
             }
@@ -323,7 +329,7 @@ function openRightPanel() {
         case 1: // Compilation
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
-                AddCompilationToList(parms.value.videoListPath, Number(resp.mid), Number(resp.fid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
+                AddCompilationToList(parms.value.videoListPath, Number(resp.mid), Number(resp.fid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
                     afterAdd();
                 });
             }
@@ -352,7 +358,7 @@ function openRightPanel() {
         case 4: //Profile
             addItToList.value = () => {
                 CardStatus.ConfirmBtnLoadig = true;
-                AddProfileVideoToList(parms.value.videoListPath, Number(resp.bvid), props.parms.options.downCount, props.parms.options.downPart).then(()=>{
+                AddProfileVideoToList(parms.value.videoListPath, Number(resp.bvid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
                     afterAdd();
                 });
             }

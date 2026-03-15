@@ -97,43 +97,51 @@ func AddAudioTask(sessdata, auid string) error {
 }
 
 // AddCollectionTask 向列表中添加一个收藏夹
-func AddCollectionTask(sessdata, favlistId string, count int, downloadCompilation bool) error {
+func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCompilation bool) error {
 	// 请求收藏夹基础数据，初始化循环
 	favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 1, 1)
 	if err != nil {
 		return err
 	}
-	// 计算下载页数
-	var pageCount int
-	if count == 0 {
-		// 如果下载数量为 0 （全部下载）
-		count = favlist.Data.Info.Media_count
-		pageCount = count / 20
-	} else {
-		// 计算下载页数
-		pageCount = count / 20
+	// 计算起始和结束索引
+	startIdx := offset - 1
+	if startIdx < 0 {
+		startIdx = 0
 	}
-	// 非完整页面
-	if count%20 != 0 {
-		pageCount++
+	
+	maxCount := favlist.Data.Info.Media_count
+	if count == 0 || startIdx+count > maxCount {
+		count = maxCount - startIdx
 	}
+	if count <= 0 {
+		return nil
+	}
+
+	endIdx := startIdx + count - 1
+
+	startPage := startIdx / 20
+	endPage := endIdx / 20
 
 	// 主循环
-	for i := 0; i < pageCount; i++ {
-		pageSize := 20
-		// 处理非完整尾页
-		if i+1 == pageCount && count%20 != 0 {
-			pageSize = count % 20
-		}
-
+	for i := startPage; i <= endPage; i++ {
 		// 获取当前分页信息
 		favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 20, i+1)
 		if err != nil {
 			return err
 		}
 
+		pageStart := 0
+		if i == startPage {
+			pageStart = startIdx % 20
+		}
+		
+		pageEnd := 19
+		if i == endPage {
+			pageEnd = endIdx % 20
+		}
+
 		// 遍历分页
-		for j := 0; j < len(favlist.Data.Medias) && j < pageSize; j++ {
+		for j := pageStart; j <= pageEnd && j < len(favlist.Data.Medias); j++ {
 
 			if favlist.Data.Medias[j].Type == 2 {
 				// 添加视频到列表
@@ -154,42 +162,51 @@ func AddCollectionTask(sessdata, favlistId string, count int, downloadCompilatio
 }
 
 // AddCompilationTask 向列表中添加一个视频合集
-func AddCompilationTask(sessdata string, mid, sid, count int, downloadCompilation bool) error {
+func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCompilation bool) error {
 	// 请求收藏夹基础数据，初始化循环
 	favlist, err := bilibili.GetCompliationObj(mid, sid, 1, 1)
 	if err != nil {
 		return err
 	}
-	// 计算下载页数
-	var pageCount int
-	if count == 0 {
-		// 如果下载数量为 0 （全部下载）
-		count = favlist.Data.Meta.Total
-		pageCount = count / 20
-	} else {
-		// 计算下载页数
-		pageCount = count / 20
+	// 计算起始和结束索引
+	startIdx := offset - 1
+	if startIdx < 0 {
+		startIdx = 0
 	}
-	// 非完整页面
-	if count%20 != 0 {
-		pageCount++
+	
+	maxCount := favlist.Data.Meta.Total
+	if count == 0 || startIdx+count > maxCount {
+		count = maxCount - startIdx
 	}
+	if count <= 0 {
+		return nil
+	}
+
+	endIdx := startIdx + count - 1
+
+	startPage := startIdx / 20
+	endPage := endIdx / 20
 
 	// 主循环
-	for i := 0; i < pageCount; i++ {
-		pageSize := 20
-		// 处理非完整尾页
-		if i+1 == pageCount && count%20 != 0 {
-			pageSize = count % 20
-		}
-
+	for i := startPage; i <= endPage; i++ {
 		// 获取当前分页信息
 		favlist, err := bilibili.GetCompliationObj(mid, sid, 20, i+1)
 		if err != nil {
 			return err
 		}
+		
+		pageStart := 0
+		if i == startPage {
+			pageStart = startIdx % 20
+		}
+		
+		pageEnd := 19
+		if i == endPage {
+			pageEnd = endIdx % 20
+		}
+		
 		// 遍历分页
-		for j := 0; j < len(favlist.Data.Archives) && j < pageSize; j++ {
+		for j := pageStart; j <= pageEnd && j < len(favlist.Data.Archives); j++ {
 			// 添加视频到列表
 			err := AddVideoTask(sessdata, favlist.Data.Archives[j].Bvid, downloadCompilation)
 			if err != nil {
@@ -202,43 +219,55 @@ func AddCompilationTask(sessdata string, mid, sid, count int, downloadCompilatio
 }
 
 // AddProfileVideoTask 向列表中添加个人主页视频
-func AddProfileVideoTask(sessdata string, mid, count int, downloadCompilation bool) error {
+func AddProfileVideoTask(sessdata string, mid, offset, count int, downloadCompilation bool) error {
 	respJson, err := bilibili.GetProfileVideo(strconv.Itoa(mid), "1", "1", sessdata)
 	if err != nil {
 		return err
 	}
 
-	// 计算下载页数
-	var pageCount int
-	if count == 0 {
-		// 如果下载数量为 0 （全部下载）
-		count = int(gjson.Get(respJson, "data.page.count").Int())
-		pageCount = count / 20
-	} else {
-		// 计算下载页数
-		pageCount = count / 20
+	// 计算起始和结束索引
+	startIdx := offset - 1
+	if startIdx < 0 {
+		startIdx = 0
 	}
-	// 非完整页面
-	if count%20 != 0 {
-		pageCount++
+	
+	maxCount := int(gjson.Get(respJson, "data.page.count").Int())
+	if count == 0 || startIdx+count > maxCount {
+		count = maxCount - startIdx
 	}
+	if count <= 0 {
+		return nil
+	}
+
+	endIdx := startIdx + count - 1
+
+	startPage := startIdx / 20
+	endPage := endIdx / 20
 
 	// 主循环
-	for i := 0; i < pageCount; i++ {
-		pageSize := 20
-
-		// 处理非完整尾页
-		if i+1 == pageCount && count%20 != 0 {
-			pageSize = count % 20
-		}
-
+	for i := startPage; i <= endPage; i++ {
 		// 获取当前分页信息
 		respJson, err := bilibili.GetProfileVideo(strconv.Itoa(mid), strconv.Itoa(i+1), "20", sessdata)
 		if err != nil {
 			return err
 		}
+		
+		pageStart := 0
+		if i == startPage {
+			pageStart = startIdx % 20
+		}
+		
+		pageEnd := 19
+		if i == endPage {
+			pageEnd = endIdx % 20
+		}
+		
 		// 遍历分页
-		for j := 0; j < pageSize; j++ {
+		for j := pageStart; j <= pageEnd; j++ {
+			bvid := gjson.Get(respJson, "data.list.vlist."+strconv.Itoa(j)+".bvid").String()
+			if bvid == "" {
+				continue
+			}
 			// 添加视频到列表
 			err := AddVideoTask(sessdata, gjson.Get(respJson, "data.list.vlist."+strconv.Itoa(j)+".bvid").String(), downloadCompilation)
 			if err != nil {

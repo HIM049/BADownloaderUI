@@ -7,11 +7,11 @@ import {context} from '../models';
 
 export function AddAudioToList(arg1:string,arg2:string):Promise<void>;
 
-export function AddCollectionToList(arg1:string,arg2:string,arg3:number,arg4:boolean):Promise<void>;
+export function AddCollectionToList(arg1:string,arg2:string,arg3:number,arg4:number,arg5:boolean):Promise<void>;
 
-export function AddCompilationToList(arg1:string,arg2:number,arg3:number,arg4:number,arg5:boolean):Promise<void>;
+export function AddCompilationToList(arg1:string,arg2:number,arg3:number,arg4:number,arg5:number,arg6:boolean):Promise<void>;
 
-export function AddProfileVideoToList(arg1:string,arg2:number,arg3:number,arg4:boolean):Promise<void>;
+export function AddProfileVideoToList(arg1:string,arg2:number,arg3:number,arg4:number,arg5:boolean):Promise<void>;
 
 export function AddVideoToList(arg1:string,arg2:string,arg3:boolean):Promise<void>;
 

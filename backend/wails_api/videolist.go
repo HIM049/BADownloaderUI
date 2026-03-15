@@ -75,13 +75,13 @@ func (w *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation boo
 }
 
 // AddCollectionToList 添加收藏夹内容
-func (w *WailsApi) AddCollectionToList(listPath, fid string, count int, downloadCompilation bool) error {
+func (w *WailsApi) AddCollectionToList(listPath, fid string, offset, count int, downloadCompilation bool) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := download.AddCollectionTask(sessdata, fid, count, downloadCompilation)
+	err := download.AddCollectionTask(sessdata, fid, offset, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -90,13 +90,13 @@ func (w *WailsApi) AddCollectionToList(listPath, fid string, count int, download
 }
 
 // AddCompilationToList 添加视频合集
-func (w *WailsApi) AddCompilationToList(listPath string, mid, sid, count int, downloadCompilation bool) error {
+func (w *WailsApi) AddCompilationToList(listPath string, mid, sid, offset, count int, downloadCompilation bool) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := download.AddCompilationTask(sessdata, mid, sid, count, downloadCompilation)
+	err := download.AddCompilationTask(sessdata, mid, sid, offset, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -120,13 +120,13 @@ func (w *WailsApi) AddAudioToList(listPath, auid string) error {
 }
 
 // AddProfileVideoToList 添加个人主页视频
-func (w *WailsApi) AddProfileVideoToList(listPath string, mid, count int, downloadCompilation bool) error {
+func (w *WailsApi) AddProfileVideoToList(listPath string, mid, offset, count int, downloadCompilation bool) error {
 	sessdata := ""
 	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
 		sessdata = config.Cfg.Account.SESSDATA
 	}
 
-	err := download.AddProfileVideoTask(sessdata, mid, count, downloadCompilation)
+	err := download.AddProfileVideoTask(sessdata, mid, offset, count, downloadCompilation)
 	if err != nil {
 		return err
 	}

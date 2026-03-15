@@ -6,16 +6,16 @@ export function AddAudioToList(arg1, arg2) {
   return window['go']['wails_api']['WailsApi']['AddAudioToList'](arg1, arg2);
 }
 
-export function AddCollectionToList(arg1, arg2, arg3, arg4) {
-  return window['go']['wails_api']['WailsApi']['AddCollectionToList'](arg1, arg2, arg3, arg4);
+export function AddCollectionToList(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['wails_api']['WailsApi']['AddCollectionToList'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function AddCompilationToList(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['wails_api']['WailsApi']['AddCompilationToList'](arg1, arg2, arg3, arg4, arg5);
+export function AddCompilationToList(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['wails_api']['WailsApi']['AddCompilationToList'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
-export function AddProfileVideoToList(arg1, arg2, arg3, arg4) {
-  return window['go']['wails_api']['WailsApi']['AddProfileVideoToList'](arg1, arg2, arg3, arg4);
+export function AddProfileVideoToList(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['wails_api']['WailsApi']['AddProfileVideoToList'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function AddVideoToList(arg1, arg2, arg3) {
