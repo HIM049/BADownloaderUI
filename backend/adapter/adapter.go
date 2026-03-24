@@ -30,4 +30,13 @@ type TaskInfo struct {
 	SongAuthor string
 	CoverUrl   string
 	IsDelete   bool
+
+	// Fields for reconstruction
+	Type     int      `json:"type,omitempty"` // 1 for Video, 2 for Audio
+	Bvid     string   `json:"bvid,omitempty"`
+	Cid      int      `json:"cid,omitempty"`
+	Auid     string   `json:"auid,omitempty"`
+	Sessdata string   `json:"sessdata,omitempty"`
+	Option   Option   `json:"option,omitempty"`
+	MetaData MetaData `json:"meta_data,omitempty"`
 }

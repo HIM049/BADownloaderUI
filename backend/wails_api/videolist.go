@@ -190,3 +190,36 @@ func (w *WailsApi) SaveVideoListTo(path string) error {
 
 	return nil
 }
+
+// ImportVideoList 导入任务列表
+func (w *WailsApi) ImportVideoList() error {
+	path, err := runtime.OpenFileDialog(w.ctx, runtime.OpenDialogOptions{
+		Title: "打开列表",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "JSON Files (*.json)", Pattern: "*.json"},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	if path == "" {
+		return nil
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	var tasks []adapter.TaskInfo
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&tasks)
+	if err != nil {
+		return err
+	}
+
+	download.ImportTasks(tasks)
+	runtime.EventsEmit(w.ctx, "refreshVideoList")
+	return nil
+}

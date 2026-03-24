@@ -7,7 +7,6 @@ import (
 	"bili-audio-downloader/backend/ffmpeg"
 	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
-	"errors"
 	"fmt"
 	"sync"
 )
@@ -69,12 +68,12 @@ func (a *Audio) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = a.downloadStream(a.path.StreamPath)
 			if err != nil {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
+				err = fmt.Errorf("failed to download video stream: %v (retry %d)", err, i)
 				continue
 
 			}
 			if !utils.IsFileExists(a.path.StreamPath) {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
+				err = fmt.Errorf("failed to download video stream: %s (retry %d)", "file not exitsts", i)
 				continue
 			}
 			break
@@ -93,11 +92,11 @@ func (a *Audio) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = utils.SaveFromURL(a.coverUrl, a.path.CoverPath, bilibili.GetRandomUA())
 			if err != nil {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
+				err = fmt.Errorf("failed to download video stream: %v (retry %d)", err, i)
 				continue
 			}
 			if !utils.IsFileExists(a.path.CoverPath) {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
+				err = fmt.Errorf("failed to download video stream: %s (retry %d)", "file not exitsts", i)
 				continue
 			}
 			break
@@ -153,13 +152,13 @@ func (a *Audio) downloadStream(streamPath string) error {
 	audio.Auid = a.auid
 	err := audio.GetStream(a.sessdata)
 	if err != nil {
-		return errors.New(fmt.Sprintf("get audio stream error: %s", err))
+		return fmt.Errorf("get audio stream error: %s", err)
 	}
 
 	// 通过流地址下载
 	err = utils.StreamingDownloader(audio.Stream.StreamLink, streamPath, bilibili.GetRandomUA())
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to download stream: %s", err))
+		return fmt.Errorf("failed to download stream: %s", err)
 	}
 	return nil
 }
@@ -170,6 +169,11 @@ func (a *Audio) GetTaskInfo() *adapter.TaskInfo {
 		SongAuthor: a.metaData.Author,
 		CoverUrl:   a.coverUrl,
 		IsDelete:   a.isDelete,
+		Type:       2,
+		Auid:       a.auid,
+		Sessdata:   a.sessdata,
+		Option:     a.option,
+		MetaData:   a.metaData,
 	}
 	return &taskInfo
 }

@@ -1,19 +1,25 @@
 <template>
     <FramePage title="添加内容">
         <template #actions>
-            <var-button type="danger" icon-container class="float-right" @click="() => {
-            Dialog('清除当前任务列表').then(result => {
-                if (result === 'confirm') {
-                    ResetDownloadList().then(() => {
-                        emit('updateBadge');
-                        Snackbar.success('清除成功');
-                    });
-                }
-            });
-        }">
-                <var-icon name="delete" />
-                清除列表
-            </var-button>
+            <var-space>
+                <var-button type="primary" @click="importList">
+                    <var-icon name="upload" />
+                    导入列表
+                </var-button>
+                <var-button type="danger" icon-container @click="() => {
+                Dialog('清除当前任务列表').then(result => {
+                    if (result === 'confirm') {
+                        ResetDownloadList().then(() => {
+                            emit('updateBadge');
+                            Snackbar.success('清除成功');
+                        });
+                    }
+                });
+            }">
+                    <var-icon name="delete" />
+                    清除列表
+                </var-button>
+            </var-space>
         </template>
 
         <var-radio-group v-model="QueryType" @change="queryInfornation">
@@ -123,7 +129,8 @@ import {
     AddCompilationToList,
     AddAudioToList,
     AddProfileVideoToList,
-    ResetDownloadList
+    ResetDownloadList,
+    ImportVideoList
 } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn, EventsEmit } from '../../../wailsjs/runtime'
 import {Dialog, Snackbar} from '@varlet/ui'
@@ -374,6 +381,18 @@ function afterAdd() {
     props.parms.options.downCount = 0;
     emit('updateBadge');
     CardStatus.ConfirmBtnLoadig = false;
+}
+
+// 导入列表
+function importList() {
+    ImportVideoList().then(err => {
+        if (err) {
+            Snackbar.error("导入失败: " + err);
+        } else {
+            Snackbar.success("导入成功");
+            emit('updateBadge');
+        }
+    });
 }
 
 // 过滤视频分享链接

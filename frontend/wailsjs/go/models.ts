@@ -1,11 +1,58 @@
 export namespace adapter {
 	
+	export class MetaData {
+	    Title: string;
+	    PageTitle: string;
+	    PartId: number;
+	    SongName: string;
+	    Author: string;
+	    LyricsUrl: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new MetaData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Title = source["Title"];
+	        this.PageTitle = source["PageTitle"];
+	        this.PartId = source["PartId"];
+	        this.SongName = source["SongName"];
+	        this.Author = source["Author"];
+	        this.LyricsUrl = source["LyricsUrl"];
+	    }
+	}
+	export class Option {
+	    song_name: boolean;
+	    song_cover: boolean;
+	    song_author: boolean;
+	    download_flac: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Option(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.song_name = source["song_name"];
+	        this.song_cover = source["song_cover"];
+	        this.song_author = source["song_author"];
+	        this.download_flac = source["download_flac"];
+	    }
+	}
 	export class TaskInfo {
 	    Index: number;
 	    SongName: string;
 	    SongAuthor: string;
 	    CoverUrl: string;
 	    IsDelete: boolean;
+	    type?: number;
+	    bvid?: string;
+	    cid?: number;
+	    auid?: string;
+	    sessdata?: string;
+	    option?: Option;
+	    meta_data?: MetaData;
 	
 	    static createFrom(source: any = {}) {
 	        return new TaskInfo(source);
@@ -18,7 +65,32 @@ export namespace adapter {
 	        this.SongAuthor = source["SongAuthor"];
 	        this.CoverUrl = source["CoverUrl"];
 	        this.IsDelete = source["IsDelete"];
+	        this.type = source["type"];
+	        this.bvid = source["bvid"];
+	        this.cid = source["cid"];
+	        this.auid = source["auid"];
+	        this.sessdata = source["sessdata"];
+	        this.option = this.convertValues(source["option"], Option);
+	        this.meta_data = this.convertValues(source["meta_data"], MetaData);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 
 }

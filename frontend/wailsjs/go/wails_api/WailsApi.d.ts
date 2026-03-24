@@ -37,6 +37,8 @@ export function GetUserInf():Promise<bilibili.AccountInformation>;
 
 export function GetUsersCollect():Promise<bilibili.Collects>;
 
+export function ImportVideoList():Promise<void>;
+
 export function LoadConfig():Promise<config.Config>;
 
 export function LoginBilibili():Promise<void>;

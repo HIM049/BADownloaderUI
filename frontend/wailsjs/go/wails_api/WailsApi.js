@@ -66,6 +66,10 @@ export function GetUsersCollect() {
   return window['go']['wails_api']['WailsApi']['GetUsersCollect']();
 }
 
+export function ImportVideoList() {
+  return window['go']['wails_api']['WailsApi']['ImportVideoList']();
+}
+
 export function LoadConfig() {
   return window['go']['wails_api']['WailsApi']['LoadConfig']();
 }

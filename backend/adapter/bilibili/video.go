@@ -7,7 +7,6 @@ import (
 	"bili-audio-downloader/backend/ffmpeg"
 	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
-	"errors"
 	"fmt"
 	"strconv"
 	"sync"
@@ -75,11 +74,11 @@ func (v *Video) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = v.downloadStream(v.path.StreamPath)
 			if err != nil {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
+				err = fmt.Errorf("failed to download video stream: %v (retry %d)", err, i)
 				continue
 			}
 			if !utils.IsFileExists(v.path.StreamPath) {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
+				err = fmt.Errorf("failed to download video stream: %s (retry %d)", "file not exitsts", i)
 				continue
 			}
 			break
@@ -98,11 +97,11 @@ func (v *Video) Download() error {
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
 			err = utils.SaveFromURL(v.coverUrl, v.path.CoverPath, bilibili.GetRandomUA())
 			if err != nil {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %v (retry %d)", err, i))
+				err = fmt.Errorf("failed to download video stream: %v (retry %d)", err, i)
 				continue
 			}
 			if !utils.IsFileExists(v.path.CoverPath) {
-				err = errors.New(fmt.Sprintf("failed to download video stream: %s (retry %d)", "file not exitsts", i))
+				err = fmt.Errorf("failed to download video stream: %s (retry %d)", "file not exitsts", i)
 				continue
 			}
 			break
@@ -129,7 +128,7 @@ func (v *Video) downloadStream(streamPath string) error {
 	// 请求流地址
 	json, err := bilibili.GetVideoStream(v.bvid, strconv.Itoa(v.cid), v.sessdata)
 	if gjson.Get(json, "code").Int() != 0 {
-		return errors.New("return value is not 0")
+		return fmt.Errorf("return value is not 0")
 	}
 
 	// 获取流地址
@@ -141,13 +140,13 @@ func (v *Video) downloadStream(streamPath string) error {
 	}
 
 	if stream == "" {
-		return errors.New("return stream is empty")
+		return fmt.Errorf("return stream is empty")
 	}
 
 	// 通过流地址下载
 	err = utils.StreamingDownloader(stream, streamPath, bilibili.GetRandomUA())
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to download stream: %s", err))
+		return fmt.Errorf("failed to download stream: %s", err)
 	}
 	return nil
 }
@@ -196,6 +195,12 @@ func (w *Video) GetTaskInfo() *adapter.TaskInfo {
 		SongAuthor: w.metaData.Author,
 		CoverUrl:   w.coverUrl,
 		IsDelete:   w.isDelete,
+		Type:       1,
+		Bvid:       w.bvid,
+		Cid:        w.cid,
+		Sessdata:   w.sessdata,
+		Option:     w.option,
+		MetaData:   w.metaData,
 	}
 	return &taskInfo
 }

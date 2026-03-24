@@ -3,6 +3,7 @@ package download
 import (
 	"bili-audio-downloader/backend/adapter"
 	bilibili2 "bili-audio-downloader/backend/adapter/bilibili"
+	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/utils"
 	"bili-audio-downloader/bilibili"
 	"strconv"
@@ -18,6 +19,28 @@ func ResetTaskList() {
 
 func AddTask(task DownloadTask) {
 	DownloadList = append(DownloadList, task)
+}
+
+// ImportTasks 从导出的任务信息中恢复任务列表
+func ImportTasks(tasks []adapter.TaskInfo) {
+	for _, info := range tasks {
+		sessdata := info.Sessdata
+		if sessdata == "" {
+			if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
+				sessdata = config.Cfg.Account.SESSDATA
+			}
+		}
+
+		if info.Type == 1 { // Video
+			video := bilibili2.NewVideo(info.Bvid, info.Cid, info.CoverUrl, sessdata, info.MetaData)
+			video.SetDelete(info.IsDelete)
+			AddTask(video)
+		} else if info.Type == 2 { // Audio
+			audio := bilibili2.NewAudio(info.Auid, info.CoverUrl, sessdata, info.MetaData)
+			audio.SetDelete(info.IsDelete)
+			AddTask(audio)
+		}
+	}
 }
 
 // AddVideoTask 向列表中添加一个视频
@@ -74,7 +97,7 @@ func AddVideoTask(sessdata, bvid string, downloadCompilation bool) error {
 
 // AddAudio 向列表中添加一个音频项目
 func AddAudioTask(sessdata, auid string) error {
-	// 查询视频信息
+	// 查询音频信息
 	audio := new(bilibili.Audio)
 	err := audio.Query(auid)
 	if err != nil {
@@ -108,7 +131,7 @@ func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCo
 	if startIdx < 0 {
 		startIdx = 0
 	}
-	
+
 	maxCount := favlist.Data.Info.Media_count
 	if count == 0 || startIdx+count > maxCount {
 		count = maxCount - startIdx
@@ -134,7 +157,7 @@ func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCo
 		if i == startPage {
 			pageStart = startIdx % 20
 		}
-		
+
 		pageEnd := 19
 		if i == endPage {
 			pageEnd = endIdx % 20
@@ -173,7 +196,7 @@ func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCo
 	if startIdx < 0 {
 		startIdx = 0
 	}
-	
+
 	maxCount := favlist.Data.Meta.Total
 	if count == 0 || startIdx+count > maxCount {
 		count = maxCount - startIdx
@@ -194,17 +217,17 @@ func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCo
 		if err != nil {
 			return err
 		}
-		
+
 		pageStart := 0
 		if i == startPage {
 			pageStart = startIdx % 20
 		}
-		
+
 		pageEnd := 19
 		if i == endPage {
 			pageEnd = endIdx % 20
 		}
-		
+
 		// 遍历分页
 		for j := pageStart; j <= pageEnd && j < len(favlist.Data.Archives); j++ {
 			// 添加视频到列表
@@ -230,7 +253,7 @@ func AddProfileVideoTask(sessdata string, mid, offset, count int, downloadCompil
 	if startIdx < 0 {
 		startIdx = 0
 	}
-	
+
 	maxCount := int(gjson.Get(respJson, "data.page.count").Int())
 	if count == 0 || startIdx+count > maxCount {
 		count = maxCount - startIdx
@@ -251,17 +274,17 @@ func AddProfileVideoTask(sessdata string, mid, offset, count int, downloadCompil
 		if err != nil {
 			return err
 		}
-		
+
 		pageStart := 0
 		if i == startPage {
 			pageStart = startIdx % 20
 		}
-		
+
 		pageEnd := 19
 		if i == endPage {
 			pageEnd = endIdx % 20
 		}
-		
+
 		// 遍历分页
 		for j := pageStart; j <= pageEnd; j++ {
 			bvid := gjson.Get(respJson, "data.list.vlist."+strconv.Itoa(j)+".bvid").String()
