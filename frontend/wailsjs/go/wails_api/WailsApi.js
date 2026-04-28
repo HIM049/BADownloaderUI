@@ -70,6 +70,10 @@ export function ImportVideoList() {
   return window['go']['wails_api']['WailsApi']['ImportVideoList']();
 }
 
+export function InstallFfmpegByWinget() {
+  return window['go']['wails_api']['WailsApi']['InstallFfmpegByWinget']();
+}
+
 export function LoadConfig() {
   return window['go']['wails_api']['WailsApi']['LoadConfig']();
 }

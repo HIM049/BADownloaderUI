@@ -90,7 +90,7 @@ import FramePage from '../components/modules/frame_page.vue'
 import CellSwitch from './modules/setting_switch_cell.vue'
 import SettingCell from './modules/setting_cell.vue'
 import { reactive, ref, onMounted } from 'vue'
-import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig, SetDownloadPathDialog } from '../../wailsjs/go/wails_api/WailsApi'
+import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig, SetDownloadPathDialog, Checkffmpeg } from '../../wailsjs/go/wails_api/WailsApi'
 import { config as ConfigModels } from '../../wailsjs/go/models'
 
 import { Dialog, Snackbar } from '@varlet/ui'
@@ -115,8 +115,7 @@ onMounted(() => {
     }, 100)
 })
 
-// TODO: fix ffmpeg checker
-// TODO: ffmpeg path setter
+
 
 // 设置内容
 const config = ref(new ConfigModels.Config())
@@ -212,14 +211,14 @@ function setUseAccount() {
 
 // 校验是否存在 ffmpeg
 function setConvertFormat() {
-    // Checkffmpeg().then(result => {
-    //     if (result) {
-    //         saveConfig();
-    //     } else {
-    //         config.file_config.convert_format = false;
-    //         Snackbar.warning("未检测到 ffmpeg 安装");
-    //     }
-    // })
+    Checkffmpeg().then(result => {
+        if (result) {
+            saveConfig();
+        } else {
+            config.value.file_config.convert_format = false;
+            Snackbar.warning("未检测到 ffmpeg，无法启用转码");
+        }
+    });
 }
 
 </script>

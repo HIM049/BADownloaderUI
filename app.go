@@ -3,6 +3,7 @@ package main
 import (
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
+	"bili-audio-downloader/backend/ffmpeg"
 	"bili-audio-downloader/backend/services"
 	"context"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -26,6 +27,10 @@ func (a *App) startup(ctx context.Context) {
 	wails.LogDebug(a.ctx, "Start Initializing Folder")
 	initFolder(a.ctx)
 
+	// Check ffmpeg
+	wails.LogDebug(a.ctx, "Start Check FFmpeg")
+	go checkFfmpegAndAlarm(a.ctx)
+
 	// Check software update
 	wails.LogDebug(a.ctx, "Start Check Update")
 	go checkUpdateAndAlarm(a.ctx)
@@ -37,6 +42,16 @@ func (a *App) shutdown(ctx context.Context) {
 	// 清理缓存
 	if config.Cfg.DeleteCache {
 		os.RemoveAll(config.Cfg.GetCachePath())
+	}
+}
+
+// Check ffmpeg and alarm
+func checkFfmpegAndAlarm(ctx context.Context) {
+	exists := ffmpeg.CheckExists()
+	if exists {
+		wails.LogInfo(ctx, "FFmpeg found in system PATH")
+	} else {
+		wails.LogWarning(ctx, "FFmpeg not found in system PATH")
 	}
 }
 

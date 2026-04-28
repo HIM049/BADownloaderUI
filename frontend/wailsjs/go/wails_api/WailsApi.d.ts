@@ -39,6 +39,8 @@ export function GetUsersCollect():Promise<bilibili.Collects>;
 
 export function ImportVideoList():Promise<void>;
 
+export function InstallFfmpegByWinget():Promise<void>;
+
 export function LoadConfig():Promise<config.Config>;
 
 export function LoginBilibili():Promise<void>;
