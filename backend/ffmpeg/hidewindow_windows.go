@@ -1,6 +1,6 @@
 //go:build windows
 
-package services
+package ffmpeg
 
 import (
 	"os/exec"

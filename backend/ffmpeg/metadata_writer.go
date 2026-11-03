@@ -2,12 +2,11 @@ package ffmpeg
 
 import (
 	"bili-audio-downloader/backend/constants"
-	"bili-audio-downloader/backend/utils"
-	"fmt"
 )
 
+// WriteMetadata 写入标题、艺术家和封面，音频流直接复制
 func WriteMetadata(input, output, coverPath, songName, songAuthor string, format string) error {
-	err := initFfmpeg(&input, &output)
+	input, output, err := absPaths(input, output)
 	if err != nil {
 		return err
 	}
@@ -70,10 +69,5 @@ func WriteMetadata(input, output, coverPath, songName, songAuthor string, format
 
 	args = append(args, "-f", formatFlag, output)
 
-	log, err := utils.RunCommand("ffmpeg", args...)
-	if err != nil {
-		return fmt.Errorf("ffmpeg error: %v\nOutput: %s", err, log)
-	}
-
-	return nil
+	return run(args...)
 }
