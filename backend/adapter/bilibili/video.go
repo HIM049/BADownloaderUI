@@ -2,16 +2,13 @@ package bilibili
 
 import (
 	"bili-audio-downloader/backend/adapter"
+	"bili-audio-downloader/backend/biliapi"
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
 	"bili-audio-downloader/backend/ffmpeg"
 	"bili-audio-downloader/backend/utils"
-	"bili-audio-downloader/bilibili"
 	"fmt"
-	"strconv"
 	"sync"
-
-	"github.com/tidwall/gjson"
 )
 
 type Video struct {
@@ -95,7 +92,7 @@ func (v *Video) Download() error {
 
 		var err error
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
-			err = utils.SaveFromURL(v.coverUrl, v.path.CoverPath, bilibili.GetRandomUA())
+			err = biliapi.Download(v.coverUrl, v.path.CoverPath)
 			if err != nil {
 				err = fmt.Errorf("failed to download video stream: %v (retry %d)", err, i)
 				continue
@@ -126,14 +123,14 @@ func (v *Video) Download() error {
 
 func (v *Video) downloadStream(streamPath string) error {
 	// 请求流地址
-	json, err := bilibili.GetVideoStream(v.bvid, strconv.Itoa(v.cid), v.sessdata)
-	if gjson.Get(json, "code").Int() != 0 {
-		return fmt.Errorf("return value is not 0")
+	playURL, err := biliapi.GetPlayURL(v.bvid, v.cid, v.sessdata)
+	if err != nil {
+		return fmt.Errorf("get video stream error: %s", err)
 	}
 
 	// 获取流地址
-	stream := gjson.Get(json, "data.dash.audio.0.base_url").String()
-	flacStream := gjson.Get(json, "data.dash.flac.audio.base_url").String()
+	stream := playURL.AudioURL()
+	flacStream := playURL.FlacURL()
 	if v.option.DownloadFlac && flacStream != "" {
 		stream = flacStream
 		v.path.OutputFormat = constants.AudioType.Flac
@@ -144,7 +141,7 @@ func (v *Video) downloadStream(streamPath string) error {
 	}
 
 	// 通过流地址下载
-	err = utils.StreamingDownloader(stream, streamPath, bilibili.GetRandomUA())
+	err = biliapi.Download(stream, streamPath)
 	if err != nil {
 		return fmt.Errorf("failed to download stream: %s", err)
 	}

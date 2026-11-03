@@ -2,13 +2,12 @@ package download
 
 import (
 	"bili-audio-downloader/backend/adapter"
-	bilibili2 "bili-audio-downloader/backend/adapter/bilibili"
+	"bili-audio-downloader/backend/adapter/bilibili"
+	"bili-audio-downloader/backend/biliapi"
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/utils"
-	"bili-audio-downloader/bilibili"
+	"fmt"
 	"strconv"
-
-	"github.com/tidwall/gjson"
 )
 
 var DownloadList []DownloadTask
@@ -31,12 +30,13 @@ func ImportTasks(tasks []adapter.TaskInfo) {
 			}
 		}
 
-		if info.Type == 1 { // Video
-			video := bilibili2.NewVideo(info.Bvid, info.Cid, info.CoverUrl, sessdata, info.MetaData)
+		switch info.Type {
+		case 1: // Video
+			video := bilibili.NewVideo(info.Bvid, info.Cid, info.CoverUrl, sessdata, info.MetaData)
 			video.SetDelete(info.IsDelete)
 			AddTask(video)
-		} else if info.Type == 2 { // Audio
-			audio := bilibili2.NewAudio(info.Auid, info.CoverUrl, sessdata, info.MetaData)
+		case 2: // Audio
+			audio := bilibili.NewAudio(info.Auid, info.CoverUrl, sessdata, info.MetaData)
 			audio.SetDelete(info.IsDelete)
 			AddTask(audio)
 		}
@@ -46,22 +46,24 @@ func ImportTasks(tasks []adapter.TaskInfo) {
 // AddVideoTask 向列表中添加一个视频
 func AddVideoTask(sessdata, bvid string, downloadCompilation bool) error {
 	// 查询视频信息
-	video := new(bilibili.Video)
-	err := video.Query(sessdata, bvid)
+	view, err := biliapi.GetVideoView(bvid, sessdata)
 	if err != nil {
 		return err
+	}
+	if len(view.Pages) == 0 {
+		return fmt.Errorf("video %s has no pages", bvid)
 	}
 
 	// 处理分集数量
 	var total int = 1
 	if downloadCompilation {
-		total = len(video.Videos)
+		total = len(view.Pages)
 	}
 
 	// 保存信息
 	for i := 0; i < total; i++ {
-		Title := utils.CheckFileName(video.Meta.Title)
-		PageTitle := utils.CheckFileName(video.Videos[i].Part)
+		Title := utils.CheckFileName(view.Title)
+		PageTitle := utils.CheckFileName(view.Pages[i].Part)
 
 		// 处理音频标题（单 P 视频）
 		var SongName string
@@ -84,11 +86,11 @@ func AddVideoTask(sessdata, bvid string, downloadCompilation bool) error {
 			PageTitle: PageTitle,
 			PartId:    i,
 			SongName:  SongName,
-			Author:    video.Up.Name,
+			Author:    view.Owner.Name,
 			LyricsUrl: "",
 		}
 
-		video := bilibili2.NewVideo(video.Bvid, video.Videos[i].Cid, video.Meta.Cover, sessdata, metaData)
+		video := bilibili.NewVideo(bvid, view.Pages[i].Cid, view.Pic, sessdata, metaData)
 
 		AddTask(video)
 	}
@@ -98,22 +100,21 @@ func AddVideoTask(sessdata, bvid string, downloadCompilation bool) error {
 // AddAudio 向列表中添加一个音频项目
 func AddAudioTask(sessdata, auid string) error {
 	// 查询音频信息
-	audio := new(bilibili.Audio)
-	err := audio.Query(auid)
+	info, err := biliapi.GetAudioInfo(auid)
 	if err != nil {
 		return err
 	}
 
 	metaData := adapter.MetaData{
-		Title:     utils.CheckFileName(audio.Meta.Title),
-		PageTitle: utils.CheckFileName(audio.Meta.Title),
+		Title:     utils.CheckFileName(info.Title),
+		PageTitle: utils.CheckFileName(info.Title),
 		PartId:    0,
-		SongName:  audio.Meta.Title,
-		Author:    audio.Up.Author,
-		LyricsUrl: audio.Meta.Lyric,
+		SongName:  info.Title,
+		Author:    info.Author,
+		LyricsUrl: info.Lyric,
 	}
 
-	audioTask := bilibili2.NewAudio(auid, audio.Meta.Cover, sessdata, metaData)
+	audioTask := bilibili.NewAudio(auid, info.Cover, sessdata, metaData)
 	AddTask(audioTask)
 
 	return nil
@@ -122,7 +123,7 @@ func AddAudioTask(sessdata, auid string) error {
 // AddCollectionTask 向列表中添加一个收藏夹
 func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCompilation bool) error {
 	// 请求收藏夹基础数据，初始化循环
-	favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 1, 1)
+	favlist, err := biliapi.GetFavList(favlistId, sessdata, 1, 1)
 	if err != nil {
 		return err
 	}
@@ -132,7 +133,7 @@ func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCo
 		startIdx = 0
 	}
 
-	maxCount := favlist.Data.Info.Media_count
+	maxCount := favlist.Info.MediaCount
 	if count == 0 || startIdx+count > maxCount {
 		count = maxCount - startIdx
 	}
@@ -148,7 +149,7 @@ func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCo
 	// 主循环
 	for i := startPage; i <= endPage; i++ {
 		// 获取当前分页信息
-		favlist, err := bilibili.GetFavListObj(favlistId, sessdata, 20, i+1)
+		favlist, err := biliapi.GetFavList(favlistId, sessdata, 20, i+1)
 		if err != nil {
 			return err
 		}
@@ -164,17 +165,17 @@ func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCo
 		}
 
 		// 遍历分页
-		for j := pageStart; j <= pageEnd && j < len(favlist.Data.Medias); j++ {
+		for j := pageStart; j <= pageEnd && j < len(favlist.Medias); j++ {
 
-			if favlist.Data.Medias[j].Type == 2 {
+			if favlist.Medias[j].Type == biliapi.FavMediaVideo {
 				// 添加视频到列表
-				err := AddVideoTask(sessdata, favlist.Data.Medias[j].Bvid, downloadCompilation)
+				err := AddVideoTask(sessdata, favlist.Medias[j].Bvid, downloadCompilation)
 				if err != nil {
 					continue
 				}
 			} else {
 				// 添加收藏夹中的音频
-				err := AddAudioTask(sessdata, strconv.Itoa(favlist.Data.Medias[j].Id))
+				err := AddAudioTask(sessdata, strconv.Itoa(favlist.Medias[j].ID))
 				if err != nil {
 					continue
 				}
@@ -187,7 +188,7 @@ func AddCollectionTask(sessdata, favlistId string, offset, count int, downloadCo
 // AddCompilationTask 向列表中添加一个视频合集
 func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCompilation bool) error {
 	// 请求收藏夹基础数据，初始化循环
-	favlist, err := bilibili.GetCompliationObj(mid, sid, 1, 1)
+	season, err := biliapi.GetSeasonArchives(mid, sid, 1, 1)
 	if err != nil {
 		return err
 	}
@@ -197,7 +198,7 @@ func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCo
 		startIdx = 0
 	}
 
-	maxCount := favlist.Data.Meta.Total
+	maxCount := season.Meta.Total
 	if count == 0 || startIdx+count > maxCount {
 		count = maxCount - startIdx
 	}
@@ -213,7 +214,7 @@ func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCo
 	// 主循环
 	for i := startPage; i <= endPage; i++ {
 		// 获取当前分页信息
-		favlist, err := bilibili.GetCompliationObj(mid, sid, 20, i+1)
+		season, err := biliapi.GetSeasonArchives(mid, sid, 20, i+1)
 		if err != nil {
 			return err
 		}
@@ -229,9 +230,9 @@ func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCo
 		}
 
 		// 遍历分页
-		for j := pageStart; j <= pageEnd && j < len(favlist.Data.Archives); j++ {
+		for j := pageStart; j <= pageEnd && j < len(season.Archives); j++ {
 			// 添加视频到列表
-			err := AddVideoTask(sessdata, favlist.Data.Archives[j].Bvid, downloadCompilation)
+			err := AddVideoTask(sessdata, season.Archives[j].Bvid, downloadCompilation)
 			if err != nil {
 				continue
 			}
@@ -243,7 +244,7 @@ func AddCompilationTask(sessdata string, mid, sid, offset, count int, downloadCo
 
 // AddProfileVideoTask 向列表中添加个人主页视频
 func AddProfileVideoTask(sessdata string, mid, offset, count int, downloadCompilation bool) error {
-	respJson, err := bilibili.GetProfileVideo(strconv.Itoa(mid), "1", "1", sessdata)
+	space, err := biliapi.GetSpaceVideos(mid, sessdata, 1, 1)
 	if err != nil {
 		return err
 	}
@@ -254,7 +255,7 @@ func AddProfileVideoTask(sessdata string, mid, offset, count int, downloadCompil
 		startIdx = 0
 	}
 
-	maxCount := int(gjson.Get(respJson, "data.page.count").Int())
+	maxCount := space.Page.Count
 	if count == 0 || startIdx+count > maxCount {
 		count = maxCount - startIdx
 	}
@@ -270,7 +271,7 @@ func AddProfileVideoTask(sessdata string, mid, offset, count int, downloadCompil
 	// 主循环
 	for i := startPage; i <= endPage; i++ {
 		// 获取当前分页信息
-		respJson, err := bilibili.GetProfileVideo(strconv.Itoa(mid), strconv.Itoa(i+1), "20", sessdata)
+		space, err := biliapi.GetSpaceVideos(mid, sessdata, 20, i+1)
 		if err != nil {
 			return err
 		}
@@ -286,13 +287,13 @@ func AddProfileVideoTask(sessdata string, mid, offset, count int, downloadCompil
 		}
 
 		// 遍历分页
-		for j := pageStart; j <= pageEnd; j++ {
-			bvid := gjson.Get(respJson, "data.list.vlist."+strconv.Itoa(j)+".bvid").String()
+		for j := pageStart; j <= pageEnd && j < len(space.List.Vlist); j++ {
+			bvid := space.List.Vlist[j].Bvid
 			if bvid == "" {
 				continue
 			}
 			// 添加视频到列表
-			err := AddVideoTask(sessdata, gjson.Get(respJson, "data.list.vlist."+strconv.Itoa(j)+".bvid").String(), downloadCompilation)
+			err := AddVideoTask(sessdata, bvid, downloadCompilation)
 			if err != nil {
 				continue
 			}

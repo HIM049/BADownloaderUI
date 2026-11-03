@@ -2,11 +2,11 @@ package bilibili
 
 import (
 	"bili-audio-downloader/backend/adapter"
+	"bili-audio-downloader/backend/biliapi"
 	"bili-audio-downloader/backend/config"
 	"bili-audio-downloader/backend/constants"
 	"bili-audio-downloader/backend/ffmpeg"
 	"bili-audio-downloader/backend/utils"
-	"bili-audio-downloader/bilibili"
 	"fmt"
 	"sync"
 )
@@ -90,7 +90,7 @@ func (a *Audio) Download() error {
 
 		var err error
 		for i := 0; i < config.Cfg.DownloadConfig.RetryCount; i++ {
-			err = utils.SaveFromURL(a.coverUrl, a.path.CoverPath, bilibili.GetRandomUA())
+			err = biliapi.Download(a.coverUrl, a.path.CoverPath)
 			if err != nil {
 				err = fmt.Errorf("failed to download video stream: %v (retry %d)", err, i)
 				continue
@@ -148,15 +148,16 @@ func (a *Audio) ExportFile() error {
 
 func (a *Audio) downloadStream(streamPath string) error {
 	// 请求流地址
-	audio := new(bilibili.Audio)
-	audio.Auid = a.auid
-	err := audio.GetStream(a.sessdata)
+	stream, err := biliapi.GetAudioStream(a.auid, a.sessdata)
 	if err != nil {
 		return fmt.Errorf("get audio stream error: %s", err)
 	}
+	if stream.URL() == "" {
+		return fmt.Errorf("return stream is empty")
+	}
 
 	// 通过流地址下载
-	err = utils.StreamingDownloader(audio.Stream.StreamLink, streamPath, bilibili.GetRandomUA())
+	err = biliapi.Download(stream.URL(), streamPath)
 	if err != nil {
 		return fmt.Errorf("failed to download stream: %s", err)
 	}
