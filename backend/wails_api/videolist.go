@@ -1,9 +1,7 @@
 package wails_api
 
 import (
-	"bili-audio-downloader/backend/adapter"
-	"bili-audio-downloader/backend/config"
-	"bili-audio-downloader/backend/download"
+	"bili-audio-downloader/backend/task"
 	"encoding/json"
 	"os"
 
@@ -12,61 +10,29 @@ import (
 
 // GetListCount 获取列表中视频数量
 func (w *WailsApi) GetListCount() int {
-	return len(download.DownloadList)
+	return w.tasks.Len()
 }
 
 // ResetDownloadList 重置列表
 func (w *WailsApi) ResetDownloadList() {
-	download.ResetTaskList()
+	w.tasks.Reset()
 }
 
 // GetTaskListAll 获取完整的任务列表信息
-func (w *WailsApi) GetTaskListAll() []adapter.TaskInfo {
-	var taskList []adapter.TaskInfo
-
-	for i, task := range download.DownloadList {
-		info := task.GetTaskInfo()
-		info.Index = i
-		taskList = append(taskList, *info)
-	}
-
-	return taskList
+func (w *WailsApi) GetTaskListAll() []task.TaskInfo {
+	return w.tasks.All()
 }
 
 // GetTaskListPage 获取一页的任务列表信息
-func (w *WailsApi) GetTaskListPage(page int) []adapter.TaskInfo {
-	var taskList []adapter.TaskInfo
-
-	const PageSize = 20
-	length := len(download.DownloadList)
-	start := page * PageSize
-	end := start + PageSize
-
-	if start >= length {
-		return []adapter.TaskInfo{}
-	}
-
-	if end > length {
-		end = length
-	}
-
-	for i, task := range download.DownloadList[start:end] {
-		info := task.GetTaskInfo()
-		info.Index = i + start
-		taskList = append(taskList, *info)
-	}
-
-	return taskList
+func (w *WailsApi) GetTaskListPage(page int) []task.TaskInfo {
+	return w.tasks.Page(page, 20)
 }
 
 // AddVideoToList 添加单个视频
 func (w *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation bool) error {
-	sessdata := ""
-	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 
-	err := download.AddVideoTask(sessdata, bvid, downloadCompilation)
+	err := w.tasks.AddVideo(sessdata, bvid, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -76,12 +42,9 @@ func (w *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation boo
 
 // AddCollectionToList 添加收藏夹内容
 func (w *WailsApi) AddCollectionToList(listPath, fid string, offset, count int, downloadCompilation bool) error {
-	sessdata := ""
-	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 
-	err := download.AddCollectionTask(sessdata, fid, offset, count, downloadCompilation)
+	err := w.tasks.AddFavList(sessdata, fid, offset, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -91,12 +54,9 @@ func (w *WailsApi) AddCollectionToList(listPath, fid string, offset, count int, 
 
 // AddCompilationToList 添加视频合集
 func (w *WailsApi) AddCompilationToList(listPath string, mid, sid, offset, count int, downloadCompilation bool) error {
-	sessdata := ""
-	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 
-	err := download.AddCompilationTask(sessdata, mid, sid, offset, count, downloadCompilation)
+	err := w.tasks.AddSeason(sessdata, mid, sid, offset, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -106,12 +66,9 @@ func (w *WailsApi) AddCompilationToList(listPath string, mid, sid, offset, count
 
 // AddAudioToList 添加单个音频
 func (w *WailsApi) AddAudioToList(listPath, auid string) error {
-	sessdata := ""
-	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 
-	err := download.AddAudioTask(sessdata, auid)
+	err := w.tasks.AddAudio(sessdata, auid)
 	if err != nil {
 		return err
 	}
@@ -121,12 +78,9 @@ func (w *WailsApi) AddAudioToList(listPath, auid string) error {
 
 // AddProfileVideoToList 添加个人主页视频
 func (w *WailsApi) AddProfileVideoToList(listPath string, mid, offset, count int, downloadCompilation bool) error {
-	sessdata := ""
-	if config.Cfg.Account.IsLogin && config.Cfg.Account.UseAccount {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 
-	err := download.AddProfileVideoTask(sessdata, mid, offset, count, downloadCompilation)
+	err := w.tasks.AddSpaceVideos(sessdata, mid, offset, count, downloadCompilation)
 	if err != nil {
 		return err
 	}
@@ -136,16 +90,12 @@ func (w *WailsApi) AddProfileVideoToList(listPath string, mid, offset, count int
 
 // SetTaskDeleteState 设置任务删除状态
 func (w *WailsApi) SetTaskDeleteState(index int, delete bool) {
-	if index >= 0 && index < len(download.DownloadList) {
-		download.DownloadList[index].SetDelete(delete)
-	}
+	w.tasks.SetDeleted(index, delete)
 }
 
 // UpdateTaskMeta 更新任务元数据
 func (w *WailsApi) UpdateTaskMeta(index int, songName, author string) {
-	if index >= 0 && index < len(download.DownloadList) {
-		download.DownloadList[index].SetMeta(songName, author)
-	}
+	w.tasks.SetMeta(index, songName, author)
 }
 
 // ExportVideoList 导出任务列表（带对话框）
@@ -168,13 +118,6 @@ func (w *WailsApi) ExportVideoList() error {
 
 // SaveVideoListTo 导出任务列表
 func (w *WailsApi) SaveVideoListTo(path string) error {
-	var listToExport []adapter.TaskInfo
-	for i, task := range download.DownloadList {
-		info := task.GetTaskInfo()
-		info.Index = i
-		listToExport = append(listToExport, *info)
-	}
-
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -183,7 +126,7 @@ func (w *WailsApi) SaveVideoListTo(path string) error {
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	err = encoder.Encode(listToExport)
+	err = encoder.Encode(w.tasks.All())
 	if err != nil {
 		return err
 	}
@@ -212,14 +155,15 @@ func (w *WailsApi) ImportVideoList() error {
 	}
 	defer file.Close()
 
-	var tasks []adapter.TaskInfo
+	var tasks []task.TaskInfo
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&tasks)
 	if err != nil {
 		return err
 	}
 
-	download.ImportTasks(tasks)
+	sessdata := accountSessdata()
+	w.tasks.Import(tasks, sessdata)
 	runtime.EventsEmit(w.ctx, "refreshVideoList")
 	return nil
 }

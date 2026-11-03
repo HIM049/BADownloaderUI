@@ -11,10 +11,7 @@ import (
 
 // QueryVideo 查询视频信息
 func (w *WailsApi) QueryVideo(bvid string) (VideoInfo, error) {
-	sessdata := ""
-	if config.Cfg.Account.UseAccount && config.Cfg.Account.IsLogin {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 
 	view, err := biliapi.GetVideoView(bvid, sessdata)
 	if err != nil {
@@ -31,10 +28,7 @@ func (w *WailsApi) QueryVideo(bvid string) (VideoInfo, error) {
 
 // QueryCollection 查询并返回收藏夹信息
 func (w *WailsApi) QueryCollection(favListID string) FavListInfo {
-	sessdata := ""
-	if config.Cfg.Account.UseAccount && config.Cfg.Account.IsLogin {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 	favlist, err := biliapi.GetFavList(favListID, sessdata, 1, 1)
 	if err != nil {
 		wails.LogErrorf(w.ctx, "获取收藏夹内容时出现错误：%s", err)
@@ -83,10 +77,7 @@ func (w *WailsApi) QueryAudio(auid string) (AudioInfo, error) {
 
 // QueryProfileVideo 查询用户投稿视频数量
 func (w *WailsApi) QueryProfileVideo(mid string) (int, error) {
-	sessdata := ""
-	if config.Cfg.Account.UseAccount && config.Cfg.Account.IsLogin {
-		sessdata = config.Cfg.Account.SESSDATA
-	}
+	sessdata := accountSessdata()
 
 	midInt, err := strconv.Atoi(mid)
 	if err != nil {
