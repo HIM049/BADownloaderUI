@@ -3,39 +3,36 @@
         <template #actions>
             <var-button type="primary" @click="saveListTo">另存为</var-button>
         </template>
-        <!-- Removed manual controls -->
     </FramePage>
-    <AdditionCard v-if="CardStatus.ShowList">
-        <var-list :finished="CardStatus.finished" :loading="CardStatus.loading" @load="load" :immediate-check="false">
-            <li v-for="(video, index) in TaskList.tasks" :key="index" class="list-none">
-                <var-card :title="video.SongName" :src="video.CoverUrl" layout="row" image-width="250px" outlines v-if="!video.delete" class="mb-5">
+    <AdditionCard>
+        <var-list :finished="list.finished" :loading="list.loading" @load="load" :immediate-check="false">
+            <li v-for="(task, index) in list.tasks" :key="task.Index" class="list-none">
+                <var-card :title="task.SongName" :src="task.CoverUrl" layout="row" image-width="250px" outlines v-if="!task.IsDelete" class="mb-5">
                     <template #description>
                         <var-divider />
                         <div class="mx-2.5">
-                            <var-chip plain type="info" class="mb-1.5">歌曲名称：{{ video.SongName }}</var-chip>
-                            <var-chip plain type="info" class="mb-[30px]">歌曲作者：{{ video.SongAuthor }}</var-chip>
+                            <var-chip plain type="info" class="mb-1.5">歌曲名称：{{ task.SongName }}</var-chip>
+                            <var-chip plain type="info" class="mb-[30px]">歌曲作者：{{ task.SongAuthor }}</var-chip>
                         </div>
                     </template>
 
                     <template #extra>
                         <div class="flex items-center">
-                            <var-button type="danger" size="large" round @click="setDeleteState(index)" class="mr-2.5"> <var-icon name="delete" /> </var-button>
-                            <var-button type="primary" @click="openRightPanel(index)">编辑</var-button>
+                            <var-button type="danger" size="large" round @click="toggleDelete(index)" class="mr-2.5"> <var-icon name="delete" /> </var-button>
+                            <var-button type="primary" @click="openPanel(index)">编辑</var-button>
                         </div>
                     </template>
                 </var-card>
 
-                
-                <var-card :title="video.title" outlines class="mb-5 h-[187px]" v-if="video.delete">
+                <var-card :title="task.SongName" outlines class="mb-5 h-[187px]" v-else>
                     <template #description>
                         <div class="flex justify-center">
-                            
-                        <h3>已设为删除</h3>
+                            <h3>已设为删除</h3>
                         </div>
                     </template>
                     <template #extra>
                         <div class="flex items-center">
-                            <var-button type="success" @click="setDeleteState(index)" class="mr-2.5"> <var-icon name="history" />  恢复 </var-button>
+                            <var-button type="success" @click="toggleDelete(index)" class="mr-2.5"> <var-icon name="history" />  恢复 </var-button>
                             <var-button type="primary" disabled>编辑</var-button>
                         </div>
                     </template>
@@ -45,69 +42,53 @@
                 <div class="py-5 text-center text-[#888]">已经到底了</div>
             </template>
         </var-list>
-        
-        <!-- Debug: Manual Load Button -->
-        <!-- <var-button block type="primary" @click="load" style="margin-top: 10px;">Manually Load More (Debug)</var-button> -->
-        
     </AdditionCard>
 
-    <var-popup position="right" v-model:show="CardStatus.RightPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
+    <var-popup position="right" v-model:show="panel.show" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
         <div class="p-6 w-[280px]">
             <h3>元数据编辑</h3>
             <div>
-                <var-cell><var-input variant="outlined" placeholder="曲名" size="small" v-model="CardStatus.Meta.song_name"/></var-cell>
-                <var-cell><var-input variant="outlined" placeholder="歌手" size="small" v-model="CardStatus.Meta.author"/></var-cell>
+                <var-cell><var-input variant="outlined" placeholder="曲名" size="small" v-model="panel.songName"/></var-cell>
+                <var-cell><var-input variant="outlined" placeholder="歌手" size="small" v-model="panel.author"/></var-cell>
             </div>
         </div>
         <var-space class="absolute right-5 bottom-5">
-            <var-button type="primary" :loading="CardStatus.ConfirmBtnLoadig" loading-type="wave" @click="saveVideoMeta">保存</var-button>
+            <var-button type="primary" :loading="panel.saving" loading-type="wave" @click="saveMeta">保存</var-button>
         </var-space>
     </var-popup>
-
 </template>
 
 <script setup>
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
-import { reactive, computed, watch, ref, onMounted } from 'vue'
-import { GetTaskListPage, GetTaskListAll, SetTaskDeleteState, UpdateTaskMeta, SaveVideoListTo, ExportVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
+import { reactive, watch, onMounted } from 'vue'
+import { GetTaskListPage, SetTaskDeleteState, UpdateTaskMeta, ExportVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
-import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
+import { Snackbar } from '@varlet/ui'
 import { call } from '../../utils/call'
 import { flow } from '../../state'
 
-const videoList = ref([])
+// 与后端 GetTaskListPage 的每页数量一致
+const pageSize = 20
 
-const TaskList = reactive({
+// 已加载的任务和分页状态
+const list = reactive({
     tasks: [],
-    index: 0,
-})
-
-const CardStatus = reactive({
-    RightPanel: false,
-    ShowList: true, // Init to true to show list immediately
-    // RightPanelEdit: true,
-    ListIndex: 0,
-    Meta: reactive({
-        song_name: "",
-        author: "",
-    }),
+    page: 0,
     loading: false,
     finished: false,
 })
 
-
-onMounted(() => {
-    load() // Initial load
+// 元数据编辑面板
+const panel = reactive({
+    show: false,
+    index: 0,
+    songName: '',
+    author: '',
+    saving: false,
 })
 
-// 重新从第一页加载列表
-function reload() {
-    TaskList.index = 0
-    TaskList.tasks = []
-    CardStatus.finished = false
-    load();
-}
+onMounted(load)
 
 // 进入列表编辑页或后端导入列表后刷新
 watch(() => flow.pageIndex, (index) => {
@@ -115,83 +96,65 @@ watch(() => flow.pageIndex, (index) => {
 })
 EventsOn('refreshVideoList', reload)
 
+// 重新从第一页加载列表
+function reload() {
+    list.tasks = []
+    list.page = 0
+    list.finished = false
+    load()
+}
+
+// 加载下一页，不足一页时结束
+async function load() {
+    list.loading = true
+    const { ok, data } = await call(GetTaskListPage(list.page), '加载失败')
+    list.loading = false
+    if (!ok) {
+        return
+    }
+    list.tasks.push(...data)
+    list.page++
+    list.finished = data.length < pageSize
+}
 
 // 另存列表
 async function saveListTo() {
-    const { ok } = await call(ExportVideoList(), "导出失败");
+    const { ok } = await call(ExportVideoList(), '导出失败')
     if (ok) {
-        Snackbar.success("操作完成");
+        Snackbar.success('操作完成')
     }
 }
 
-// 修改视频删除状态
-function setDeleteState(index) {
-    const currentState = TaskList.tasks[index].IsDelete;
-    // Optimistic update
-    TaskList.tasks[index].IsDelete = !currentState;
-    TaskList.tasks[index].delete = !currentState; // Keep compatibility if 'delete' prop used in template
-
-    SetTaskDeleteState(TaskList.tasks[index].Index, !currentState).then(() => { // Use real index from task
-         // Success
-    }).catch(err => {
-        // Revert on failure
-        TaskList.tasks[index].IsDelete = currentState;
-        TaskList.tasks[index].delete = currentState;
-        Snackbar.error("状态更新失败: " + err);
-    });
+// 切换删除状态，失败时恢复
+async function toggleDelete(index) {
+    const task = list.tasks[index]
+    task.IsDelete = !task.IsDelete
+    const { ok } = await call(SetTaskDeleteState(task.Index, task.IsDelete), '状态更新失败')
+    if (!ok) {
+        task.IsDelete = !task.IsDelete
+    }
 }
 
-// 打开右侧面板
-function openRightPanel(index) {
-    CardStatus.ListIndex = index;
-    // Assuming TaskList.tasks matches backend order for now, or using Index from task
-    const task = TaskList.tasks[index];
-    CardStatus.Meta.song_name = task.SongName;
-    CardStatus.Meta.author = task.SongAuthor;
-    CardStatus.RightPanel = true;
+function openPanel(index) {
+    const task = list.tasks[index]
+    panel.index = index
+    panel.songName = task.SongName
+    panel.author = task.SongAuthor
+    panel.show = true
 }
 
-// 动态加载数据
-function load() {
-    console.log("Loading page:", TaskList.index);
-    CardStatus.loading = true
-    GetTaskListPage(TaskList.index).then(result => {
-        console.log("Loaded result:", result ? result.length : 0);
-        if (!result || result.length === 0) {
-            console.log("Finished");
-            CardStatus.finished = true
-            CardStatus.loading = false
-            return
-        }
-        
-        // Map IsDelete to 'delete' prop for compatibility with template v-ifs
-        result.forEach(task => {
-            task.delete = task.IsDelete;
-        });
-
-        TaskList.tasks.push(...result)
-        TaskList.index++
-        CardStatus.loading = false
-    }).catch(err => {
-        console.log("Load error:", err);
-        CardStatus.loading = false
-        Snackbar.error("加载失败: " + err)
-    })
-}
-
-
-// 保存列表修改
-function saveVideoMeta() {
-    const index = CardStatus.ListIndex;
-    const taskIndex = TaskList.tasks[index].Index;
-    
-    UpdateTaskMeta(taskIndex, CardStatus.Meta.song_name, CardStatus.Meta.author).then(() => {
-        TaskList.tasks[index].SongName = CardStatus.Meta.song_name;
-        TaskList.tasks[index].SongAuthor = CardStatus.Meta.author;
-        Snackbar.success("保存成功");
-        CardStatus.RightPanel = false;
-    }).catch(err => {
-         Snackbar.error("保存失败: " + err);
-    });
+// 保存元数据修改
+async function saveMeta() {
+    const task = list.tasks[panel.index]
+    panel.saving = true
+    const { ok } = await call(UpdateTaskMeta(task.Index, panel.songName, panel.author), '保存失败')
+    panel.saving = false
+    if (!ok) {
+        return
+    }
+    task.SongName = panel.songName
+    task.SongAuthor = panel.author
+    Snackbar.success('保存成功')
+    panel.show = false
 }
 </script>

@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import SettingCell from "./setting_cell.vue"
-import { computed } from 'vue'
+import { computed, nextTick } from 'vue'
 
 const props = defineProps<{
     title?: string
@@ -25,8 +25,9 @@ const parms = computed({
     }
 })
 
+// var-switch 先触发 change 再更新值，等值更新后再回调
 function handleChange() {
-    props.onchange?.()
+    nextTick(() => props.onchange?.())
 }
 
 </script>

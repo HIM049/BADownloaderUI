@@ -86,15 +86,15 @@
 import FramePage from '../components/modules/frame_page.vue'
 import CellSwitch from './modules/setting_switch_cell.vue'
 import SettingCell from './modules/setting_cell.vue'
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, nextTick } from 'vue'
 import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig, SetDownloadPathDialog, Checkffmpeg } from '../../wailsjs/go/wails_api/WailsApi'
 import { config as ConfigModels } from '../../wailsjs/go/models'
-
 import { Dialog, Snackbar } from '@varlet/ui'
 import { call } from '../utils/call'
 
-const allowSave = ref(false) // Whether saving is allowed (avoids initial load triggers)
-const overload = ref(false) // Whether page is loaded
+// 计数器在值被程序修改时也会触发 change，载入配置期间不保存
+const allowSave = ref(false)
+const overload = ref(false) // 配置是否已载入
 
 const CardStatus = reactive({
     configClass0: [] as string[],
@@ -103,123 +103,87 @@ const CardStatus = reactive({
     configClass3: [] as string[],
 })
 
-onMounted(() => {
-    // Delay enabling save to avoid triggering on initial value setting
-    setTimeout(() => {
-        loadConfig();
-        setTimeout(() => {
-            allowSave.value = true
-        }, 100)
-    }, 100)
-})
-
-
-
 // 设置内容
 const config = ref(new ConfigModels.Config())
 
+onMounted(loadConfig)
+
+// 从配置文件重新读取设置
+async function loadConfig() {
+    allowSave.value = false
+    const refreshed = await call(RefreshConfig(), "读取设置失败")
+    if (!refreshed.ok) return
+    config.value = await LoadConfig()
+    overload.value = true
+    await nextTick()
+    allowSave.value = true
+}
+
 async function setDownloadPathDialog() {
-    const { ok } = await call(SetDownloadPathDialog(), "设置下载路径失败");
+    const { ok } = await call(SetDownloadPathDialog(), "设置下载路径失败")
     if (ok) {
-        loadConfig();
+        loadConfig()
     }
 }
 
-// 读取配置文件
-function loadConfig() {
-    RefreshConfig();
-    LoadConfig().then(result => {
-        config.value = result;
-        overload.value = true;
-    })
-}
-
-// Unified change handler that respects the safety flag
+// 表单控件变化时保存
 function handleSave() {
     if (allowSave.value) {
         saveConfig()
     }
 }
 
-// 保存配置文件
-function saveConfig() {
-    setTimeout(function () {
-        call(SaveConfig(config.value), "保存失败").then(({ ok }) => {
-            if (ok) Snackbar.success("保存成功");
-        })
-    },100);
+// 保存配置文件，返回是否成功
+async function saveConfig(): Promise<boolean> {
+    const { ok } = await call(SaveConfig(config.value), "保存失败")
+    if (ok) Snackbar.success("保存成功")
+    return ok
 }
 
 // 重置配置文件
 async function resetConfig() {
-    const { ok } = await call(ResetConfig(), "重置失败");
+    const { ok } = await call(ResetConfig(), "重置失败")
     if (ok) {
-        loadConfig();
-        Snackbar.success("已重置配置文件");
+        loadConfig()
+        Snackbar.success("已重置配置文件")
     }
 }
 
 // 切换主题
-function setTheme() {
-    call(SaveConfig(config.value), "保存失败").then(({ ok }) => {
-        if (!ok) return;
-        Dialog('立即重新加载主题？').then(result => {
-            if (result === 'confirm') {
-                loadConfig();
-                window.location.reload();
-            }
-            return;
-        });
-        Snackbar.success("保存成功");
-    });
+async function setTheme() {
+    if (!await saveConfig()) return
+    if (await Dialog('立即重新加载主题？') === 'confirm') {
+        window.location.reload()
+    }
 }
 
 // 登出账户
-function logoutAccount() {
-    Dialog('要退出登录吗？').then(result => {
-        if (result === 'confirm') {
-            config.value.account.is_login = false;
-            config.value.account.use_account = false;
-            config.value.account.sessdata = "";
-            config.value.account.bili_jct = "";
-            config.value.account.dede_user_id = "";
-            config.value.account.dede_user_id__ck_md5 = "";
-            config.value.account.sid = "";
-            saveConfig();
-            setTimeout(() => {
-                Snackbar.success("已退出登录");
-            }, 110);
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-        }
-        return;
-    })
+async function logoutAccount() {
+    if (await Dialog('要退出登录吗？') !== 'confirm') return
+    config.value.account = new ConfigModels.Account({})
+    if (!await saveConfig()) return
+    Snackbar.success("已退出登录")
+    setTimeout(() => window.location.reload(), 1000)
 }
 
 // 开启账户开关时检查登录
 function setUseAccount() {
-    setTimeout(() => {
-            
-        if (config.value.account.is_login) {
-            saveConfig();
-        } else {
-            config.value.account.use_account = false;
-            Snackbar.warning("您暂未登录");
-        }
-    }, 0);
+    if (config.value.account.is_login) {
+        handleSave()
+    } else {
+        config.value.account.use_account = false
+        Snackbar.warning("您暂未登录")
+    }
 }
 
 // 校验是否存在 ffmpeg
-function setConvertFormat() {
-    Checkffmpeg().then(result => {
-        if (result) {
-            saveConfig();
-        } else {
-            config.value.file_config.convert_format = false;
-            Snackbar.warning("未检测到 ffmpeg，无法启用转码");
-        }
-    });
+async function setConvertFormat() {
+    if (await Checkffmpeg()) {
+        handleSave()
+    } else {
+        config.value.file_config.convert_format = false
+        Snackbar.warning("未检测到 ffmpeg，无法启用转码")
+    }
 }
 
 </script>
