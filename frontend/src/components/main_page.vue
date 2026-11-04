@@ -26,7 +26,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import HeadBar from '../components/modules/head_bar.vue'
 import UserSpace from '../components/user_space.vue'
 import CollectDownload from '../components/collect_download.vue'

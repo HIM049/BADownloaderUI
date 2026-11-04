@@ -1,6 +1,8 @@
 import { StyleProvider, Themes } from '@varlet/ui'
 
-const lightPink = {
+type ThemeVars = Record<string, string>
+
+const lightPink: ThemeVars = {
     '--color-primary': '#9c4146',
     '--color-on-primary': '#ffffff',
     '--color-primary-container': '#ffdad9',
@@ -50,7 +52,7 @@ const lightPink = {
 //     '--color-inverse-surface': '#ece0df'
 // }
 
-const lightBlue = {
+const lightBlue: ThemeVars = {
     "--color-primary": "#006688",
     "--color-on-primary": "#ffffff",
     "--color-primary-container": "#c2e8ff",
@@ -101,9 +103,9 @@ const lightBlue = {
 //   }
 
 // 主题名与配置文件中的 theme 对应
-const themes = { lightPink, lightBlue }
+const themes: Record<string, ThemeVars> = { lightPink, lightBlue }
 
 // applyTheme 应用主题，未知名称使用粉色
-export function applyTheme(name) {
-    StyleProvider({ ...Themes.md3Light, ...(themes[name] ?? lightPink) })
+export function applyTheme(name?: string) {
+    StyleProvider({ ...Themes.md3Light, ...(themes[name ?? ''] ?? lightPink) })
 }

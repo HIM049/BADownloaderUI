@@ -2,7 +2,7 @@
     <MainPage />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import MainPage from './components/main_page.vue'
 import { onMounted } from 'vue'
 import { Dialog, Snackbar } from '@varlet/ui'

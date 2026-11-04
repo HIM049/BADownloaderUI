@@ -96,7 +96,7 @@
     </var-popup>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
@@ -114,20 +114,44 @@ import {
     ResetDownloadList,
     ImportVideoList
 } from '../../../wailsjs/go/wails_api/WailsApi'
-import { EventsOn } from '../../../wailsjs/runtime'
+import { task, wails_api } from '../../../wailsjs/go/models'
+import { onEvent, type SourceKey } from '../../events'
 import { Dialog, Snackbar } from '@varlet/ui'
 import { call } from '../../utils/call'
 import { refreshListCount } from '../../state'
 
+// 添加时传给后端的选项
+interface AddOptions {
+    offset: number
+    count: number
+    part: boolean
+    meta: task.Option
+}
+
+// 可添加的来源：parse 从输入解析 ID，query 查询信息，add 添加到列表；ranged 表示支持起始位置和数量
+interface Source<ID> {
+    key: SourceKey
+    label: string
+    placeholder: string
+    ranged: boolean
+    parse(text: string): ID | null
+    query(id: ID): Promise<wails_api.QueryResult>
+    add(id: ID, options: AddOptions): Promise<void>
+}
+
+// defineSource 推断每个来源的 ID 类型，再统一放进来源表
+function defineSource<ID>(source: Source<ID>): Source<unknown> {
+    return source as unknown as Source<unknown>
+}
+
 // matchID 用正则匹配输入，成功时用 build 生成 ID 对象，失败返回 null
-function matchID(text, regex, build) {
+function matchID<ID>(text: string, regex: RegExp, build: (match: RegExpMatchArray) => ID): ID | null {
     const match = text.match(regex)
     return match ? build(match) : null
 }
 
-// 可添加的来源：parse 从输入解析 ID，query 查询信息，add 添加到列表；ranged 表示支持起始位置和数量
 const sources = [
-    {
+    defineSource({
         key: 'favlist',
         label: '收藏夹',
         placeholder: '请输入 收藏夹网页 URL',
@@ -135,8 +159,8 @@ const sources = [
         parse: (text) => matchID(text, /fid=(\d+)/, (m) => ({ fid: m[1] })),
         query: (id) => QueryCollection(id.fid),
         add: (id, o) => AddCollectionToList(id.fid, o.offset, o.count, o.part, o.meta),
-    },
-    {
+    }),
+    defineSource({
         key: 'season',
         label: '视频合集',
         placeholder: '请输入 视频合集网页 URL',
@@ -144,8 +168,8 @@ const sources = [
         parse: (text) => matchID(text, /space\.bilibili\.com\/(\d+)\/favlist\?fid=(\d+)&/, (m) => ({ mid: Number(m[1]), sid: Number(m[2]) })),
         query: (id) => QueryCompilation(id.mid, id.sid),
         add: (id, o) => AddCompilationToList(id.mid, id.sid, o.offset, o.count, o.part, o.meta),
-    },
-    {
+    }),
+    defineSource({
         key: 'video',
         label: '视频链接',
         placeholder: '请输入 网页端视频分享链接',
@@ -153,8 +177,8 @@ const sources = [
         parse: (text) => matchID(text, /BV\w+/, (m) => ({ bvid: m[0] })),
         query: (id) => QueryVideo(id.bvid),
         add: (id, o) => AddVideoToList(id.bvid, o.part, o.meta),
-    },
-    {
+    }),
+    defineSource({
         key: 'audio',
         label: 'AUID',
         placeholder: '请输入 AUID',
@@ -162,8 +186,8 @@ const sources = [
         parse: (text) => matchID(text, /^au(\d+)$/, (m) => ({ auid: m[1] })),
         query: (id) => QueryAudio(id.auid),
         add: (id, o) => AddAudioToList(id.auid, o.meta),
-    },
-    {
+    }),
+    defineSource({
         key: 'space',
         label: '用户空间',
         placeholder: '请输入 用户空间 URL',
@@ -171,16 +195,16 @@ const sources = [
         parse: (text) => matchID(text, /space\.bilibili\.com\/(\d+)/, (m) => ({ mid: m[1] })),
         query: (id) => QueryProfileVideo(id.mid),
         add: (id, o) => AddProfileVideoToList(Number(id.mid), o.offset, o.count, o.part, o.meta),
-    },
+    }),
 ]
 
-const sourceKey = ref('favlist')
-const source = computed(() => sources.find((item) => item.key === sourceKey.value))
+const sourceKey = ref<SourceKey>('favlist')
+const source = computed(() => sources.find((item) => item.key === sourceKey.value) ?? sources[0])
 const input = ref('')
 
 // 最近一次查询成功的 ID 和结果
-const target = ref(null)
-const result = reactive({ title: '', cover: '', count: 0, up_name: '' })
+const target = ref<{ source: Source<unknown>, id: unknown } | null>(null)
+const result = reactive<wails_api.QueryResult>({ title: '', cover: '', count: 0, up_name: '' })
 const showResult = ref(false)
 
 // 添加面板的选项
@@ -198,7 +222,7 @@ const options = reactive({
 watch([sourceKey, input], query)
 
 // 个人空间页面的一键添加
-EventsOn('addToList', (kind, url) => {
+onEvent('addToList', (kind, url) => {
     sourceKey.value = kind
     input.value = url
     openPanel()

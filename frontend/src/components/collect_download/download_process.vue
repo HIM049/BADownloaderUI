@@ -29,11 +29,11 @@
     </FramePage>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import FramePage from '../modules/frame_page.vue'
 import { reactive } from 'vue'
 import { DownloadTaskList, OpenDownloadFolader } from '../../../wailsjs/go/wails_api/WailsApi'
-import { EventsOn } from '../../../wailsjs/runtime'
+import { onEvent } from '../../events'
 import { flow } from '../../state'
 
 // 进度条相关
@@ -51,7 +51,7 @@ async function startDownload() {
 
 
 // 下载完成事件
-EventsOn("downloadFinish", (task) => {
+onEvent("downloadFinish", (task) => {
     progress.downFinished++;
     progress.downloadingTitle = task.title;
     progress.progressPercent = (progress.downFinished / flow.listCount) * 100;

@@ -10,7 +10,7 @@
     </body>
 </template>
 
-<script setup>
-const props = defineProps(['title'])
+<script setup lang="ts">
+defineProps<{ title: string }>()
 
 </script>

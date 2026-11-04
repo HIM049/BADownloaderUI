@@ -58,12 +58,13 @@
     </var-popup>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
 import { reactive, watch, onMounted } from 'vue'
 import { GetTaskListPage, SetTaskDeleteState, UpdateTaskMeta, ExportVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
-import { EventsOn } from '../../../wailsjs/runtime'
+import { task } from '../../../wailsjs/go/models'
+import { onEvent } from '../../events'
 import { Snackbar } from '@varlet/ui'
 import { call } from '../../utils/call'
 import { flow } from '../../state'
@@ -73,7 +74,7 @@ const pageSize = 20
 
 // 已加载的任务和分页状态
 const list = reactive({
-    tasks: [],
+    tasks: [] as task.TaskInfo[],
     page: 0,
     loading: false,
     finished: false,
@@ -94,7 +95,7 @@ onMounted(load)
 watch(() => flow.pageIndex, (index) => {
     if (index === 1) reload()
 })
-EventsOn('refreshVideoList', reload)
+onEvent('refreshVideoList', reload)
 
 // 重新从第一页加载列表
 function reload() {
@@ -126,7 +127,7 @@ async function saveListTo() {
 }
 
 // 切换删除状态，失败时恢复
-async function toggleDelete(index) {
+async function toggleDelete(index: number) {
     const task = list.tasks[index]
     task.IsDelete = !task.IsDelete
     const { ok } = await call(SetTaskDeleteState(task.Index, task.IsDelete), '状态更新失败')
@@ -135,7 +136,7 @@ async function toggleDelete(index) {
     }
 }
 
-function openPanel(index) {
+function openPanel(index: number) {
     const task = list.tasks[index]
     panel.index = index
     panel.songName = task.SongName

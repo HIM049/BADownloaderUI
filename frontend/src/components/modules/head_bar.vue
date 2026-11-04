@@ -32,15 +32,13 @@
     </header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { WindowMinimise, Quit } from '../../../wailsjs/runtime'
 import { GetAppVersion } from '../../../wailsjs/go/wails_api/WailsApi'
 
-const APP_VERSION = ref(null)
-onMounted(() => {
-    GetAppVersion().then(result => {
-        APP_VERSION.value = result
-    })
+const APP_VERSION = ref('')
+onMounted(async () => {
+    APP_VERSION.value = await GetAppVersion()
 })
 </script>

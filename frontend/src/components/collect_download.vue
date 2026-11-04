@@ -23,7 +23,7 @@
     </footer>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import AddVideos from '../components/collect_download/add_videos.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
@@ -60,8 +60,8 @@ watch(() => flow.pageIndex, refreshListCount)
 // 调节底部导航按钮位置
 onMounted(() => {
     refreshListCount()
-    document.getElementById('scroll-box').addEventListener('scroll', (e) => {
-        scrollTop.value = 10 - e.target.scrollTop
+    document.getElementById('scroll-box')?.addEventListener('scroll', (e) => {
+        scrollTop.value = 10 - (e.target as HTMLElement).scrollTop
     })
 })
 </script>
