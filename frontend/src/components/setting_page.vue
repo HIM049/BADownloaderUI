@@ -68,9 +68,6 @@
                         <var-input class="m-2.5 w-full" variant="outlined" placeholder="下载缓存路径" size="small" readonly  v-model="config.file_config.cache_path" />
                         <var-button type="primary" @click="" disabled>更改</var-button>
                     </div>
-
-                    <var-input class="m-2.5" variant="outlined" placeholder="视频列表路径" size="small" v-model="config.file_config.videolist_path"
-                        :rules="[v => !!v || '该选项不能为空']" @change="handleSave" />
                     </var-collapse-item>
                 </var-collapse>
             </var-paper>

@@ -3,16 +3,20 @@ package config
 import (
 	"bili-audio-downloader/backend/constants"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
+	"text/template"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
-
-	"github.com/spf13/viper"
 )
+
+// configPath 配置文件位置
+const configPath = "./config.json"
 
 type Config struct {
 	ConfigVersion  int            `json:"config_version"`
@@ -33,7 +37,6 @@ type FileConfig struct {
 	FileNameTemplate string `json:"file_name_template"`
 	DownloadPath     string `json:"download_path"`
 	CachePath        string `json:"cache_path"`
-	VideoListPath    string `json:"videolist_path"`
 }
 
 type Account struct {
@@ -48,122 +51,96 @@ type Account struct {
 
 var Cfg Config
 
+// InitConfig 启动时读取配置，失败时退出
 func InitConfig(ctx context.Context) {
-	viper.SetConfigName("config")
-	viper.SetConfigType("json")
-	viper.AddConfigPath("./")
-
-	err := LoadConfig(ctx)
-	if err != nil {
+	if err := LoadConfig(ctx); err != nil {
 		wails.LogFatalf(ctx, "Failed to load config: %v", err)
 	}
-
-	// Check config version
-	if Cfg.ConfigVersion != constants.CONFIG_VERSION {
-		if Cfg.ConfigVersion < constants.CONFIG_VERSION {
-			err := migrateConfig("./config.json")
-			if err != nil {
-				wails.LogFatalf(ctx, "Failed to migrate config: %v\n", err)
-			}
-		} else {
-			wails.LogInfo(ctx, "Config version is higher than current version")
-		}
-	}
 }
 
-// LoadConfig Read config file
+// LoadConfig 读取配置文件到 Cfg
+// 文件不存在时写入默认配置；内容无法解析时备份为 .bak 并使用默认配置；旧版本配置会升级版本号并保存
 func LoadConfig(ctx context.Context) error {
-	err := viper.ReadInConfig()
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			wails.LogWarningf(ctx, "Config file not found: %v, create a new one", err)
-			newConfig := DefaultConfig()
+	cfg := DefaultConfig()
+	needSave := false
 
-			// Creat config file
-			_, err = os.Create("config.json")
-			if err != nil {
-				return errors.New(fmt.Sprintf("failed to create config file: %v", err))
+	data, err := os.ReadFile(configPath)
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		wails.LogWarning(ctx, "Config file not found, create a new one")
+		needSave = true
+	case err != nil:
+		return fmt.Errorf("failed to read config file: %w", err)
+	default:
+		cfg.ConfigVersion = 0
+		if err := json.Unmarshal(data, cfg); err != nil {
+			wails.LogErrorf(ctx, "Invalid config file, backup to %s.bak and use default: %v", configPath, err)
+			if err := os.Rename(configPath, configPath+".bak"); err != nil {
+				return fmt.Errorf("failed to backup config file: %w", err)
 			}
-
-			// Write default config into file
-			err = newConfig.UpdateAndSave()
-			if err != nil {
-				return errors.New(fmt.Sprintf("failed to write config file: %v", err))
-			}
-			wails.LogInfo(ctx, "Created new config file")
-		} else {
-			return errors.New(fmt.Sprintf("failed to read config file: %v", err))
+			cfg = DefaultConfig()
+			needSave = true
 		}
 	}
 
-	// Init config struct
-	downloadCfg := DownloadConfig{
-		DownloadThreads: viper.GetInt("download_config.download_threads"),
-		RetryCount:      viper.GetInt("download_config.retry_count"),
+	switch {
+	case cfg.ConfigVersion < constants.CONFIG_VERSION:
+		wails.LogInfof(ctx, "Upgrade config version from %d to %d", cfg.ConfigVersion, constants.CONFIG_VERSION)
+		cfg.ConfigVersion = constants.CONFIG_VERSION
+		needSave = true
+	case cfg.ConfigVersion > constants.CONFIG_VERSION:
+		wails.LogInfo(ctx, "Config version is higher than current version")
 	}
 
-	fileCfg := FileConfig{
-		ConvertFormat:    viper.GetBool("file_config.convert_format"),
-		FileNameTemplate: viper.GetString("file_config.file_name_template"),
-		DownloadPath:     viper.GetString("file_config.download_path"),
-		CachePath:        viper.GetString("file_config.cache_path"),
-		VideoListPath:    viper.GetString("file_config.videolist_path"),
+	if needSave {
+		return cfg.UpdateAndSave()
 	}
-
-	account := Account{
-		IsLogin:           viper.GetBool("Account.is_login"),
-		UseAccount:        viper.GetBool("Account.use_account"),
-		SESSDATA:          viper.GetString("Account.sessdata"),
-		Bili_jct:          viper.GetString("Account.bili_jct"),
-		DedeUserID:        viper.GetString("Account.dede_user_id"),
-		DedeUserID__ckMd5: viper.GetString("Account.dede_user_id__ck_md5"),
-		Sid:               viper.GetString("Account.sid"),
-	}
-
-	// 初始化主配置结构体
-	Cfg = Config{
-		ConfigVersion: viper.GetInt("config_version"),
-		DeleteCache:   viper.GetBool("delete_cache"),
-		Theme:         viper.GetString("theme"),
-		// Debug:        viper.GetBool("debug"),
-		DownloadConfig: downloadCfg,
-		FileConfig:     fileCfg,
-		Account:        account,
-	}
+	cfg.normalize()
+	Cfg = *cfg
 	return nil
 }
 
+// UpdateAndSave 修正非法值后写入配置文件，并替换当前使用的 Cfg
 func (cfg *Config) UpdateAndSave() error {
-	viper.Set("config_version", cfg.ConfigVersion)
-	viper.Set("delete_cache", cfg.DeleteCache)
-	viper.Set("theme", cfg.Theme)
+	cfg.normalize()
 
-	viper.Set("download_config.download_threads", cfg.DownloadConfig.DownloadThreads)
-	viper.Set("download_config.retry_count", cfg.DownloadConfig.RetryCount)
-
-	viper.Set("file_config.convert_format", cfg.FileConfig.ConvertFormat)
-	viper.Set("file_config.file_name_template", cfg.FileConfig.FileNameTemplate)
-	viper.Set("file_config.download_path", cfg.FileConfig.DownloadPath)
-	viper.Set("file_config.cache_path", cfg.FileConfig.CachePath)
-	viper.Set("file_config.videolist_path", cfg.FileConfig.VideoListPath)
-
-	viper.Set("Account.is_login", cfg.Account.IsLogin)
-	viper.Set("Account.use_account", cfg.Account.UseAccount)
-	viper.Set("Account.sessdata", cfg.Account.SESSDATA)
-	viper.Set("Account.bili_jct", cfg.Account.Bili_jct)
-	viper.Set("Account.dede_user_id", cfg.Account.DedeUserID)
-	viper.Set("Account.dede_user_id__ck_md5", cfg.Account.DedeUserID__ckMd5)
-	viper.Set("Account.sid", cfg.Account.Sid)
-
-	if err := viper.WriteConfig(); err != nil {
+	data, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
 		return err
 	}
+	tmp := configPath + ".tmp"
+	if err := os.WriteFile(tmp, data, 0644); err != nil {
+		return err
+	}
+	if err := os.Rename(tmp, configPath); err != nil {
+		return err
+	}
+
+	Cfg = *cfg
 	return nil
 }
 
-// 初始化设置
+// normalize 将空值或非法值替换为默认值
+func (cfg *Config) normalize() {
+	def := DefaultConfig()
+	fc := &cfg.FileConfig
+
+	if _, err := template.New("filename").Parse(fc.FileNameTemplate); strings.TrimSpace(fc.FileNameTemplate) == "" || err != nil {
+		fc.FileNameTemplate = def.FileConfig.FileNameTemplate
+	}
+	if strings.TrimSpace(fc.DownloadPath) == "" {
+		fc.DownloadPath = def.FileConfig.DownloadPath
+	}
+	if strings.TrimSpace(fc.CachePath) == "" {
+		fc.CachePath = def.FileConfig.CachePath
+	}
+	cfg.DownloadConfig.DownloadThreads = max(cfg.DownloadConfig.DownloadThreads, 0)
+	cfg.DownloadConfig.RetryCount = max(cfg.DownloadConfig.RetryCount, 0)
+}
+
+// DefaultConfig 返回默认配置
 func DefaultConfig() *Config {
-	cfg := Config{
+	return &Config{
 		ConfigVersion: constants.CONFIG_VERSION,
 		DeleteCache:   true,
 		Theme:         "lightBlue",
@@ -176,41 +153,24 @@ func DefaultConfig() *Config {
 			FileNameTemplate: "{{.ID}}_{{.Title}}({{.Subtitle}})_{{.Quality}}{{.Format}}",
 			DownloadPath:     "./Download",
 			CachePath:        "./Cache",
-			VideoListPath:    "./Cache/video_list.json",
-		},
-		Account: Account{
-			IsLogin:           false,
-			UseAccount:        false,
-			SESSDATA:          "",
-			Bili_jct:          "",
-			DedeUserID:        "",
-			DedeUserID__ckMd5: "",
-			Sid:               "",
 		},
 	}
-	return &cfg
 }
 
+// GetDownloadPath 返回下载目录的绝对路径
 func (cfg *Config) GetDownloadPath() string {
-	path, err := filepath.Abs(cfg.FileConfig.DownloadPath)
-	if err != nil {
-		log.Fatalln("Failed to get abs path: ", err)
-	}
-	return path
+	return absOrRaw(cfg.FileConfig.DownloadPath)
 }
 
+// GetCachePath 返回缓存目录的绝对路径
 func (cfg *Config) GetCachePath() string {
-	path, err := filepath.Abs(cfg.FileConfig.CachePath)
-	if err != nil {
-		log.Fatalln("Failed to get abs path: ", err)
-	}
-	return path
+	return absOrRaw(cfg.FileConfig.CachePath)
 }
 
-func (cfg *Config) GetVideolistPath() string {
-	path, err := filepath.Abs(cfg.FileConfig.VideoListPath)
-	if err != nil {
-		log.Fatalln("Failed to get abs path: ", err)
+// absOrRaw 返回绝对路径，转换失败时返回原路径
+func absOrRaw(path string) string {
+	if abs, err := filepath.Abs(path); err == nil {
+		return abs
 	}
 	return path
 }

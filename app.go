@@ -8,6 +8,7 @@ import (
 	"context"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 	"os"
+	"path/filepath"
 )
 
 // App struct
@@ -39,9 +40,12 @@ func (a *App) startup(ctx context.Context) {
 
 // shutdown is called when the app shutdown
 func (a *App) shutdown(ctx context.Context) {
-	// 清理缓存
+	// 清理缓存目录下程序创建的子目录
 	if config.Cfg.DeleteCache {
-		os.RemoveAll(config.Cfg.GetCachePath())
+		cachePath := config.Cfg.GetCachePath()
+		for _, dir := range []string{"audio", "cover"} {
+			os.RemoveAll(filepath.Join(cachePath, dir))
+		}
 	}
 }
 
@@ -105,9 +109,9 @@ func initFolder(ctx context.Context) {
 	}
 
 	for _, path := range paths {
-		err := os.MkdirAll(path, 0755)
-		if err != nil {
-			wails.LogFatalf(ctx, "Initialize Folder Failed: %s", err)
+		if err := os.MkdirAll(path, 0755); err != nil {
+			wails.LogErrorf(ctx, "Initialize Folder Failed: %s", err)
+			return
 		}
 	}
 	wails.LogInfo(ctx, "Initialize Folder Successful")
