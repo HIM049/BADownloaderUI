@@ -21,9 +21,7 @@
             <div v-for="(collect, index) in user_collect.List" class="my-1.5 mx-5">
                 <var-space justify="space-between" align="center">
                     <text class="text-[15px] font-semibold">{{ collect.title }}</text>
-                    <var-button type="primary"
-                        @click="addToList('https://space.bilibili.com/' + user_collect.user_mid + '/favlist?fid=' + collect.id + '&ftype=create', 11)"><var-icon
-                            name="plus" />添加至列表</var-button>
+                    <var-button type="primary" @click="addCreated(collect)"><var-icon name="plus" />添加至列表</var-button>
                 </var-space>
             </div>
         </var-paper>
@@ -36,9 +34,7 @@
                 <var-space justify="space-between" align="center">
                     <text class="text-[15px] font-semibold">{{ collect.title }}</text>
 
-                    <var-button type="primary" @click="
-                        addToList(collect.attr == 0 ? 'https://space.bilibili.com/' + user_collect.user_mid + '/favlist?fid=' + collect.id + '&ftype=collect&ctype=21' : 'https://space.bilibili.com/' + user_collect.user_mid + '/favlist?fid=' + collect.id + '&ftype=collect&ctype=11', collect.attr)
-                        "><var-icon name="plus" />添加至列表</var-button>
+                    <var-button type="primary" @click="addCollected(collect)"><var-icon name="plus" />添加至列表</var-button>
                 </var-space>
             </div>
         </var-paper>
@@ -96,9 +92,23 @@ onMounted(async () => {
     }
 });
 
-// 一键添加至列表
-function addToList(url, type) {
-    EventsEmit('addToList', url, type);
+// 一键添加创建的收藏夹
+function addCreated(collect) {
+    EventsEmit('addToList', 'favlist', favlistURL(collect.id, 'ftype=create'));
+}
+
+// 一键添加收藏的内容，attr 为 0 时是视频合集
+function addCollected(collect) {
+    if (collect.attr == 0) {
+        EventsEmit('addToList', 'season', favlistURL(collect.id, 'ftype=collect&ctype=21'));
+    } else {
+        EventsEmit('addToList', 'favlist', favlistURL(collect.id, 'ftype=collect&ctype=11'));
+    }
+}
+
+// 拼接与网页端格式一致的收藏夹链接
+function favlistURL(fid, query) {
+    return 'https://space.bilibili.com/' + user_collect.value.user_mid + '/favlist?fid=' + fid + '&' + query;
 }
 
 // 获取订阅收藏夹列表

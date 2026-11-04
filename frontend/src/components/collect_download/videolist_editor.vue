@@ -74,6 +74,7 @@ import { GetTaskListPage, GetTaskListAll, SetTaskDeleteState, UpdateTaskMeta, Sa
 import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
 import { call } from '../../utils/call'
+import { flow } from '../../state'
 
 const videoList = ref([])
 
@@ -95,36 +96,24 @@ const CardStatus = reactive({
     finished: false,
 })
 
-const props = defineProps(['parms', 'status'])
-const emit = defineEmits(['update:parms', 'update:status', 'refresh'])
-const parms = computed({
-    get() {
-        return props.parms
-    },
-    set(parms) {
-        emit('update:parms', parms)
-    }
-})
-
-const status = computed({
-    get() {
-        return props.status
-    },
-    set(status) {
-        emit('update:status', status)
-    }
-})
 
 onMounted(() => {
     load() // Initial load
 })
 
-EventsOn('refreshVideoList', () => {
+// 重新从第一页加载列表
+function reload() {
     TaskList.index = 0
     TaskList.tasks = []
     CardStatus.finished = false
     load();
+}
+
+// 进入列表编辑页或后端导入列表后刷新
+watch(() => flow.pageIndex, (index) => {
+    if (index === 1) reload()
 })
+EventsOn('refreshVideoList', reload)
 
 
 // 另存列表

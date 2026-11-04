@@ -6,109 +6,91 @@
                     <var-icon name="upload" />
                     导入列表
                 </var-button>
-                <var-button type="danger" icon-container @click="() => {
-                Dialog('清除当前任务列表').then(result => {
-                    if (result === 'confirm') {
-                        ResetDownloadList().then(() => {
-                            emit('updateBadge');
-                            Snackbar.success('清除成功');
-                        });
-                    }
-                });
-            }">
+                <var-button type="danger" icon-container @click="resetList">
                     <var-icon name="delete" />
                     清除列表
                 </var-button>
             </var-space>
         </template>
 
-        <var-radio-group v-model="QueryType" @change="queryInfornation">
-            <var-radio :checked-value="0">收藏夹</var-radio>
-            <var-radio :checked-value="1">视频合集</var-radio>
-            <var-radio :checked-value="2">视频链接</var-radio>
-            <var-radio :checked-value="3">AUID</var-radio>
-            <var-radio :checked-value="4">用户空间</var-radio>
+        <var-radio-group v-model="sourceKey">
+            <var-radio v-for="item in sources" :key="item.key" :checked-value="item.key">{{ item.label }}</var-radio>
         </var-radio-group>
 
-        <var-input :placeholder="inputTip" v-model="input" clearable
-        class="mb-6" >
+        <var-input :placeholder="source.placeholder" v-model="input" clearable class="mb-6">
             <template #prepend-icon>
                 <var-icon name="magnify" />
             </template>
         </var-input>
         <!-- TODO: 一键粘贴剪切板 -->
-
-
     </FramePage>
-    <var-collapse-transition :expand="CardStatus.InfoCard" class="mb-8">
+
+    <var-collapse-transition :expand="showResult" class="mb-8">
         <AdditionCard title="查询结果">
             <div class="flex justify-center">
-                <img :src="resp.cover" class="w-[250px] h-[156px] rounded-lg">
+                <img :src="result.cover" class="w-[250px] h-[156px] rounded-lg">
                 <div class="ml-5 flex flex-col">
-                    <text class="text-lg font-bold">{{ resp.title }}</text>
+                    <text class="text-lg font-bold">{{ result.title }}</text>
                     <br>
-                    <var-chip type="primary" class="mt-1.5">视频数量：{{ resp.count }}</var-chip>
-                    <!-- <br> -->
-                    <var-chip type="primary" class="mt-1.5">创建人：{{ resp.up_name }}</var-chip>
+                    <var-chip type="primary" class="mt-1.5">视频数量：{{ result.count }}</var-chip>
+                    <var-chip type="primary" class="mt-1.5">创建人：{{ result.up_name }}</var-chip>
                 </div>
             </div>
 
-            <div></div>
-
             <var-space justify="flex-end">
-                <var-button type="primary" @click="openRightPanel">添加至列表</var-button>
+                <var-button type="primary" @click="openPanel">添加至列表</var-button>
             </var-space>
         </AdditionCard>
     </var-collapse-transition>
 
-    <var-popup position="right" v-model:show="CardStatus.RightPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
+    <var-popup position="right" v-model:show="showPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
         <div class="p-6">
             <h3>添加选项</h3>
             <var-cell> 下载全部
                 <template #extra>
-                    <var-switch v-model="CardStatus.DownloadAll" @click="parms.options.downCount = 0" variant :disabled="!CardStatus.EnableDownloadAll" />
+                    <var-switch v-model="options.downloadAll" variant :disabled="!source.ranged" />
                 </template>
             </var-cell>
 
             <var-cell> 起始位置
                 <template #extra>
-                    <var-counter :min="1" :max="resp.count" v-model="parms.options.downOffset"/>
+                    <var-counter :min="1" :max="result.count" v-model="options.offset" />
                 </template>
             </var-cell>
 
             <var-cell> 下载数量
                 <template #extra>
-                    <var-counter :min="0" :max="resp.count" v-model="parms.options.downCount" :disabled="CardStatus.DownloadAll"/>
+                    <var-counter :min="0" :max="result.count" v-model="options.count" :disabled="options.downloadAll" />
                 </template>
             </var-cell>
 
             <var-cell> 下载分集
                 <template #extra>
-                    <var-switch v-model="parms.options.downPart" variant />
+                    <var-switch v-model="options.part" variant />
                 </template>
             </var-cell>
-            
+
             <h3>元数据选项</h3>
             <var-cell> 歌曲名称
                 <template #extra>
-                    <var-switch v-model="parms.options.songName" @click.stop variant />
+                    <var-switch v-model="options.meta.song_name" @click.stop variant />
                 </template>
             </var-cell>
 
             <var-cell> 歌曲封面
                 <template #extra>
-                    <var-switch v-model="parms.options.songCover" @click.stop variant />
+                    <var-switch v-model="options.meta.song_cover" @click.stop variant />
                 </template>
             </var-cell>
 
             <var-cell> 歌曲作者
                 <template #extra>
-                    <var-switch v-model="parms.options.songAuthor" @click.stop variant />
+                    <var-switch v-model="options.meta.song_author" @click.stop variant />
                 </template>
             </var-cell>
             <br>
             <var-space class="absolute right-5 bottom-5">
-                <var-button type="primary" :loading="CardStatus.ConfirmBtnLoadig" loading-type="wave" @click="addItToList">确定添加</var-button>
+                <var-button type="primary" :loading="adding" loading-type="wave" @click="addToList">确定添加</var-button>
             </var-space>
         </div>
     </var-popup>
@@ -132,301 +114,172 @@ import {
     ResetDownloadList,
     ImportVideoList
 } from '../../../wailsjs/go/wails_api/WailsApi'
-import { EventsOn, EventsEmit } from '../../../wailsjs/runtime'
-import {Dialog, Snackbar} from '@varlet/ui'
+import { EventsOn } from '../../../wailsjs/runtime'
+import { Dialog, Snackbar } from '@varlet/ui'
 import { call } from '../../utils/call'
+import { refreshListCount } from '../../state'
 
-const props = defineProps(['parms', 'status'])
-const emit = defineEmits(['update:parms', 'update:status', 'updateBadge'])
+// matchID 用正则匹配输入，成功时用 build 生成 ID 对象，失败返回 null
+function matchID(text, regex, build) {
+    const match = text.match(regex)
+    return match ? build(match) : null
+}
 
-const inputTip = ref("请输入 收藏夹网页 URL")
-const input = ref("")
-const QueryType = ref(0)
-const addItToList = ref(null)
-
-// 本页卡片状态
-const CardStatus = reactive({
-    InfoCard: false,
-    InfoVCount: false,
-    InfoVUpper: false,
-    RightPanel: false,
-    DownloadAll: true,
-    EnableDownloadAll: true,
-    ConfirmBtnLoadig: false
-})
-
-const parms = computed({
-    get() {
-        return props.parms
+// 可添加的来源：parse 从输入解析 ID，query 查询信息，add 添加到列表；ranged 表示支持起始位置和数量
+const sources = [
+    {
+        key: 'favlist',
+        label: '收藏夹',
+        placeholder: '请输入 收藏夹网页 URL',
+        ranged: true,
+        parse: (text) => matchID(text, /fid=(\d+)/, (m) => ({ fid: m[1] })),
+        query: (id) => QueryCollection(id.fid),
+        add: (id, o) => AddCollectionToList(id.fid, o.offset, o.count, o.part, o.meta),
     },
-    set(parms) {
-        emit('update:parms', parms)
-    }
-})
-
-const status = computed({
-    get() {
-        return props.status
+    {
+        key: 'season',
+        label: '视频合集',
+        placeholder: '请输入 视频合集网页 URL',
+        ranged: true,
+        parse: (text) => matchID(text, /space\.bilibili\.com\/(\d+)\/favlist\?fid=(\d+)&/, (m) => ({ mid: Number(m[1]), sid: Number(m[2]) })),
+        query: (id) => QueryCompilation(id.mid, id.sid),
+        add: (id, o) => AddCompilationToList(id.mid, id.sid, o.offset, o.count, o.part, o.meta),
     },
-    set(status) {
-        emit('update:status', status)
-    }
-})
+    {
+        key: 'video',
+        label: '视频链接',
+        placeholder: '请输入 网页端视频分享链接',
+        ranged: false,
+        parse: (text) => matchID(text, /BV\w+/, (m) => ({ bvid: m[0] })),
+        query: (id) => QueryVideo(id.bvid),
+        add: (id, o) => AddVideoToList(id.bvid, o.part, o.meta),
+    },
+    {
+        key: 'audio',
+        label: 'AUID',
+        placeholder: '请输入 AUID',
+        ranged: false,
+        parse: (text) => matchID(text, /^au(\d+)$/, (m) => ({ auid: m[1] })),
+        query: (id) => QueryAudio(id.auid),
+        add: (id, o) => AddAudioToList(id.auid, o.meta),
+    },
+    {
+        key: 'space',
+        label: '用户空间',
+        placeholder: '请输入 用户空间 URL',
+        ranged: true,
+        parse: (text) => matchID(text, /space\.bilibili\.com\/(\d+)/, (m) => ({ mid: m[1] })),
+        query: (id) => QueryProfileVideo(id.mid),
+        add: (id, o) => AddProfileVideoToList(Number(id.mid), o.offset, o.count, o.part, o.meta),
+    },
+]
 
-// 查询函数返回值
-const resp = reactive({
-    bvid: "",
-    fid: 0,
-    mid: 0,
-    title: "",
-    cover: "",
+const sourceKey = ref('favlist')
+const source = computed(() => sources.find((item) => item.key === sourceKey.value))
+const input = ref('')
+
+// 最近一次查询成功的 ID 和结果
+const target = ref(null)
+const result = reactive({ title: '', cover: '', count: 0, up_name: '' })
+const showResult = ref(false)
+
+// 添加面板的选项
+const showPanel = ref(false)
+const adding = ref(false)
+const options = reactive({
+    downloadAll: true,
+    offset: 1,
     count: 0,
-    up_name: "",
+    part: true,
+    meta: { song_name: true, song_cover: true, song_author: true },
 })
 
-// 输入的 ID 变化时查询歌曲信息
-watch(input, () => {
-    queryInfornation();
+// 来源或输入变化时重新查询
+watch([sourceKey, input], query)
+
+// 个人空间页面的一键添加
+EventsOn('addToList', (kind, url) => {
+    sourceKey.value = kind
+    input.value = url
+    openPanel()
 })
 
-// 一键添加事件
-EventsOn('addToList', (url, type) => {
-    QueryType.value = type === 0 ? 1 : 0;
-    input.value = url;
-    openRightPanel();
-})
-
-// 查询信息函数
-function queryInfornation() {
-
-    switch(QueryType.value) {
-        case 0: // collect
-            inputTip.value = '请输入 收藏夹网页 URL'
-            break;
-        case 1: // compilation
-            inputTip.value = '请输入 视频合集网页 URL'
-            break;
-        case 2: // video
-            inputTip.value = '请输入 网页端视频分享链接'
-            break;
-        case 3: // audio
-            inputTip.value = '请输入 AUID'
-            break;
-        case 4: // profile
-            inputTip.value = '请输入 用户空间 URL'
-        break;
+// 解析输入并查询信息，只采用最后一次查询的结果
+let querySeq = 0
+async function query() {
+    const seq = ++querySeq
+    showResult.value = false
+    target.value = null
+    if (input.value === '') {
+        return
     }
 
-    if (input.value === "") {
-        // 空输入判断
-        CardStatus.InfoCard = false;
-        return;
+    const current = source.value
+    const id = current.parse(input.value)
+    if (id == null) {
+        Snackbar.warning('链接匹配失败')
+        return
     }
-    switch(QueryType.value) {
-        case 0: // Collection
-            const fid = extractCollect(input.value);
-            if (fid == null) {
-                CardStatus.InfoCard = false;
-                Snackbar.warning("链接匹配失败");
-                return;
-            }
-            showQuery(QueryCollection(fid), () => {
-                resp.fid = fid;
-            });
-            break;
-        case 1: // Compilation
-            const resultId = extractCompilation(input.value);
-            if (resultId == null) {
-                CardStatus.InfoCard = false;
-                Snackbar.warning("链接匹配失败");
-                return;
-            }
-            
-            showQuery(QueryCompilation(Number(resultId.mid), Number(resultId.fid)), () => {
-                resp.fid = Number(resultId.fid);
-                resp.mid = Number(resultId.mid);
-            });
-            break;
-        case 2: // Video
-            const bvid = extractBvid(input.value);
-            if (bvid == null) {
-                CardStatus.InfoCard = false;
-                Snackbar.warning("链接匹配失败");
-                return;
-            }
-            showQuery(QueryVideo(bvid), () => {
-                resp.bvid = bvid;
-            });
-            break;
 
-        case 3:
-            const auid = extractAuid(input.value);
-            if (auid == null) {
-                CardStatus.InfoCard = false;
-                Snackbar.warning("链接匹配失败");
-                return;
-            }
-            showQuery(QueryAudio(auid), () => {
-                resp.bvid = auid;
-            });
-            break;
-        
-        case 4:
-            const mid = extractMid(input.value);
-            if (mid == null) {
-                CardStatus.InfoCard = false;
-                Snackbar.warning("链接匹配失败");
-                return;
-            }
-            showQuery(QueryProfileVideo(mid), () => {
-                resp.bvid = mid;
-            });
-            break;
+    const { ok, data } = await call(current.query(id), '查询失败')
+    if (!ok || seq !== querySeq) {
+        return
     }
+    Object.assign(result, data)
+    target.value = { source: current, id }
+    showResult.value = true
 }
 
-function openRightPanel() {
-    CardStatus.DownloadAll = true;
-    props.parms.options.downPart = true;
-    CardStatus.EnableDownloadAll = true;
-
-    switch (QueryType.value) {
-        case 0: // Collection
-            addItToList.value = () => {
-                runAdd(AddCollectionToList(resp.fid, props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart, metaOption()));
-            }
-            break;
-    
-        case 1: // Compilation
-            addItToList.value = () => {
-                runAdd(AddCompilationToList(Number(resp.mid), Number(resp.fid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart, metaOption()));
-            }
-            break;
-
-        case 2: // Video
-            CardStatus.EnableDownloadAll = false;
-            addItToList.value = () => {
-                runAdd(AddVideoToList(resp.bvid, props.parms.options.downPart, metaOption()));
-            }
-            break;
-
-        case 3: //Audio
-            CardStatus.EnableDownloadAll = false;
-            addItToList.value = () => {
-                runAdd(AddAudioToList(resp.bvid, metaOption()));
-            }
-            break;
-
-        case 4: //Profile
-            addItToList.value = () => {
-                runAdd(AddProfileVideoToList(Number(resp.bvid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart, metaOption()));
-            }
-            break;
-    }
-    CardStatus.RightPanel = true;
+function openPanel() {
+    options.downloadAll = true
+    options.part = true
+    showPanel.value = true
 }
 
-// 展示查询结果，成功后执行 onSuccess 记录 ID
-async function showQuery(promise, onSuccess) {
-    const { ok, data } = await call(promise, "查询失败");
+// 按面板选项添加到列表
+async function addToList() {
+    if (target.value == null) {
+        Snackbar.warning('请等待查询完成')
+        return
+    }
+
+    adding.value = true
+    const { ok } = await call(target.value.source.add(target.value.id, {
+        offset: options.offset || 1,
+        count: options.downloadAll ? 0 : options.count,
+        part: options.part,
+        meta: { ...options.meta },
+    }), '添加失败')
+    adding.value = false
     if (!ok) {
-        CardStatus.InfoCard = false;
-        return;
+        return
     }
-    resp.title = data.title;
-    resp.cover = data.cover;
-    resp.count = data.count;
-    resp.up_name = data.up_name;
-    onSuccess();
-    CardStatus.InfoCard = true;
-}
 
-// 当前面板中的元数据写入选项
-function metaOption() {
-    return {
-        song_name: props.parms.options.songName,
-        song_cover: props.parms.options.songCover,
-        song_author: props.parms.options.songAuthor,
-    };
-}
-
-// 执行添加并更新面板状态
-async function runAdd(promise) {
-    CardStatus.ConfirmBtnLoadig = true;
-    const { ok } = await call(promise, "添加失败");
-    CardStatus.ConfirmBtnLoadig = false;
-    if (!ok) {
-        return;
-    }
-    Snackbar.success("添加完成");
-    CardStatus.RightPanel = false;
-    input.value = "";
-    props.parms.options.downCount = 0;
-    emit('updateBadge');
+    Snackbar.success('添加完成')
+    showPanel.value = false
+    input.value = ''
+    options.count = 0
+    refreshListCount()
 }
 
 // 导入列表
 async function importList() {
-    const { ok } = await call(ImportVideoList(), "导入失败");
+    const { ok } = await call(ImportVideoList(), '导入失败')
     if (ok) {
-        Snackbar.success("导入成功");
-        emit('updateBadge');
+        Snackbar.success('导入成功')
+        refreshListCount()
     }
 }
 
-// 过滤视频分享链接
-function extractBvid(url) {
-    const regex = /BV\w+/;
-    const match = url.match(regex);
-
-    if (match) {
-        return match[0];
-    } else {
-        return null;
+// 确认后清除任务列表
+async function resetList() {
+    if (await Dialog('清除当前任务列表') !== 'confirm') {
+        return
+    }
+    const { ok } = await call(ResetDownloadList(), '清除失败')
+    if (ok) {
+        Snackbar.success('清除成功')
+        refreshListCount()
     }
 }
-
-// 过滤收藏夹链接
-function extractCollect(url) {
-    const regex = /fid=(\d+)/;
-    const match = url.match(regex);
-
-    if (match) {
-        return match[1];
-    } else {
-        return null;
-    }
-}
-
-// 过滤视频合集链接
-function extractCompilation(url) {
-    const regex = /space\.bilibili\.com\/(\d+)\/favlist\?fid=(\d+)&/;
-    const match = url.match(regex);
-
-    if (match) {
-        return {
-            mid: match[1],
-            fid: match[2]
-        };
-    } else {
-        return null;
-    }
-}
-
-// 过滤AUID
-function extractAuid(auid) {
-    const match = auid.match(/^au(\d+)$/);
-    return match ? match[1] : null;
-}
-
-// 过滤用户空间 MID
-function extractMid(url) {
-    const regex = /space\.bilibili\.com\/(\d+)/;
-    const match = url.match(regex);
-    if (match) {
-        return match[1]; // 返回匹配到的数字部分
-    }
-    return null; // 如果没有匹配到，返回 null
-}
-
 </script>

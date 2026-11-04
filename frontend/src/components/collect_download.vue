@@ -1,23 +1,23 @@
 <template>
-    <var-tabs-items v-model:active="parms.pageIndex">
+    <var-tabs-items v-model:active="flow.pageIndex">
         <var-tab-item>
-            <AddVideos v-model:parms="parms" v-model:status="status" @updateBadge="updateBadge" />
+            <AddVideos />
         </var-tab-item>
 
         <var-tab-item>
-            <VideolistEditor v-model:parms="parms" v-model:status="status" @refresh="updateBadge" />
+            <VideolistEditor />
         </var-tab-item>
 
         <var-tab-item>
-            <DownloadProcess v-model:parms="parms" v-model:status="status" />
+            <DownloadProcess />
         </var-tab-item>
     </var-tabs-items>
 
     <footer class="fixed bottom-2.5 right-2.5 w-[calc(100%-20px)]" :style="{bottom: scrollTop + 'px'}">
         <var-space justify="space-between">
-            <var-button type="primary" size="large" @click="parms.pageIndex--" :disabled="!status.allowBack" v-show="status.showBack">< 上一步</var-button>
-            <var-badge type="danger" position="left-top" :value="parms.listCount" :hidden="!status.showBadge">
-                <var-button type="primary" size="large" @click="nextButton" :disabled="!status.allowNext" v-show="status.showNext">下一步 ></var-button>
+            <var-button type="primary" size="large" @click="flow.pageIndex--" :disabled="!nav.allowBack" v-show="nav.showBack">< 上一步</var-button>
+            <var-badge type="danger" position="left-top" :value="flow.listCount" :hidden="!nav.showBadge">
+                <var-button type="primary" size="large" @click="next" :disabled="!nav.allowNext">下一步 ></var-button>
             </var-badge>
         </var-space>
     </footer>
@@ -27,116 +27,41 @@
 import AddVideos from '../components/collect_download/add_videos.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
-import { ref, reactive, watch, onMounted } from 'vue'
-import { GetListCount } from '../../wailsjs/go/wails_api/WailsApi'
-import { Dialog, Snackbar } from '@varlet/ui'
-import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
-// 页面索引值
-const pageIndex = ref(0)
+import { ref, computed, watch, onMounted } from 'vue'
+import { flow, refreshListCount } from '../state'
+
 // 底部翻页按钮距离
 const scrollTop = ref(10)
 
-const nextButton = ref(() => {
-    parms.pageIndex++
+// 按当前页面和任务数量计算翻页按钮状态
+const nav = computed(() => {
+    const hasTasks = flow.listCount > 0
+    switch (flow.pageIndex) {
+        case 0:
+            return { showBack: false, allowBack: false, allowNext: hasTasks, showBadge: hasTasks }
+        case 1:
+            return { showBack: true, allowBack: true, allowNext: hasTasks, showBadge: hasTasks }
+        default:
+            return { showBack: true, allowBack: flow.download === 'idle', allowNext: flow.download === 'done', showBadge: false }
+    }
 })
 
-// 收藏夹信息
-const parms = reactive({
-    pageIndex: 0,
-    listCount: 0,
-    // 下载设置
-    options: reactive({
-        downCount: 0,
-        downPart: true,
-        songName: true,
-        songCover: true,
-        songAuthor: true,
-    })
-})
+// 下载完成后的下一步重新加载页面回到首页
+function next() {
+    if (flow.pageIndex >= 2) {
+        window.location.reload()
+        return
+    }
+    flow.pageIndex++
+}
 
-// 页面翻页按钮状态
-const status = reactive({
-    showBack: false,
-    allowBack: true,
-    showNext: true,
-    allowNext: false,
-    showBadge: false,
-})
+watch(() => flow.pageIndex, refreshListCount)
 
 // 调节底部导航按钮位置
 onMounted(() => {
-    var scrollableElement = document.getElementById('scroll-box');
-
-    scrollableElement.addEventListener('scroll', function(e) {
-        scrollTop.value = 10 - e.target.scrollTop;
-    });
-
+    refreshListCount()
+    document.getElementById('scroll-box').addEventListener('scroll', (e) => {
+        scrollTop.value = 10 - e.target.scrollTop
+    })
 })
-
-watch(parms, (newValue) => {
-    if (newValue.listCount <= 0) {
-        status.allowNext = false;
-    } else {
-        status.allowNext =  true;
-    }
-});
-
-// 导航按钮控制
-watch(parms, (newPageIndex) => {
-    status.showBack = true;
-    status.showNext = true;
-    status.allowBack = true;
-    status.allowNext = true;
-    status.showBadge = false;
-
-    nextButton.value = () => {
-        parms.pageIndex++
-    };
-    // 添加视频
-    if (newPageIndex.pageIndex === 0) {
-        status.allowNext = false;
-        updateBadge();
-    }
-    // 列表编辑页面
-    if (newPageIndex.pageIndex === 1) {
-        nextButton.value = () => {
-            // Dialog('清理删除项并下一步？').then(result => {
-            //     if (result == 'confirm') {
-            //         // TidyVideoList(parms.videoListPath);
-            //         parms.pageIndex++;
-            //     }
-            //
-            //     return;
-            // });
-            parms.pageIndex++;
-        };
-        EventsEmit('refreshVideoList');
-        updateBadge();
-    }
-    // 下载页面
-    if (newPageIndex.pageIndex == 2) {
-        status.allowNext = false
-        // status.allowBack = false
-    }
-    // 回到首页
-    if (newPageIndex.pageIndex > 2) {
-        pageIndex.value = 0;
-        window.location.reload();
-    }
-})
-
-// 更新列表数量显示
-function updateBadge() {
-    GetListCount(parms.videoListPath).then(result => {
-        // badgeValue.value = result;
-        parms.listCount = result;
-        if (parms.listCount <= 0) {
-            status.showBadge = false;
-            status.allowNext = false;
-        } else {
-            status.showBadge = true;
-            status.allowNext = true;
-        }
-    });
-}
 </script>
