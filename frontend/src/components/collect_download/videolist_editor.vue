@@ -6,37 +6,20 @@
     </FramePage>
     <AdditionCard>
         <var-list :finished="list.finished" :loading="list.loading" @load="load" :immediate-check="false">
-            <li v-for="(task, index) in list.tasks" :key="task.Index" class="list-none">
-                <var-card :title="task.SongName" :src="task.CoverUrl" layout="row" image-width="250px" outlines v-if="!task.IsDelete" class="mb-5">
-                    <template #description>
-                        <var-divider />
-                        <div class="mx-2.5">
-                            <var-chip plain type="info" class="mb-1.5">歌曲名称：{{ task.SongName }}</var-chip>
-                            <var-chip plain type="info" class="mb-[30px]">歌曲作者：{{ task.SongAuthor }}</var-chip>
-                        </div>
+            <li v-for="(task, index) in list.tasks" :key="task.Index" class="list-none mb-4">
+                <MediaCard
+                    :title="task.SongName"
+                    :cover="task.CoverUrl"
+                    :items="[{ label: '歌曲名称', value: task.SongName }, { label: '歌曲作者', value: task.SongAuthor }]"
+                    :muted-label="task.IsDelete ? '已删除' : ''"
+                >
+                    <template #actions>
+                        <var-button round :type="task.IsDelete ? 'success' : 'danger'" @click="toggleDelete(index)">
+                            <var-icon :name="task.IsDelete ? 'history' : 'delete'" />
+                        </var-button>
+                        <var-button type="primary" :disabled="task.IsDelete" @click="openPanel(index)">编辑</var-button>
                     </template>
-
-                    <template #extra>
-                        <div class="flex items-center">
-                            <var-button type="danger" size="large" round @click="toggleDelete(index)" class="mr-2.5"> <var-icon name="delete" /> </var-button>
-                            <var-button type="primary" @click="openPanel(index)">编辑</var-button>
-                        </div>
-                    </template>
-                </var-card>
-
-                <var-card :title="task.SongName" outlines class="mb-5 h-[187px]" v-else>
-                    <template #description>
-                        <div class="flex justify-center">
-                            <h3>已设为删除</h3>
-                        </div>
-                    </template>
-                    <template #extra>
-                        <div class="flex items-center">
-                            <var-button type="success" @click="toggleDelete(index)" class="mr-2.5"> <var-icon name="history" />  恢复 </var-button>
-                            <var-button type="primary" disabled>编辑</var-button>
-                        </div>
-                    </template>
-                </var-card>
+                </MediaCard>
             </li>
             <template #finished>
                 <div class="py-5 text-center text-[#888]">已经到底了</div>
@@ -61,6 +44,7 @@
 <script setup lang="ts">
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
+import MediaCard from '../modules/media_card.vue'
 import { reactive, watch, onMounted } from 'vue'
 import { GetTaskListPage, SetTaskDeleteState, UpdateTaskMeta, ExportVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { task } from '../../../wailsjs/go/models'

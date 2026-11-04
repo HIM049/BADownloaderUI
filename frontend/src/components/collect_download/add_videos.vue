@@ -27,19 +27,15 @@
 
     <var-collapse-transition :expand="showResult" class="mb-8">
         <AdditionCard title="查询结果">
-            <div class="flex justify-center">
-                <img :src="result.cover" class="w-[250px] h-[156px] rounded-lg">
-                <div class="ml-5 flex flex-col">
-                    <span class="text-lg font-bold">{{ result.title }}</span>
-                    <br>
-                    <var-chip type="primary" class="mt-1.5">视频数量：{{ result.count }}</var-chip>
-                    <var-chip type="primary" class="mt-1.5">创建人：{{ result.up_name }}</var-chip>
-                </div>
-            </div>
-
-            <var-space justify="flex-end">
-                <var-button type="primary" @click="openPanel">添加至列表</var-button>
-            </var-space>
+            <MediaCard
+                :title="result.title"
+                :cover="result.cover"
+                :items="[{ label: '视频数量', value: result.count }, { label: '创建人', value: result.up_name }]"
+            >
+                <template #actions>
+                    <var-button type="primary" @click="openPanel">添加至列表</var-button>
+                </template>
+            </MediaCard>
         </AdditionCard>
     </var-collapse-transition>
 
@@ -99,6 +95,7 @@
 <script setup lang="ts">
 import FramePage from '../modules/frame_page.vue'
 import AdditionCard from '../modules/addition_card.vue'
+import MediaCard from '../modules/media_card.vue'
 import { reactive, computed, ref, watch } from 'vue'
 import {
     QueryVideo,

@@ -23,7 +23,9 @@
 
     <AdditionCard title="收藏和订阅" v-if="isLogin && loaded.favorites">
         <FolderList :folders="favorites.List" @add="addCollected" />
-        <var-pagination v-model:current="favPage" :total="favorites.count" :size="pageSize" :show-size-changer="false" class="mt-4" />
+        <var-paper class="surface-container mt-4 !py-2.5 flex justify-center">
+            <var-pagination v-model:current="favPage" :total="favorites.count" :size="pageSize" :show-size-changer="false" :simple="false" />
+        </var-paper>
     </AdditionCard>
 </template>
 
