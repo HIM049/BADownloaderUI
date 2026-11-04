@@ -13,7 +13,7 @@
                     <UserSpace/>
                 </var-tab-item>
 
-                <var-tab-item id="scroll-box">
+                <var-tab-item>
                     <CollectDownload/>
                 </var-tab-item>
 
@@ -37,15 +37,3 @@ import { ref } from 'vue'
 const activePage = ref(1)
 
 </script>
-
-<style>
-/* 修复 input 刷新后不显示提示文字 */
-.var-input label {
-    max-width: none;
-}
-
-/* 页面滚动 */
-.var-swipe-item {
-    overflow: auto;
-}
-</style>

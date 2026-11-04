@@ -30,7 +30,7 @@
             <div class="flex justify-center">
                 <img :src="result.cover" class="w-[250px] h-[156px] rounded-lg">
                 <div class="ml-5 flex flex-col">
-                    <text class="text-lg font-bold">{{ result.title }}</text>
+                    <span class="text-lg font-bold">{{ result.title }}</span>
                     <br>
                     <var-chip type="primary" class="mt-1.5">视频数量：{{ result.count }}</var-chip>
                     <var-chip type="primary" class="mt-1.5">创建人：{{ result.up_name }}</var-chip>
@@ -43,7 +43,7 @@
         </AdditionCard>
     </var-collapse-transition>
 
-    <var-popup position="right" v-model:show="showPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
+    <var-popup position="right" v-model:show="showPanel" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="side-panel">
         <div class="p-6">
             <h3>添加选项</h3>
             <var-cell> 下载全部

@@ -1,37 +1,37 @@
 <template>
-    <var-tabs-items v-model:active="flow.pageIndex">
-        <var-tab-item>
-            <AddVideos />
-        </var-tab-item>
+    <!-- 分页带 transform，fixed 会失效，用 sticky 让导航停在滚动区域底部 -->
+    <div class="flex flex-col min-h-full">
+        <var-tabs-items v-model:active="flow.pageIndex" class="grow">
+            <var-tab-item>
+                <AddVideos />
+            </var-tab-item>
 
-        <var-tab-item>
-            <VideolistEditor />
-        </var-tab-item>
+            <var-tab-item>
+                <VideolistEditor />
+            </var-tab-item>
 
-        <var-tab-item>
-            <DownloadProcess />
-        </var-tab-item>
-    </var-tabs-items>
+            <var-tab-item>
+                <DownloadProcess />
+            </var-tab-item>
+        </var-tabs-items>
 
-    <footer class="fixed bottom-2.5 right-2.5 w-[calc(100%-20px)]" :style="{bottom: scrollTop + 'px'}">
-        <var-space justify="space-between">
-            <var-button type="primary" size="large" @click="flow.pageIndex--" :disabled="!nav.allowBack" v-show="nav.showBack">< 上一步</var-button>
-            <var-badge type="danger" position="left-top" :value="flow.listCount" :hidden="!nav.showBadge">
-                <var-button type="primary" size="large" @click="next" :disabled="!nav.allowNext">下一步 ></var-button>
-            </var-badge>
-        </var-space>
-    </footer>
+        <footer class="sticky bottom-2.5 mx-2.5 mb-2.5">
+            <var-space justify="space-between">
+                <var-button type="primary" size="large" @click="flow.pageIndex--" :disabled="!nav.allowBack" v-show="nav.showBack">< 上一步</var-button>
+                <var-badge type="danger" position="left-top" :value="flow.listCount" :hidden="!nav.showBadge">
+                    <var-button type="primary" size="large" @click="next" :disabled="!nav.allowNext">下一步 ></var-button>
+                </var-badge>
+            </var-space>
+        </footer>
+    </div>
 </template>
 
 <script setup lang="ts">
 import AddVideos from '../components/collect_download/add_videos.vue'
 import VideolistEditor from '../components/collect_download/videolist_editor.vue'
 import DownloadProcess from '../components/collect_download/download_process.vue'
-import { ref, computed, watch, onMounted } from 'vue'
+import { computed, watch, onMounted } from 'vue'
 import { flow, refreshListCount } from '../state'
-
-// 底部翻页按钮距离
-const scrollTop = ref(10)
 
 // 按当前页面和任务数量计算翻页按钮状态
 const nav = computed(() => {
@@ -57,11 +57,5 @@ function next() {
 
 watch(() => flow.pageIndex, refreshListCount)
 
-// 调节底部导航按钮位置
-onMounted(() => {
-    refreshListCount()
-    document.getElementById('scroll-box')?.addEventListener('scroll', (e) => {
-        scrollTop.value = 10 - (e.target as HTMLElement).scrollTop
-    })
-})
+onMounted(refreshListCount)
 </script>

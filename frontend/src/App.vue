@@ -35,10 +35,3 @@ onMounted(() => {
 });
 
 </script>
-
-<style>
-div.var-paper {
-    padding: 20px;
-    border-radius: 20px;
-}
-</style>

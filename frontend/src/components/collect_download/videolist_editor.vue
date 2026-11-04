@@ -44,7 +44,7 @@
         </var-list>
     </AdditionCard>
 
-    <var-popup position="right" v-model:show="panel.show" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="!h-[75%] !absolute !right-[35px] !bottom-[35px] !rounded-lg !top-auto">
+    <var-popup position="right" v-model:show="panel.show" :overlay-style="{backgroundColor: 'rgba(0, 0, 0, 0.2)'}" class="side-panel">
         <div class="p-6 w-[280px]">
             <h3>元数据编辑</h3>
             <div>

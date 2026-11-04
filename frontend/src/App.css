@@ -5,3 +5,43 @@ html,
 #root {
     font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
+
+body {
+    margin: 10px;
+    background-color: var(--page-background);
+    --tabs-background: #fff0;
+}
+
+div.var-paper {
+    padding: 20px;
+    border-radius: 20px;
+}
+
+/* 修复 input 刷新后不显示提示文字 */
+.var-input label {
+    max-width: none;
+}
+
+/* 分页内容各自滚动，隐藏滚动条 */
+.var-swipe-item {
+    overflow: auto;
+}
+
+.var-swipe-item::-webkit-scrollbar {
+    display: none;
+}
+
+/* 主题容器色背景 */
+.var-paper.surface-container {
+    background-color: var(--color-primary-container);
+}
+
+/* 从右下角弹出的侧边面板 */
+.side-panel {
+    position: absolute !important;
+    top: auto !important;
+    right: 35px !important;
+    bottom: 35px !important;
+    height: 75% !important;
+    border-radius: 0.5rem !important;
+}

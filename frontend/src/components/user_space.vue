@@ -1,56 +1,36 @@
 <template>
     <FramePage title="个人空间">
-        <var-space class="items-center" justify="center" v-if="!showLoginWindow && !is_login">
+        <var-space class="items-center" justify="center" v-if="!showLogin && !isLogin">
             你还没有登录
             <var-button type="primary" @click="login">登录</var-button>
         </var-space>
-        <var-collapse-transition :expand="showLoginWindow">
-            <var-paper style="background-color: var(--color-primary-container);">
+        <var-collapse-transition :expand="showLogin">
+            <var-paper class="surface-container">
                 <h3>扫码登录</h3>
-                <img class="flex mx-auto rounded-[15px]" :src="qrcodeStr" alt="Image">
+                <img class="flex mx-auto rounded-[15px]" :src="qrcode" alt="Image">
                 <p class="flex justify-center">{{ loginText }}</p>
             </var-paper>
         </var-collapse-transition>
-        <var-space v-if="is_login && CardStatus.LoadUserInf" justify="center">
-            <var-avatar :src="user_Information.avatar" />
-            <p class="text-md font-bold my-3">{{ user_Information.name }}</p>
+        <var-space v-if="isLogin && loaded.account" justify="center">
+            <var-avatar :src="account.avatar" />
+            <p class="text-md font-bold my-3">{{ account.name }}</p>
         </var-space>
     </FramePage>
-    <AdditionCard title="创建的收藏夹" v-if="is_login && CardStatus.LoadUsersCollect">
-        <var-paper style="background-color: var(--color-primary-container);">
-            <div v-for="collect in user_collect.List" :key="collect.id" class="my-1.5 mx-5">
-                <var-space justify="space-between" align="center">
-                    <text class="text-[15px] font-semibold">{{ collect.title }}</text>
-                    <var-button type="primary" @click="addCreated(collect)"><var-icon name="plus" />添加至列表</var-button>
-                </var-space>
-            </div>
-        </var-paper>
+
+    <AdditionCard title="创建的收藏夹" v-if="isLogin && loaded.created">
+        <FolderList :folders="created.List" @add="addCreated" />
     </AdditionCard>
 
-    <AdditionCard title="收藏和订阅" v-if="is_login && CardStatus.LoadFavCollect">
-
-        <var-paper style="background-color: var(--color-primary-container);">
-            <div v-for="collect in user_Favourite.List" :key="collect.id" class="my-1.5 mx-5">
-                <var-space justify="space-between" align="center">
-                    <text class="text-[15px] font-semibold">{{ collect.title }}</text>
-
-                    <var-button type="primary" @click="addCollected(collect)"><var-icon name="plus" />添加至列表</var-button>
-                </var-space>
-            </div>
-        </var-paper>
-
-        <var-space class="flex items-center">
-            <var-button-group type="primary" size="normal" outline>
-                <var-button @click="page_index--">上一页</var-button>
-                <var-button @click="page_index++">下一页</var-button>
-            </var-button-group>
-        </var-space>
+    <AdditionCard title="收藏和订阅" v-if="isLogin && loaded.favorites">
+        <FolderList :folders="favorites.List" @add="addCollected" />
+        <var-pagination v-model:current="favPage" :total="favorites.count" :size="pageSize" :show-size-changer="false" class="mt-4" />
     </AdditionCard>
 </template>
 
 <script setup lang="ts">
 import FramePage from '../components/modules/frame_page.vue'
 import AdditionCard from './modules/addition_card.vue'
+import FolderList from './modules/folder_list.vue'
 import { ref, reactive, onMounted, watch } from 'vue'
 import { LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf, LoginBilibili } from '../../wailsjs/go/wails_api/WailsApi'
 import { biliapi, wails_api } from '../../wailsjs/go/models'
@@ -58,113 +38,106 @@ import { onEvent, emitEvent } from '../events'
 import { Snackbar } from '@varlet/ui'
 import { call } from '../utils/call'
 
-const loginText = ref("请扫描二维码登录") // 登录时的提示字符
-const qrcodeStr = ref('') // 二维码图片
-const showLoginWindow = ref(false) // 展示登录窗口
-const is_login = ref(false) // 登录状态
-const page_index = ref(1) // 订阅的收藏夹的页码
+// 与后端 GetFavCollect 的每页数量一致
+const pageSize = 20
 
-const user_collect = ref(new wails_api.FolderList({ List: [] })); // 用户创建的收藏夹列表
-const user_Favourite = ref(new wails_api.FolderList({ List: [] })); // 用户订阅的收藏夹列表
-const user_Information = ref(new wails_api.AccountInfo()); // 用户信息
-const fav_count = ref(0);
+const loginText = ref('请扫描二维码登录') // 登录时的提示文字
+const qrcode = ref('') // 二维码图片
+const showLogin = ref(false) // 展示登录窗口
+const isLogin = ref(false) // 登录状态
+const favPage = ref(1) // 订阅的收藏夹的页码
 
-const CardStatus = reactive({
-    LoadUsersCollect: false,
-    LoadFavCollect: false,
-    LoadUserInf: false,
+const created = ref(new wails_api.FolderList({ List: [] })) // 用户创建的收藏夹列表
+const favorites = ref(new wails_api.FolderList({ List: [] })) // 用户订阅的收藏夹列表
+const account = ref(new wails_api.AccountInfo()) // 用户信息
+
+// 各卡片的数据是否已加载
+const loaded = reactive({
+    created: false,
+    favorites: false,
+    account: false,
 })
 
 onMounted(async () => {
-    await checkLogin();
-    if (!is_login.value) {
-        return;
+    await checkLogin()
+    if (!isLogin.value) {
+        return
     }
-    const collect = await call(GetUsersCollect(), "获取收藏夹失败");
+    const collect = await call(GetUsersCollect(), '获取收藏夹失败')
     if (collect.ok) {
-        user_collect.value = collect.data;
-        CardStatus.LoadUsersCollect = true;
+        created.value = collect.data
+        loaded.created = true
     }
-    getFavCollect();
-    const user = await call(GetUserInf(), "获取用户信息失败");
+    getFavCollect()
+    const user = await call(GetUserInf(), '获取用户信息失败')
     if (user.ok) {
-        user_Information.value = user.data;
-        CardStatus.LoadUserInf = true;
+        account.value = user.data
+        loaded.account = true
     }
-});
+})
 
 // 一键添加创建的收藏夹
-function addCreated(collect: biliapi.FavFolder) {
-    emitEvent('addToList', 'favlist', favlistURL(collect.id, 'ftype=create'));
+function addCreated(folder: biliapi.FavFolder) {
+    emitEvent('addToList', 'favlist', favlistURL(folder.id, 'ftype=create'))
 }
 
 // 一键添加收藏的内容，attr 为 0 时是视频合集
-function addCollected(collect: biliapi.FavFolder) {
-    if (collect.attr == 0) {
-        emitEvent('addToList', 'season', favlistURL(collect.id, 'ftype=collect&ctype=21'));
+function addCollected(folder: biliapi.FavFolder) {
+    if (folder.attr == 0) {
+        emitEvent('addToList', 'season', favlistURL(folder.id, 'ftype=collect&ctype=21'))
     } else {
-        emitEvent('addToList', 'favlist', favlistURL(collect.id, 'ftype=collect&ctype=11'));
+        emitEvent('addToList', 'favlist', favlistURL(folder.id, 'ftype=collect&ctype=11'))
     }
 }
 
 // 拼接与网页端格式一致的收藏夹链接
 function favlistURL(fid: number, query: string) {
-    return 'https://space.bilibili.com/' + user_collect.value.user_mid + '/favlist?fid=' + fid + '&' + query;
+    return 'https://space.bilibili.com/' + created.value.user_mid + '/favlist?fid=' + fid + '&' + query
 }
 
-// 获取订阅收藏夹列表
+// 获取当前页的订阅收藏夹
 async function getFavCollect() {
-    const { ok, data } = await call(GetFavCollect(page_index.value), "获取收藏夹失败");
+    const { ok, data } = await call(GetFavCollect(favPage.value), '获取收藏夹失败')
     if (ok) {
-        user_Favourite.value = data;
-        fav_count.value = data.count;
-        CardStatus.LoadFavCollect = true;
+        favorites.value = data
+        loaded.favorites = true
     }
 }
 
-// 订阅的收藏夹翻页
-watch(page_index, (newValue) => {
-    if (newValue <= 0) {
-        page_index.value = 1;
-    } else if (newValue > fav_count.value / 20 + 1) {
-        page_index.value = Math.floor(fav_count.value / 20 + 1);
-    }
-    getFavCollect();
-
-})
+watch(favPage, getFavCollect)
 
 // 获取二维码事件
-onEvent("qrcodeStr", (qr) => {
-    qrcodeStr.value = "data:image/png;base64," + qr;
+onEvent('qrcodeStr', (qr) => {
+    qrcode.value = 'data:image/png;base64,' + qr
 })
 
 // 登录状态事件
-onEvent("loginStatus", (status) => {
-    if (status == "登录成功") {
-        Snackbar.success("登录成功");
-        checkLogin();
+onEvent('loginStatus', (status) => {
+    if (status == '登录成功') {
+        Snackbar.success('登录成功')
+        checkLogin()
         setTimeout(() => {
-            window.location.reload();
-        }, 1000);
+            window.location.reload()
+        }, 1000)
     }
-    if (status == "二维码已失效") {
-        Snackbar.warning("二维码已失效");
-        showLoginWindow.value = false;
+    if (status == '二维码已失效') {
+        Snackbar.warning('二维码已失效')
+        showLogin.value = false
     }
-    loginText.value = status;
+    loginText.value = status
 })
 
 // 检查登录状态
 async function checkLogin() {
-    const result = await LoadConfig();
-    is_login.value = result.account.is_login;
+    const result = await LoadConfig()
+    isLogin.value = result.account.is_login
 }
 
 // 登录账户
 function login() {
     LoginBilibili().then(() => {
-        showLoginWindow.value = false;
+        showLogin.value = false
     })
-    showLoginWindow.value = true;
+    showLogin.value = true
 }
 </script>

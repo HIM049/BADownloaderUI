@@ -1,34 +1,19 @@
 <template>
-    <SettingCell :title="props.title">
-        <var-switch v-model="parms" variant @change="handleChange" />
+    <SettingCell :title="title">
+        <var-switch v-model="value" variant @change="handleChange" />
     </SettingCell>
 </template>
 
 <script setup lang="ts">
-import SettingCell from "./setting_cell.vue"
-import { computed, nextTick } from 'vue'
+import SettingCell from './setting_cell.vue'
+import { nextTick } from 'vue'
 
-const props = defineProps<{
-    title?: string
-    parms?: boolean
-    onchange?: () => void
-}>()
+defineProps<{ title?: string }>()
+const value = defineModel<boolean>()
+const emit = defineEmits<{ change: [] }>()
 
-const emit = defineEmits(['update:parms'])
-
-const parms = computed({
-    get() {
-        return props.parms
-    },
-    set(parms) {
-        emit('update:parms', parms)
-    }
-})
-
-// var-switch 先触发 change 再更新值，等值更新后再回调
+// var-switch 先触发 change 再更新值，等值更新后再发出 change
 function handleChange() {
-    nextTick(() => props.onchange?.())
+    nextTick(() => emit('change'))
 }
-
 </script>
-

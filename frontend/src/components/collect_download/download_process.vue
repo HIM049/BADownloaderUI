@@ -20,7 +20,7 @@
         <var-result 
             title="下载完成"
             description="请点击下一步回到主页"
-            v-show="flow.download === 'done'"
+            v-if="flow.download === 'done'"
         >
             <template #footer>
                 <var-button @click="OpenDownloadFolader" type="primary">打开下载文件夹</var-button>
