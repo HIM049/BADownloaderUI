@@ -20,6 +20,18 @@ type MetaData struct {
 	LyricsUrl string
 }
 
+// Option 写入哪些元数据
+type Option struct {
+	SongName   bool `json:"song_name"`
+	SongCover  bool `json:"song_cover"`
+	SongAuthor bool `json:"song_author"`
+}
+
+// DefaultOption 返回全部写入的选项
+func DefaultOption() Option {
+	return Option{SongName: true, SongCover: true, SongAuthor: true}
+}
+
 // Task 一个下载任务，视频分 P 或音频
 type Task struct {
 	Kind     Kind
@@ -29,6 +41,7 @@ type Task struct {
 	CoverURL string
 	Sessdata string
 	Meta     MetaData
+	Option   Option
 	Deleted  bool
 }
 
@@ -46,6 +59,9 @@ type TaskInfo struct {
 	Auid     string   `json:"auid,omitempty"`
 	Sessdata string   `json:"sessdata,omitempty"`
 	MetaData MetaData `json:"meta_data,omitempty"`
+
+	// MetaOption 缺省时按全部写入处理
+	MetaOption *Option `json:"meta_option,omitempty"`
 }
 
 // cacheID 返回任务在缓存文件名中使用的标识
@@ -58,6 +74,7 @@ func (t *Task) cacheID() string {
 
 // info 生成任务信息
 func (t *Task) info(index int) TaskInfo {
+	option := t.Option
 	return TaskInfo{
 		Index:      index,
 		SongName:   t.Meta.SongName,
@@ -70,6 +87,7 @@ func (t *Task) info(index int) TaskInfo {
 		Auid:       t.Auid,
 		Sessdata:   t.Sessdata,
 		MetaData:   t.Meta,
+		MetaOption: &option,
 	}
 }
 
@@ -81,6 +99,10 @@ func fromInfo(info TaskInfo, sessdata string) (*Task, bool) {
 	if info.Sessdata != "" {
 		sessdata = info.Sessdata
 	}
+	option := DefaultOption()
+	if info.MetaOption != nil {
+		option = *info.MetaOption
+	}
 	return &Task{
 		Kind:     info.Type,
 		Bvid:     info.Bvid,
@@ -89,6 +111,7 @@ func fromInfo(info TaskInfo, sessdata string) (*Task, bool) {
 		CoverURL: info.CoverUrl,
 		Sessdata: sessdata,
 		Meta:     info.MetaData,
+		Option:   option,
 		Deleted:  info.IsDelete,
 	}, true
 }

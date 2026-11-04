@@ -89,7 +89,7 @@ export namespace config {
 	    theme: string;
 	    download_config: DownloadConfig;
 	    file_config: FileConfig;
-	    Account: Account;
+	    account: Account;
 	
 	    static createFrom(source: any = {}) {
 	        return new Config(source);
@@ -102,7 +102,7 @@ export namespace config {
 	        this.theme = source["theme"];
 	        this.download_config = this.convertValues(source["download_config"], DownloadConfig);
 	        this.file_config = this.convertValues(source["file_config"], FileConfig);
-	        this.Account = this.convertValues(source["Account"], Account);
+	        this.account = this.convertValues(source["account"], Account);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -151,6 +151,22 @@ export namespace task {
 	        this.LyricsUrl = source["LyricsUrl"];
 	    }
 	}
+	export class Option {
+	    song_name: boolean;
+	    song_cover: boolean;
+	    song_author: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Option(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.song_name = source["song_name"];
+	        this.song_cover = source["song_cover"];
+	        this.song_author = source["song_author"];
+	    }
+	}
 	export class TaskInfo {
 	    Index: number;
 	    SongName: string;
@@ -163,6 +179,7 @@ export namespace task {
 	    auid?: string;
 	    sessdata?: string;
 	    meta_data?: MetaData;
+	    meta_option?: Option;
 	
 	    static createFrom(source: any = {}) {
 	        return new TaskInfo(source);
@@ -181,6 +198,7 @@ export namespace task {
 	        this.auid = source["auid"];
 	        this.sessdata = source["sessdata"];
 	        this.meta_data = this.convertValues(source["meta_data"], MetaData);
+	        this.meta_option = this.convertValues(source["meta_option"], Option);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -220,115 +238,6 @@ export namespace wails_api {
 	        this.name = source["name"];
 	    }
 	}
-	export class MediaMeta {
-	    title: string;
-	    cover: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new MediaMeta(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.title = source["title"];
-	        this.cover = source["cover"];
-	    }
-	}
-	export class AudioInfo {
-	    Meta: MediaMeta;
-	    // Go type: struct { Author string "json:\"author\"" }
-	    Up: any;
-	
-	    static createFrom(source: any = {}) {
-	        return new AudioInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Meta = this.convertValues(source["Meta"], MediaMeta);
-	        this.Up = this.convertValues(source["Up"], Object);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class CompilationInfo {
-	    // Go type: struct { Meta struct { Name string "json:\"name\""; Cover string "json:\"cover\""; Total int "json:\"total\"" } "json:\"Meta\"" }
-	    Data: any;
-	
-	    static createFrom(source: any = {}) {
-	        return new CompilationInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Data = this.convertValues(source["Data"], Object);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class FavListInfo {
-	    // Go type: struct { Info struct { Title string "json:\"title\""; Cover string "json:\"cover\""; MediaCount int "json:\"media_count\""; Upper struct { Name string "json:\"name\""; Face string "json:\"face\"" } "json:\"Upper\"" } "json:\"Info\"" }
-	    Data: any;
-	
-	    static createFrom(source: any = {}) {
-	        return new FavListInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Data = this.convertValues(source["Data"], Object);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
 	export class FolderList {
 	    user_mid: number;
 	    count: number;
@@ -363,39 +272,23 @@ export namespace wails_api {
 		    return a;
 		}
 	}
-	
-	export class VideoInfo {
-	    Meta: MediaMeta;
-	    // Go type: struct { Name string "json:\"name\""; Avatar string "json:\"avatar\"" }
-	    Up: any;
+	export class QueryResult {
+	    title: string;
+	    cover: string;
+	    count: number;
+	    up_name: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new VideoInfo(source);
+	        return new QueryResult(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Meta = this.convertValues(source["Meta"], MediaMeta);
-	        this.Up = this.convertValues(source["Up"], Object);
+	        this.title = source["title"];
+	        this.cover = source["cover"];
+	        this.count = source["count"];
+	        this.up_name = source["up_name"];
 	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
 	}
 
 }

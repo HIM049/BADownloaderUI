@@ -33,26 +33,17 @@ func (w *WailsApi) OpenFileDialog() (string, error) {
 	return path, nil
 }
 
-func (w *WailsApi) SetDownloadPathDialog() {
-
-	option := wails.OpenDialogOptions{
+// SetDownloadPathDialog 选择并保存下载路径，取消选择时不做修改
+func (w *WailsApi) SetDownloadPathDialog() error {
+	path, err := wails.OpenDirectoryDialog(w.ctx, wails.OpenDialogOptions{
 		DefaultDirectory: "./",
-		DefaultFilename:  "",
 		Title:            "选择下载路径",
+	})
+	if err != nil || path == "" {
+		return err
 	}
-
-	path, err := wails.OpenDirectoryDialog(w.ctx, option)
-	if err != nil {
-		wails.EventsEmit(w.ctx, "error", "错误："+err.Error())
-	}
-
-	if path != "" {
-		config.Cfg.FileConfig.DownloadPath = path
-		err = config.Cfg.UpdateAndSave()
-		if err != nil {
-			wails.EventsEmit(w.ctx, "error", "错误："+err.Error())
-		}
-	}
+	config.Cfg.FileConfig.DownloadPath = path
+	return config.Cfg.UpdateAndSave()
 }
 
 // 打开下载文件夹

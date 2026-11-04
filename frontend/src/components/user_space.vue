@@ -59,6 +59,7 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { LoadConfig, GetUsersCollect, GetFavCollect, GetUserInf, LoginBilibili } from '../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn, EventsEmit } from '../../wailsjs/runtime'
 import { Snackbar } from '@varlet/ui'
+import { call } from '../utils/call'
 
 const loginText = ref("请扫描二维码登录") // 登录时的提示字符
 const qrcodeStr = ref(null) // 二维码图片
@@ -77,18 +78,21 @@ const CardStatus = reactive({
     LoadUserInf: false,
 })
 
-onMounted(() => {
-    checkLogin();
-    if (is_login) {
-        GetUsersCollect().then(result => {
-            user_collect.value = result;
-            CardStatus.LoadUsersCollect = true;
-        })
-        getFavCollect();
-        GetUserInf().then(result => {
-            user_Information.value = result;
-            CardStatus.LoadUserInf = true;
-        })
+onMounted(async () => {
+    await checkLogin();
+    if (!is_login.value) {
+        return;
+    }
+    const collect = await call(GetUsersCollect(), "获取收藏夹失败");
+    if (collect.ok) {
+        user_collect.value = collect.data;
+        CardStatus.LoadUsersCollect = true;
+    }
+    getFavCollect();
+    const user = await call(GetUserInf(), "获取用户信息失败");
+    if (user.ok) {
+        user_Information.value = user.data;
+        CardStatus.LoadUserInf = true;
     }
 });
 
@@ -98,12 +102,13 @@ function addToList(url, type) {
 }
 
 // 获取订阅收藏夹列表
-function getFavCollect() {
-    GetFavCollect(page_index.value).then(result => {
-        user_Favourite.value = result;
-        fav_count.value = result.count;
+async function getFavCollect() {
+    const { ok, data } = await call(GetFavCollect(page_index.value), "获取收藏夹失败");
+    if (ok) {
+        user_Favourite.value = data;
+        fav_count.value = data.count;
         CardStatus.LoadFavCollect = true;
-    })
+    }
 }
 
 // 订阅的收藏夹翻页
@@ -139,10 +144,9 @@ EventsOn("loginStatus", (status) => {
 })
 
 // 检查登录状态
-function checkLogin() {
-    LoadConfig().then(result => {
-        is_login.value = result.Account.is_login
-    })
+async function checkLogin() {
+    const result = await LoadConfig();
+    is_login.value = result.account.is_login;
 }
 
 // 登录账户

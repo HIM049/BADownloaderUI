@@ -2,18 +2,11 @@ package wails_api
 
 import (
 	"bili-audio-downloader/backend/config"
-
-	wails "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // ResetConfig 重置设置文件
-func (w *WailsApi) ResetConfig() {
-	cfg := config.DefaultConfig()
-	err := cfg.UpdateAndSave()
-	if err != nil {
-		wails.LogErrorf(w.ctx, "写入设置文件失败：%s", err)
-		wails.EventsEmit(w.ctx, "error", "写入设置时出错:"+err.Error())
-	}
+func (w *WailsApi) ResetConfig() error {
+	return config.DefaultConfig().UpdateAndSave()
 }
 
 // LoadConfig 读取设置
@@ -22,18 +15,11 @@ func (w *WailsApi) LoadConfig() config.Config {
 }
 
 // SaveConfig 写入设置
-func (w *WailsApi) SaveConfig(cfg config.Config) {
-	err := cfg.UpdateAndSave()
-	if err != nil {
-		wails.LogErrorf(w.ctx, "写入设置文件失败：%s", err)
-		wails.EventsEmit(w.ctx, "error", "写入设置时出错:"+err.Error())
-	}
+func (w *WailsApi) SaveConfig(cfg config.Config) error {
+	return cfg.UpdateAndSave()
 }
 
 // RefreshConfig 刷新设置
 func (w *WailsApi) RefreshConfig() error {
-	if err := config.LoadConfig(w.ctx); err != nil {
-		return err
-	}
-	return nil
+	return config.LoadConfig(w.ctx)
 }

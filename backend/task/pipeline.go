@@ -23,6 +23,12 @@ type Settings struct {
 	Convert    bool
 }
 
+// Progress downloadFinish 事件携带的任务信息
+type Progress struct {
+	Index int    `json:"index"`
+	Title string `json:"title"`
+}
+
 // Run 并发处理列表中的任务，每个任务结束（含已删除）时发出 downloadFinish 事件
 func (l *List) Run(ctx context.Context, s Settings) {
 	sem := make(chan struct{}, s.Threads+1)
@@ -30,8 +36,9 @@ func (l *List) Run(ctx context.Context, s Settings) {
 
 	wails.LogPrintf(ctx, "start list download process")
 	for i, t := range l.tasks {
+		progress := Progress{Index: i, Title: t.Meta.SongName}
 		if t.Deleted {
-			wails.EventsEmit(ctx, "downloadFinish", i)
+			wails.EventsEmit(ctx, "downloadFinish", progress)
 			continue
 		}
 
@@ -41,7 +48,7 @@ func (l *List) Run(ctx context.Context, s Settings) {
 			defer func() {
 				<-sem
 				wg.Done()
-				wails.EventsEmit(ctx, "downloadFinish", i)
+				wails.EventsEmit(ctx, "downloadFinish", progress)
 			}()
 
 			if err := t.process(i, s); err != nil {
@@ -52,7 +59,7 @@ func (l *List) Run(ctx context.Context, s Settings) {
 	wg.Wait()
 }
 
-// process 下载流和封面，按需转码，写入元数据并导出
+// process 下载流和封面，按需转码，按选项写入元数据并导出
 func (t *Task) process(index int, s Settings) error {
 	name := fmt.Sprintf("%d_%s", index, t.cacheID())
 	streamPath := filepath.Join(s.CacheDir, "audio", name)
@@ -71,6 +78,9 @@ func (t *Task) process(index int, s Settings) error {
 	}()
 	go func() {
 		defer wg.Done()
+		if !t.Option.SongCover {
+			return
+		}
 		coverErr = retry(s.RetryCount, func() error {
 			return biliapi.Download(t.CoverURL, coverPath)
 		})
@@ -89,8 +99,19 @@ func (t *Task) process(index int, s Settings) error {
 		current, format = converted, constants.AudioType.Mp3
 	}
 
+	// 元数据步骤同时把 DASH 流封装为目标格式，选项全部关闭时也要执行
+	var songName, author string
+	if t.Option.SongName {
+		songName = t.Meta.SongName
+	}
+	if t.Option.SongAuthor {
+		author = t.Meta.Author
+	}
+	if !t.Option.SongCover {
+		coverPath = ""
+	}
 	tagged := streamPath + "_meta" + format
-	if err := ffmpeg.WriteMetadata(current, tagged, coverPath, t.Meta.SongName, t.Meta.Author, format); err != nil {
+	if err := ffmpeg.WriteMetadata(current, tagged, coverPath, songName, author, format); err != nil {
 		return fmt.Errorf("write metadata: %w", err)
 	}
 

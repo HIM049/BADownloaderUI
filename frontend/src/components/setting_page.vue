@@ -19,9 +19,9 @@
             <var-paper ripple class="mb-4" style="background-color: var(--color-primary-container);">
                 <var-collapse v-model="CardStatus.configClass1" :offset="true" elevation="0">
                     <var-collapse-item title="账号使用" name="1" class="font-bold text-lg bg-transparent!">
-                        <CellSwitch title="获取内容时使用账号" v-model:parms="config.Account.use_account" :onchange="setUseAccount"></CellSwitch>
+                        <CellSwitch title="获取内容时使用账号" v-model:parms="config.account.use_account" :onchange="setUseAccount"></CellSwitch>
                         <SettingCell title="清除保存的账号信息">
-                            <var-button type="danger" @click="logoutAccount" :disabled="!config.Account.is_login">退出登录</var-button>
+                            <var-button type="danger" @click="logoutAccount" :disabled="!config.account.is_login">退出登录</var-button>
                         </SettingCell>
                     </var-collapse-item>
                 </var-collapse>
@@ -91,6 +91,7 @@ import { LoadConfig, SaveConfig, ResetConfig, RefreshConfig, SetDownloadPathDial
 import { config as ConfigModels } from '../../wailsjs/go/models'
 
 import { Dialog, Snackbar } from '@varlet/ui'
+import { call } from '../utils/call'
 
 const allowSave = ref(false) // Whether saving is allowed (avoids initial load triggers)
 const overload = ref(false) // Whether page is loaded
@@ -117,10 +118,11 @@ onMounted(() => {
 // 设置内容
 const config = ref(new ConfigModels.Config())
 
-function setDownloadPathDialog() {
-    SetDownloadPathDialog().then(() => {    
+async function setDownloadPathDialog() {
+    const { ok } = await call(SetDownloadPathDialog(), "设置下载路径失败");
+    if (ok) {
         loadConfig();
-    })
+    }
 }
 
 // 读取配置文件
@@ -142,23 +144,25 @@ function handleSave() {
 // 保存配置文件
 function saveConfig() {
     setTimeout(function () {
-        SaveConfig(config.value).then(() => {
-            Snackbar.success("保存成功");
+        call(SaveConfig(config.value), "保存失败").then(({ ok }) => {
+            if (ok) Snackbar.success("保存成功");
         })
     },100);
 }
 
 // 重置配置文件
-function resetConfig() {
-    ResetConfig().then(() => {
+async function resetConfig() {
+    const { ok } = await call(ResetConfig(), "重置失败");
+    if (ok) {
         loadConfig();
-    })
-    Snackbar.success("已重置配置文件");
+        Snackbar.success("已重置配置文件");
+    }
 }
 
 // 切换主题
 function setTheme() {
-    SaveConfig(config.value).then(() => {
+    call(SaveConfig(config.value), "保存失败").then(({ ok }) => {
+        if (!ok) return;
         Dialog('立即重新加载主题？').then(result => {
             if (result === 'confirm') {
                 loadConfig();
@@ -174,13 +178,13 @@ function setTheme() {
 function logoutAccount() {
     Dialog('要退出登录吗？').then(result => {
         if (result === 'confirm') {
-            config.value.Account.is_login = false;
-            config.value.Account.use_account = false;
-            config.value.Account.sessdata = "";
-            config.value.Account.bili_jct = "";
-            config.value.Account.dede_user_id = "";
-            config.value.Account.dede_user_id__ck_md5 = "";
-            config.value.Account.sid = "";
+            config.value.account.is_login = false;
+            config.value.account.use_account = false;
+            config.value.account.sessdata = "";
+            config.value.account.bili_jct = "";
+            config.value.account.dede_user_id = "";
+            config.value.account.dede_user_id__ck_md5 = "";
+            config.value.account.sid = "";
             saveConfig();
             setTimeout(() => {
                 Snackbar.success("已退出登录");
@@ -197,10 +201,10 @@ function logoutAccount() {
 function setUseAccount() {
     setTimeout(() => {
             
-        if (config.value.Account.is_login) {
+        if (config.value.account.is_login) {
             saveConfig();
         } else {
-            config.value.Account.use_account = false;
+            config.value.account.use_account = false;
             Snackbar.warning("您暂未登录");
         }
     }, 0);

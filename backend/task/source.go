@@ -11,7 +11,7 @@ import (
 const pageSize = 20
 
 // AddVideo 向列表中添加一个视频，downloadCompilation 为真时添加全部分 P
-func (l *List) AddVideo(sessdata, bvid string, downloadCompilation bool) error {
+func (l *List) AddVideo(sessdata, bvid string, downloadCompilation bool, option Option) error {
 	view, err := biliapi.GetVideoView(bvid, sessdata)
 	if err != nil {
 		return err
@@ -44,6 +44,7 @@ func (l *List) AddVideo(sessdata, bvid string, downloadCompilation bool) error {
 			Cid:      view.Pages[i].Cid,
 			CoverURL: view.Pic,
 			Sessdata: sessdata,
+			Option:   option,
 			Meta: MetaData{
 				Title:     title,
 				PageTitle: pageTitle,
@@ -57,7 +58,7 @@ func (l *List) AddVideo(sessdata, bvid string, downloadCompilation bool) error {
 }
 
 // AddAudio 向列表中添加一个音频
-func (l *List) AddAudio(sessdata, auid string) error {
+func (l *List) AddAudio(sessdata, auid string, option Option) error {
 	info, err := biliapi.GetAudioInfo(auid)
 	if err != nil {
 		return err
@@ -69,6 +70,7 @@ func (l *List) AddAudio(sessdata, auid string) error {
 		Auid:     auid,
 		CoverURL: info.Cover,
 		Sessdata: sessdata,
+		Option:   option,
 		Meta: MetaData{
 			Title:     title,
 			PageTitle: title,
@@ -81,7 +83,7 @@ func (l *List) AddAudio(sessdata, auid string) error {
 }
 
 // AddFavList 向列表中添加收藏夹内容，单条添加失败时跳过
-func (l *List) AddFavList(sessdata, favlistId string, offset, count int, downloadCompilation bool) error {
+func (l *List) AddFavList(sessdata, favlistId string, offset, count int, downloadCompilation bool, option Option) error {
 	first, err := biliapi.GetFavList(favlistId, sessdata, 1, 1)
 	if err != nil {
 		return err
@@ -94,16 +96,16 @@ func (l *List) AddFavList(sessdata, favlistId string, offset, count int, downloa
 		},
 		func(media biliapi.FavMedia) {
 			if media.Type == biliapi.FavMediaVideo {
-				_ = l.AddVideo(sessdata, media.Bvid, downloadCompilation)
+				_ = l.AddVideo(sessdata, media.Bvid, downloadCompilation, option)
 			} else {
-				_ = l.AddAudio(sessdata, strconv.Itoa(media.ID))
+				_ = l.AddAudio(sessdata, strconv.Itoa(media.ID), option)
 			}
 		},
 	)
 }
 
 // AddSeason 向列表中添加视频合集内容，单条添加失败时跳过
-func (l *List) AddSeason(sessdata string, mid, sid, offset, count int, downloadCompilation bool) error {
+func (l *List) AddSeason(sessdata string, mid, sid, offset, count int, downloadCompilation bool, option Option) error {
 	first, err := biliapi.GetSeasonArchives(mid, sid, 1, 1)
 	if err != nil {
 		return err
@@ -119,13 +121,13 @@ func (l *List) AddSeason(sessdata string, mid, sid, offset, count int, downloadC
 			return bvids, err
 		},
 		func(bvid string) {
-			_ = l.AddVideo(sessdata, bvid, downloadCompilation)
+			_ = l.AddVideo(sessdata, bvid, downloadCompilation, option)
 		},
 	)
 }
 
 // AddSpaceVideos 向列表中添加用户主页投稿视频，单条添加失败时跳过
-func (l *List) AddSpaceVideos(sessdata string, mid, offset, count int, downloadCompilation bool) error {
+func (l *List) AddSpaceVideos(sessdata string, mid, offset, count int, downloadCompilation bool, option Option) error {
 	first, err := biliapi.GetSpaceVideos(mid, sessdata, 1, 1)
 	if err != nil {
 		return err
@@ -142,7 +144,7 @@ func (l *List) AddSpaceVideos(sessdata string, mid, offset, count int, downloadC
 		},
 		func(bvid string) {
 			if bvid != "" {
-				_ = l.AddVideo(sessdata, bvid, downloadCompilation)
+				_ = l.AddVideo(sessdata, bvid, downloadCompilation, option)
 			}
 		},
 	)

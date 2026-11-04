@@ -73,6 +73,7 @@ import { reactive, computed, watch, ref, onMounted } from 'vue'
 import { GetTaskListPage, GetTaskListAll, SetTaskDeleteState, UpdateTaskMeta, SaveVideoListTo, ExportVideoList } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn } from '../../../wailsjs/runtime'
 import { Snackbar, LoadingBar, Dialog } from '@varlet/ui'
+import { call } from '../../utils/call'
 
 const videoList = ref([])
 
@@ -127,14 +128,11 @@ EventsOn('refreshVideoList', () => {
 
 
 // 另存列表
-function saveListTo() {
-    ExportVideoList().then(err => {
-        if (err) {
-            Snackbar.error("导出失败: " + err);
-        } else if (err === null) {
-             Snackbar.success("操作完成");
-        }
-    });
+async function saveListTo() {
+    const { ok } = await call(ExportVideoList(), "导出失败");
+    if (ok) {
+        Snackbar.success("操作完成");
+    }
 }
 
 // 修改视频删除状态

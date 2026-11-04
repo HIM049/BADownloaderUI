@@ -134,6 +134,7 @@ import {
 } from '../../../wailsjs/go/wails_api/WailsApi'
 import { EventsOn, EventsEmit } from '../../../wailsjs/runtime'
 import {Dialog, Snackbar} from '@varlet/ui'
+import { call } from '../../utils/call'
 
 const props = defineProps(['parms', 'status'])
 const emit = defineEmits(['update:parms', 'update:status', 'updateBadge'])
@@ -181,7 +182,6 @@ const resp = reactive({
     cover: "",
     count: 0,
     up_name: "",
-    up_avatar: "",
 })
 
 // 输入的 ID 变化时查询歌曲信息
@@ -230,15 +230,8 @@ function queryInfornation() {
                 Snackbar.warning("链接匹配失败");
                 return;
             }
-            QueryCollection(fid).then(result => {
-                resp.title = result.Data.Info.title;
-                resp.cover = result.Data.Info.cover;
-                resp.up_name = result.Data.Info.Upper.name;
-                resp.up_avatar = result.Data.Info.Upper.face;
-                resp.count = result.Data.Info.media_count;
-
+            showQuery(QueryCollection(fid), () => {
                 resp.fid = fid;
-                CardStatus.InfoCard = true;
             });
             break;
         case 1: // Compilation
@@ -249,16 +242,9 @@ function queryInfornation() {
                 return;
             }
             
-            QueryCompilation(Number(resultId.mid), Number(resultId.fid)).then(result => {
-                resp.title = result.Data.Meta.name;
-                resp.cover = result.Data.Meta.cover;
-                resp.up_name = "";
-                resp.up_avatar = "";
-                resp.count = result.Data.Meta.total;
-
+            showQuery(QueryCompilation(Number(resultId.mid), Number(resultId.fid)), () => {
                 resp.fid = Number(resultId.fid);
                 resp.mid = Number(resultId.mid);
-                CardStatus.InfoCard = true;
             });
             break;
         case 2: // Video
@@ -268,15 +254,8 @@ function queryInfornation() {
                 Snackbar.warning("链接匹配失败");
                 return;
             }
-            QueryVideo(bvid).then(result => {
-                resp.title = result.Meta.title;
-                resp.cover = result.Meta.cover;
-                resp.up_name = result.Up.name;
-                resp.up_avatar = result.Up.avatar;
-                resp.count = 1;
-
+            showQuery(QueryVideo(bvid), () => {
                 resp.bvid = bvid;
-                CardStatus.InfoCard = true;
             });
             break;
 
@@ -287,14 +266,8 @@ function queryInfornation() {
                 Snackbar.warning("链接匹配失败");
                 return;
             }
-            QueryAudio(auid).then(result => {
-                resp.title = result.Meta.title;
-                resp.cover = result.Meta.cover;
-                resp.up_name = result.Up.author;
-                resp.count = 1;
-
+            showQuery(QueryAudio(auid), () => {
                 resp.bvid = auid;
-                CardStatus.InfoCard = true;
             });
             break;
         
@@ -305,14 +278,8 @@ function queryInfornation() {
                 Snackbar.warning("链接匹配失败");
                 return;
             }
-            QueryProfileVideo(mid).then(result => {
-                resp.title = "用户个人空间";
-                resp.cover = "";
-                resp.up_name = "";
-                resp.count = result;
-
+            showQuery(QueryProfileVideo(mid), () => {
                 resp.bvid = mid;
-                CardStatus.InfoCard = true;
             });
             break;
     }
@@ -326,73 +293,85 @@ function openRightPanel() {
     switch (QueryType.value) {
         case 0: // Collection
             addItToList.value = () => {
-                CardStatus.ConfirmBtnLoadig = true;
-                AddCollectionToList(parms.value.videoListPath, resp.fid, props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    afterAdd();
-                });
+                runAdd(AddCollectionToList(resp.fid, props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart, metaOption()));
             }
             break;
     
         case 1: // Compilation
             addItToList.value = () => {
-                CardStatus.ConfirmBtnLoadig = true;
-                AddCompilationToList(parms.value.videoListPath, Number(resp.mid), Number(resp.fid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    afterAdd();
-                });
+                runAdd(AddCompilationToList(Number(resp.mid), Number(resp.fid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart, metaOption()));
             }
             break;
 
         case 2: // Video
             CardStatus.EnableDownloadAll = false;
             addItToList.value = () => {
-                CardStatus.ConfirmBtnLoadig = true;
-                AddVideoToList(parms.value.videoListPath, resp.bvid, props.parms.options.downPart).then(()=>{
-                    afterAdd();
-                });
+                runAdd(AddVideoToList(resp.bvid, props.parms.options.downPart, metaOption()));
             }
             break;
 
         case 3: //Audio
             CardStatus.EnableDownloadAll = false;
             addItToList.value = () => {
-                CardStatus.ConfirmBtnLoadig = true;
-                AddAudioToList(parms.value.videoListPath, resp.bvid).then(()=>{
-                    afterAdd();
-                });
+                runAdd(AddAudioToList(resp.bvid, metaOption()));
             }
             break;
 
         case 4: //Profile
             addItToList.value = () => {
-                CardStatus.ConfirmBtnLoadig = true;
-                AddProfileVideoToList(parms.value.videoListPath, Number(resp.bvid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart).then(()=>{
-                    afterAdd();
-                });
+                runAdd(AddProfileVideoToList(Number(resp.bvid), props.parms.options.downOffset || 1, props.parms.options.downCount, props.parms.options.downPart, metaOption()));
             }
             break;
     }
     CardStatus.RightPanel = true;
 }
 
-function afterAdd() {
+// 展示查询结果，成功后执行 onSuccess 记录 ID
+async function showQuery(promise, onSuccess) {
+    const { ok, data } = await call(promise, "查询失败");
+    if (!ok) {
+        CardStatus.InfoCard = false;
+        return;
+    }
+    resp.title = data.title;
+    resp.cover = data.cover;
+    resp.count = data.count;
+    resp.up_name = data.up_name;
+    onSuccess();
+    CardStatus.InfoCard = true;
+}
+
+// 当前面板中的元数据写入选项
+function metaOption() {
+    return {
+        song_name: props.parms.options.songName,
+        song_cover: props.parms.options.songCover,
+        song_author: props.parms.options.songAuthor,
+    };
+}
+
+// 执行添加并更新面板状态
+async function runAdd(promise) {
+    CardStatus.ConfirmBtnLoadig = true;
+    const { ok } = await call(promise, "添加失败");
+    CardStatus.ConfirmBtnLoadig = false;
+    if (!ok) {
+        return;
+    }
     Snackbar.success("添加完成");
     CardStatus.RightPanel = false;
     input.value = "";
     props.parms.options.downCount = 0;
     emit('updateBadge');
-    CardStatus.ConfirmBtnLoadig = false;
 }
 
 // 导入列表
-function importList() {
-    ImportVideoList().then(err => {
-        if (err) {
-            Snackbar.error("导入失败: " + err);
-        } else {
-            Snackbar.success("导入成功");
-            emit('updateBadge');
-        }
-    });
+async function importList() {
+    const { ok } = await call(ImportVideoList(), "导入失败");
+    if (ok) {
+        Snackbar.success("导入成功");
+        emit('updateBadge');
+    }
 }
 
 // 过滤视频分享链接

@@ -29,63 +29,28 @@ func (w *WailsApi) GetTaskListPage(page int) []task.TaskInfo {
 }
 
 // AddVideoToList 添加单个视频
-func (w *WailsApi) AddVideoToList(listPath, bvid string, downloadCompilation bool) error {
-	sessdata := accountSessdata()
-
-	err := w.tasks.AddVideo(sessdata, bvid, downloadCompilation)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (w *WailsApi) AddVideoToList(bvid string, downloadCompilation bool, option task.Option) error {
+	return w.tasks.AddVideo(accountSessdata(), bvid, downloadCompilation, option)
 }
 
 // AddCollectionToList 添加收藏夹内容
-func (w *WailsApi) AddCollectionToList(listPath, fid string, offset, count int, downloadCompilation bool) error {
-	sessdata := accountSessdata()
-
-	err := w.tasks.AddFavList(sessdata, fid, offset, count, downloadCompilation)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (w *WailsApi) AddCollectionToList(fid string, offset, count int, downloadCompilation bool, option task.Option) error {
+	return w.tasks.AddFavList(accountSessdata(), fid, offset, count, downloadCompilation, option)
 }
 
 // AddCompilationToList 添加视频合集
-func (w *WailsApi) AddCompilationToList(listPath string, mid, sid, offset, count int, downloadCompilation bool) error {
-	sessdata := accountSessdata()
-
-	err := w.tasks.AddSeason(sessdata, mid, sid, offset, count, downloadCompilation)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (w *WailsApi) AddCompilationToList(mid, sid, offset, count int, downloadCompilation bool, option task.Option) error {
+	return w.tasks.AddSeason(accountSessdata(), mid, sid, offset, count, downloadCompilation, option)
 }
 
 // AddAudioToList 添加单个音频
-func (w *WailsApi) AddAudioToList(listPath, auid string) error {
-	sessdata := accountSessdata()
-
-	err := w.tasks.AddAudio(sessdata, auid)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (w *WailsApi) AddAudioToList(auid string, option task.Option) error {
+	return w.tasks.AddAudio(accountSessdata(), auid, option)
 }
 
 // AddProfileVideoToList 添加个人主页视频
-func (w *WailsApi) AddProfileVideoToList(listPath string, mid, offset, count int, downloadCompilation bool) error {
-	sessdata := accountSessdata()
-
-	err := w.tasks.AddSpaceVideos(sessdata, mid, offset, count, downloadCompilation)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (w *WailsApi) AddProfileVideoToList(mid, offset, count int, downloadCompilation bool, option task.Option) error {
+	return w.tasks.AddSpaceVideos(accountSessdata(), mid, offset, count, downloadCompilation, option)
 }
 
 // SetTaskDeleteState 设置任务删除状态

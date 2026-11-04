@@ -36,9 +36,14 @@ func WriteMetadata(input, output, coverPath, songName, songAuthor string, format
 	}
 
 	// 元数据字段设置
+	// 为空的字段不写入
+	if songName != "" {
+		args = append(args, "-metadata", "title="+songName)
+	}
+	if songAuthor != "" {
+		args = append(args, "-metadata", "artist="+songAuthor)
+	}
 	metadata := []string{
-		"-metadata", "title=" + songName, // 标题
-		"-metadata", "artist=" + songAuthor, // 艺术家
 		//"-metadata", "album=Album Name", // 专辑名称
 		//"-metadata", "album_artist=Album Artist", // 专辑艺术家
 		//"-metadata", "composer=Composer Name", // 作曲者

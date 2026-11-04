@@ -24,7 +24,7 @@ type Config struct {
 	Theme          string         `json:"theme"`
 	DownloadConfig DownloadConfig `json:"download_config"`
 	FileConfig     FileConfig     `json:"file_config"`
-	Account        Account
+	Account        Account        `json:"account"`
 }
 
 type DownloadConfig struct {

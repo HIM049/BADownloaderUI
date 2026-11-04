@@ -69,11 +69,6 @@ const status = computed({
 function startDownload() {
     status.value.allowBack = false;
     downloading.value = true;
-    var opt = {
-        song_name: parms.value.options.songName,
-        song_cover: parms.value.options.songCover,
-        song_author: parms.value.options.songAuthor,
-    }
     DownloadTaskList().then(() => {
         downloading.value = false;
         status.value.allowNext = true;
@@ -83,9 +78,9 @@ function startDownload() {
 
 
 // 下载完成事件
-EventsOn("downloadFinish", (title) => {
+EventsOn("downloadFinish", (task) => {
     progress.downFinished++;
-    progress.downloadingTitle = title;
+    progress.downloadingTitle = task.title;
     progress.progressPercent = (progress.downFinished / parms.value.listCount) * 100;
 })
 </script>
