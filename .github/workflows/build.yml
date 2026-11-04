@@ -17,7 +17,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23.x'
+          go-version: '1.26.x'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,11 +29,11 @@ jobs:
 
       - name: Build Wails App (macOS)
         if: matrix.os == 'macos-latest'
-        run: wails build -compiler clang -platform darwin/amd64,darwin/arm64
+        run: wails build -platform darwin/amd64,darwin/arm64
 
       - name: Build Wails App (Windows)
         if: matrix.os == 'windows-latest'
-        run: wails build -compiler gcc -platform windows/amd64
+        run: wails build -platform windows/amd64
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
