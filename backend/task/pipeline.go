@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"sync"
+	"text/template"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -17,10 +18,12 @@ import (
 
 // Settings 一次下载使用的配置
 type Settings struct {
-	CacheDir   string
-	RetryCount int
-	Threads    int
-	Convert    bool
+	CacheDir         string
+	DownloadDir      string
+	FileNameTemplate string
+	RetryCount       int
+	Threads          int
+	Convert          bool
 }
 
 // Progress downloadFinish 事件携带的任务信息
@@ -31,6 +34,12 @@ type Progress struct {
 
 // Run 并发处理列表中的任务，每个任务结束（含已删除）时发出 downloadFinish 事件
 func (l *List) Run(ctx context.Context, s Settings) {
+	fileName, err := utils.ParseFileName(s.FileNameTemplate)
+	if err != nil {
+		wails.LogErrorf(ctx, "invalid file name template: %v", err)
+		return
+	}
+
 	sem := make(chan struct{}, s.Threads+1)
 	var wg sync.WaitGroup
 
@@ -51,7 +60,7 @@ func (l *List) Run(ctx context.Context, s Settings) {
 				wails.EventsEmit(ctx, "downloadFinish", progress)
 			}()
 
-			if err := t.process(i, s); err != nil {
+			if err := t.process(i, s, fileName); err != nil {
 				wails.LogErrorf(ctx, "task %d failed: %v", i, err)
 			}
 		}()
@@ -60,7 +69,7 @@ func (l *List) Run(ctx context.Context, s Settings) {
 }
 
 // process 下载流和封面，按需转码，按选项写入元数据并导出
-func (t *Task) process(index int, s Settings) error {
+func (t *Task) process(index int, s Settings, fileName *template.Template) error {
 	name := fmt.Sprintf("%d_%s", index, t.cacheID())
 	streamPath := filepath.Join(s.CacheDir, "audio", name)
 	coverPath := filepath.Join(s.CacheDir, "cover", name+".jpg")
@@ -115,7 +124,8 @@ func (t *Task) process(index int, s Settings) error {
 		return fmt.Errorf("write metadata: %w", err)
 	}
 
-	if err := utils.ExportFile(t.Meta.Title, t.Meta.PageTitle, format, index, tagged); err != nil {
+	// 文件名中的序号从 1 开始
+	if err := utils.ExportFile(fileName, s.DownloadDir, t.Meta.Title, t.Meta.PageTitle, format, index+1, tagged); err != nil {
 		return fmt.Errorf("export: %w", err)
 	}
 	return nil

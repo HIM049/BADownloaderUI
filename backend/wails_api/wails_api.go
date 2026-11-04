@@ -17,10 +17,12 @@ func (w *WailsApi) Startup(ctx context.Context) {
 
 func (w *WailsApi) DownloadTaskList() {
 	w.tasks.Run(w.ctx, task.Settings{
-		CacheDir:   config.Cfg.GetCachePath(),
-		RetryCount: config.Cfg.DownloadConfig.RetryCount,
-		Threads:    config.Cfg.DownloadConfig.DownloadThreads,
-		Convert:    config.Cfg.FileConfig.ConvertFormat,
+		CacheDir:         config.Cfg.GetCachePath(),
+		DownloadDir:      config.Cfg.GetDownloadPath(),
+		FileNameTemplate: config.Cfg.FileConfig.FileNameTemplate,
+		RetryCount:       config.Cfg.DownloadConfig.RetryCount,
+		Threads:          config.Cfg.DownloadConfig.DownloadThreads,
+		Convert:          config.Cfg.FileConfig.ConvertFormat,
 	})
 }
 
